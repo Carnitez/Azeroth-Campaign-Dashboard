@@ -2,6 +2,8 @@
 
 A local-first World of Warcraft campaign tracker for completionists and gold makers.
 
+**Live dashboard:** https://azeroth-campaign-dashboard.vercel.app
+
 ## What it tracks
 
 - Multiple characters, realms, regions, classes, specs, and professions
