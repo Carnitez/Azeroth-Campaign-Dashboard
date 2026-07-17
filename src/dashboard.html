@@ -1,0 +1,665 @@
+<div id="azeroth-command-center">
+  <style>
+    #azeroth-command-center {
+      color: var(--foreground);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    #azeroth-command-center .acc-top,
+    #azeroth-command-center .acc-toolbar,
+    #azeroth-command-center .acc-tabs,
+    #azeroth-command-center .acc-actions,
+    #azeroth-command-center .acc-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+    #azeroth-command-center .acc-top {
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    #azeroth-command-center .acc-identity {
+      display: grid;
+      gap: 0.15rem;
+    }
+    #azeroth-command-center .acc-name {
+      font-size: calc(var(--font-size-base) * 1.55);
+      font-weight: 500;
+    }
+    #azeroth-command-center .acc-toolbar {
+      justify-content: flex-end;
+    }
+    #azeroth-command-center .acc-toolbar .form-label {
+      min-width: 11rem;
+    }
+    #azeroth-command-center .acc-tabs {
+      margin-bottom: 1rem;
+    }
+    #azeroth-command-center .acc-panel[hidden] {
+      display: none;
+    }
+    #azeroth-command-center .acc-section {
+      margin-top: 1.25rem;
+    }
+    #azeroth-command-center .acc-section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+    #azeroth-command-center .acc-section-head h2,
+    #azeroth-command-center .acc-section-head h3 {
+      margin: 0;
+    }
+    #azeroth-command-center .acc-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    #azeroth-command-center .acc-main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.65fr);
+      gap: 1rem;
+      align-items: start;
+    }
+    #azeroth-command-center .acc-stack {
+      display: grid;
+      gap: 1rem;
+    }
+    #azeroth-command-center .acc-goals {
+      display: grid;
+      gap: 0.55rem;
+    }
+    #azeroth-command-center .acc-goal {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      align-items: center;
+    }
+    #azeroth-command-center .acc-goal.done .acc-goal-title {
+      text-decoration: line-through;
+      color: var(--muted-foreground);
+    }
+    #azeroth-command-center .acc-chart {
+      min-height: 190px;
+      position: relative;
+    }
+    #azeroth-command-center .acc-chart svg {
+      display: block;
+      width: 100%;
+      height: 190px;
+      overflow: visible;
+    }
+    #azeroth-command-center .acc-chart .grid-line,
+    #azeroth-command-center .acc-chart .axis-line {
+      stroke: var(--border);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+    #azeroth-command-center .acc-chart .area {
+      fill: var(--viz-series-1);
+      opacity: 0.13;
+    }
+    #azeroth-command-center .acc-chart .line {
+      fill: none;
+      stroke: var(--viz-series-1);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    #azeroth-command-center .acc-chart .dot {
+      fill: var(--background);
+      stroke: var(--viz-series-1);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+    #azeroth-command-center .acc-chart text {
+      fill: var(--muted-foreground);
+      font-size: 11px;
+    }
+    #azeroth-command-center .acc-collection-list {
+      display: grid;
+      gap: 0.85rem;
+    }
+    #azeroth-command-center .acc-collection-row {
+      display: grid;
+      grid-template-columns: minmax(7rem, 0.55fr) minmax(10rem, 1fr) minmax(12rem, 0.8fr);
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #azeroth-command-center .acc-progress-track {
+      height: 0.55rem;
+      background: var(--muted);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    #azeroth-command-center .acc-progress-fill {
+      height: 100%;
+      background: var(--viz-series-1);
+      border-radius: inherit;
+      transition: width 180ms ease;
+    }
+    #azeroth-command-center .acc-two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      align-items: start;
+    }
+    #azeroth-command-center .acc-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    #azeroth-command-center .acc-form-grid .wide {
+      grid-column: 1 / -1;
+    }
+    #azeroth-command-center .acc-empty {
+      color: var(--muted-foreground);
+      padding: 0.75rem 0;
+    }
+    #azeroth-command-center .acc-journal {
+      display: grid;
+      gap: 0.75rem;
+    }
+    #azeroth-command-center .acc-entry {
+      display: grid;
+      grid-template-columns: 7rem minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: start;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+    #azeroth-command-center dialog {
+      color: var(--foreground);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      width: min(34rem, calc(100% - 2rem));
+      max-height: calc(100% - 2rem);
+    }
+    #azeroth-command-center dialog::backdrop {
+      background: color-mix(in srgb, var(--background) 72%, transparent);
+    }
+    #azeroth-command-center dialog form {
+      display: grid;
+      gap: 1rem;
+    }
+    #azeroth-command-center .acc-dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    #azeroth-command-center .acc-dialog-head h2 {
+      margin: 0;
+    }
+    #azeroth-command-center .acc-import {
+      min-height: 8rem;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    #azeroth-command-center .acc-danger-zone {
+      border-top: 1px solid var(--border);
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+    }
+    @media (max-width: 720px) {
+      #azeroth-command-center .acc-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      #azeroth-command-center .acc-main-grid,
+      #azeroth-command-center .acc-two-col {
+        grid-template-columns: 1fr;
+      }
+      #azeroth-command-center .acc-collection-row {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+      }
+    }
+    @media (max-width: 430px) {
+      #azeroth-command-center .acc-stats,
+      #azeroth-command-center .acc-form-grid {
+        grid-template-columns: 1fr;
+      }
+      #azeroth-command-center .acc-entry {
+        grid-template-columns: 1fr auto;
+      }
+      #azeroth-command-center .acc-entry .acc-entry-body {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #azeroth-command-center .acc-progress-fill { transition: none; }
+    }
+  </style>
+
+  <header class="acc-top">
+    <div class="acc-identity" aria-live="polite">
+      <span class="acc-name" id="acc-character-name">Carnitez</span>
+      <span class="text-muted" id="acc-character-meta">Night Elf Druid · Silvermoon EU</span>
+    </div>
+    <div class="acc-toolbar">
+      <label class="form-label">Character
+        <select class="form-select" id="acc-character-select"></select>
+      </label>
+      <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit</button>
+      <button class="btn btn-primary" type="button" id="acc-add-character"><i data-lucide="user-plus" aria-hidden="true"></i> Add character</button>
+    </div>
+  </header>
+
+  <nav class="acc-tabs" aria-label="Dashboard sections">
+    <button class="btn" type="button" data-tab="overview" aria-pressed="true">Overview</button>
+    <button class="btn" type="button" data-tab="collections" aria-pressed="false">Collections</button>
+    <button class="btn" type="button" data-tab="gold" aria-pressed="false">Gold</button>
+    <button class="btn" type="button" data-tab="journal" aria-pressed="false">Journal</button>
+  </nav>
+
+  <main>
+    <section class="acc-panel" id="acc-panel-overview" data-panel="overview">
+      <div class="acc-stats">
+        <div class="card viz-stat"><span class="text-muted">Level</span><span class="viz-stat-value" id="acc-stat-level">1</span><span class="text-small text-muted" id="acc-stat-location">Shadowglen</span></div>
+        <div class="card viz-stat"><span class="text-muted">Liquid gold</span><span class="viz-stat-value" id="acc-stat-gold">0g</span><span class="text-small text-muted" id="acc-stat-gold-change">Fresh start</span></div>
+        <div class="card viz-stat"><span class="text-muted">Time played</span><span class="viz-stat-value" id="acc-stat-played">0m</span><span class="text-small text-muted" id="acc-stat-sessions">No sessions logged</span></div>
+        <div class="card viz-stat"><span class="text-muted">Collection gains</span><span class="viz-stat-value" id="acc-stat-collection">0</span><span class="text-small text-muted">Since baseline</span></div>
+      </div>
+
+      <div class="acc-main-grid acc-section">
+        <div class="acc-stack">
+          <section>
+            <div class="acc-section-head"><h2>Gold journey</h2><span class="text-muted text-small" id="acc-chart-caption">Start logging sessions to draw the journey.</span></div>
+            <div class="acc-chart" id="acc-gold-chart"></div>
+          </section>
+          <section>
+            <div class="acc-section-head"><h2>Active objectives</h2><button class="btn" type="button" id="acc-add-goal"><i data-lucide="plus" aria-hidden="true"></i> Add objective</button></div>
+            <div class="acc-goals" id="acc-goals"></div>
+          </section>
+        </div>
+        <div class="acc-stack">
+          <section class="card">
+            <div class="acc-section-head"><h3>Update progress</h3></div>
+            <form id="acc-quick-update" class="acc-form-grid">
+              <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" required></label>
+              <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" required></label>
+              <label class="form-label wide">Current location<input class="form-control" name="location" type="text" maxlength="80" required></label>
+              <button class="btn btn-primary wide" type="submit">Save progress</button>
+            </form>
+          </section>
+          <section class="card">
+            <div class="acc-section-head"><h3>Log play session</h3></div>
+            <form id="acc-session-form" class="acc-form-grid">
+              <label class="form-label">Minutes<input class="form-control" name="minutes" type="number" min="1" required></label>
+              <label class="form-label">Gold change<input class="form-control" name="goldDelta" type="number" step="0.01" value="0" required></label>
+              <label class="form-label wide">What happened?<textarea class="form-control" name="note" rows="3" maxlength="240" placeholder="Quests, drops, discoveries…"></textarea></label>
+              <button class="btn btn-primary wide" type="submit">Add session</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="acc-panel" id="acc-panel-collections" data-panel="collections" hidden>
+      <div class="acc-section-head"><div><h2>Collection progress</h2><span class="text-muted text-small">Enter the current owned count and your next milestone.</span></div></div>
+      <div class="acc-collection-list" id="acc-collections"></div>
+      <div class="acc-section acc-actions">
+        <button class="btn btn-primary" type="button" id="acc-save-collections">Save collection counts</button>
+        <button class="btn" type="button" id="acc-set-baseline">Set current counts as baseline</button>
+      </div>
+    </section>
+
+    <section class="acc-panel" id="acc-panel-gold" data-panel="gold" hidden>
+      <div class="acc-stats">
+        <div class="card viz-stat"><span class="text-muted">Recorded profit</span><span class="viz-stat-value" id="acc-profit-total">0g</span><span class="text-small text-muted">Revenue minus costs</span></div>
+        <div class="card viz-stat"><span class="text-muted">Active farming time</span><span class="viz-stat-value" id="acc-farm-time">0m</span><span class="text-small text-muted">Ledger activities</span></div>
+        <div class="card viz-stat"><span class="text-muted">Average profit/hour</span><span class="viz-stat-value" id="acc-profit-hour">—</span><span class="text-small text-muted">Measured activities only</span></div>
+        <div class="card viz-stat"><span class="text-muted">Best activity</span><span class="viz-stat-value" id="acc-best-activity">—</span><span class="text-small text-muted" id="acc-best-rate">No data yet</span></div>
+      </div>
+      <div class="acc-two-col acc-section">
+        <section class="card">
+          <div class="acc-section-head"><h2>Add gold activity</h2></div>
+          <form id="acc-ledger-form" class="acc-form-grid">
+            <label class="form-label wide">Activity<input class="form-control" name="activity" maxlength="80" required placeholder="Questing, gathering, auction sales…"></label>
+            <label class="form-label">Minutes<input class="form-control" name="minutes" type="number" min="0" value="0" required></label>
+            <label class="form-label">Revenue (g)<input class="form-control" name="revenue" type="number" min="0" step="0.01" value="0" required></label>
+            <label class="form-label">Costs (g)<input class="form-control" name="cost" type="number" min="0" step="0.01" value="0" required></label>
+            <label class="form-label">Date<input class="form-control" name="date" type="date" required></label>
+            <label class="form-label wide">Notes<textarea class="form-control" name="notes" rows="3" maxlength="240"></textarea></label>
+            <button class="btn btn-primary wide" type="submit">Record activity</button>
+          </form>
+        </section>
+        <section>
+          <div class="acc-section-head"><h2>Activity ledger</h2></div>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead><tr><th>Date</th><th>Activity</th><th class="text-end">Profit</th><th class="text-end">g/hour</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="acc-ledger-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="acc-panel" id="acc-panel-journal" data-panel="journal" hidden>
+      <div class="acc-two-col">
+        <section>
+          <div class="acc-section-head"><h2>Adventure journal</h2></div>
+          <div class="acc-journal" id="acc-journal"></div>
+        </section>
+        <section class="card">
+          <div class="acc-section-head"><h2>Data & backup</h2></div>
+          <p class="text-muted">Everything is stored in this browser. Export a backup occasionally, especially before clearing browser data.</p>
+          <div class="acc-actions">
+            <button class="btn" type="button" id="acc-export"><i data-lucide="download" aria-hidden="true"></i> Export backup</button>
+            <button class="btn" type="button" id="acc-import"><i data-lucide="upload" aria-hidden="true"></i> Import backup</button>
+          </div>
+          <div class="acc-danger-zone">
+            <button class="btn" type="button" id="acc-delete-character"><i data-lucide="trash-2" aria-hidden="true"></i> Delete current character</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="acc-character-dialog">
+    <form method="dialog" id="acc-character-form">
+      <div class="acc-dialog-head"><h2 id="acc-character-dialog-title">Add character</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-character-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="id">
+      <div class="acc-form-grid">
+        <label class="form-label">Name<input class="form-control" name="name" maxlength="24" required></label>
+        <label class="form-label">Realm<input class="form-control" name="realm" maxlength="40" required></label>
+        <label class="form-label">Region<select class="form-select" name="region"><option>EU</option><option>US</option><option>KR</option><option>TW</option></select></label>
+        <label class="form-label">Faction<select class="form-select" name="faction"><option>Alliance</option><option>Horde</option></select></label>
+        <label class="form-label">Race<input class="form-control" name="race" maxlength="40" required></label>
+        <label class="form-label">Class<input class="form-control" name="className" maxlength="40" required></label>
+        <label class="form-label">Spec<input class="form-control" name="spec" maxlength="40"></label>
+        <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" value="1" required></label>
+        <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" value="0" required></label>
+        <label class="form-label">Location<input class="form-control" name="location" maxlength="80"></label>
+        <label class="form-label wide">Professions<input class="form-control" name="professions" maxlength="100" placeholder="Herbalism, Mining"></label>
+      </div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Save character</button><button class="btn" type="button" data-close-dialog="acc-character-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-goal-dialog">
+    <form method="dialog" id="acc-goal-form">
+      <div class="acc-dialog-head"><h2>Add objective</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-goal-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <label class="form-label">Category<select class="form-select" name="type"><option>Current content</option><option>Collection</option><option>Gold</option><option>Personal</option></select></label>
+      <label class="form-label">Objective<input class="form-control" name="title" maxlength="120" required></label>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Add objective</button><button class="btn" type="button" data-close-dialog="acc-goal-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-import-dialog">
+    <form method="dialog" id="acc-import-form">
+      <div class="acc-dialog-head"><h2>Import backup</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-import-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <label class="form-label">Paste backup JSON<textarea class="form-control acc-import" name="payload" required></textarea></label>
+      <div class="text-destructive text-small" id="acc-import-error" role="alert"></div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Import and replace</button><button class="btn" type="button" data-close-dialog="acc-import-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <script>
+    (() => {
+      const root = document.getElementById('azeroth-command-center');
+      const storageKey = 'azeroth-command-center-v1';
+      const today = () => new Date().toISOString().slice(0, 10);
+      const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+      const collectionNames = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
+      const starterCollections = Object.fromEntries(collectionNames.map(name => [name, { owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }]));
+      const starterCharacter = {
+        id: 'carnitez-silvermoon-eu', name: 'Carnitez', realm: 'Silvermoon', region: 'EU', faction: 'Alliance',
+        race: 'Night Elf', className: 'Druid', spec: 'Guardian', professions: 'Herbalism, Mining', level: 1,
+        gold: 0, playedMinutes: 0, location: 'Shadowglen', createdAt: today(), collections: starterCollections,
+        goals: [
+          { id: uid(), type: 'Current content', title: 'Complete every available quest in Shadowglen', done: false },
+          { id: uid(), type: 'Collection', title: 'Capture the first account collection baseline', done: false },
+          { id: uid(), type: 'Gold', title: 'Earn the first 100 gold without outside help', done: false }
+        ],
+        sessions: [], ledger: [], snapshots: [{ date: today(), gold: 0, level: 1 }]
+      };
+      let state = loadState();
+      let activeTab = 'overview';
+
+      function loadState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey));
+          if (saved && Array.isArray(saved.characters) && saved.characters.length) return normalizeState(saved);
+        } catch (_) {}
+        return { version: 1, activeId: starterCharacter.id, characters: [starterCharacter] };
+      }
+      function normalizeState(input) {
+        input.version = 1;
+        input.characters = input.characters.map(c => ({
+          ...c,
+          collections: Object.fromEntries(collectionNames.map(name => [name, { owned: 0, target: 10, baseline: 0, ...(c.collections?.[name] || {}) }])),
+          goals: Array.isArray(c.goals) ? c.goals : [], sessions: Array.isArray(c.sessions) ? c.sessions : [],
+          ledger: Array.isArray(c.ledger) ? c.ledger : [], snapshots: Array.isArray(c.snapshots) ? c.snapshots : []
+        }));
+        if (!input.characters.some(c => c.id === input.activeId)) input.activeId = input.characters[0].id;
+        return input;
+      }
+      function saveState() {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      }
+      function character() {
+        return state.characters.find(c => c.id === state.activeId) || state.characters[0];
+      }
+      function formatGold(value) {
+        const n = Number(value) || 0;
+        return `${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}g`;
+      }
+      function formatMinutes(minutes) {
+        const m = Math.max(0, Number(minutes) || 0);
+        const h = Math.floor(m / 60);
+        const rest = m % 60;
+        return h ? `${h}h ${rest}m` : `${rest}m`;
+      }
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
+      }
+      function refreshIcons() {
+        if (window.lucide?.createIcons) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+      }
+      function render() {
+        const c = character();
+        renderCharacterSelect(c);
+        root.querySelector('#acc-character-name').textContent = c.name;
+        root.querySelector('#acc-character-meta').textContent = `${c.race} ${c.className} · ${c.realm} ${c.region}`;
+        root.querySelector('#acc-stat-level').textContent = c.level;
+        root.querySelector('#acc-stat-location').textContent = c.location || 'Location not recorded';
+        root.querySelector('#acc-stat-gold').textContent = formatGold(c.gold);
+        const totalSessionDelta = c.sessions.reduce((sum, s) => sum + Number(s.goldDelta || 0), 0);
+        root.querySelector('#acc-stat-gold-change').textContent = c.sessions.length ? `${totalSessionDelta >= 0 ? '+' : ''}${formatGold(totalSessionDelta)} in logged sessions` : 'Fresh start';
+        root.querySelector('#acc-stat-played').textContent = formatMinutes(c.playedMinutes);
+        root.querySelector('#acc-stat-sessions').textContent = c.sessions.length ? `${c.sessions.length} session${c.sessions.length === 1 ? '' : 's'} logged` : 'No sessions logged';
+        const gains = Object.values(c.collections).reduce((sum, x) => sum + Math.max(0, Number(x.owned) - Number(x.baseline)), 0);
+        root.querySelector('#acc-stat-collection').textContent = gains.toLocaleString();
+        const quick = root.querySelector('#acc-quick-update');
+        quick.elements.level.value = c.level;
+        quick.elements.gold.value = c.gold;
+        quick.elements.location.value = c.location || '';
+        renderGoals(c);
+        renderGoldChart(c);
+        renderCollections(c);
+        renderGold(c);
+        renderJournal(c);
+        refreshIcons();
+      }
+      function renderCharacterSelect(c) {
+        const select = root.querySelector('#acc-character-select');
+        select.innerHTML = state.characters.map(x => `<option value="${escapeHtml(x.id)}"${x.id === c.id ? ' selected' : ''}>${escapeHtml(x.name)} — ${escapeHtml(x.realm)}</option>`).join('');
+      }
+      function renderGoals(c) {
+        const target = root.querySelector('#acc-goals');
+        if (!c.goals.length) {
+          target.innerHTML = '<div class="acc-empty">No active objectives. Add one clear next step.</div>';
+          return;
+        }
+        target.innerHTML = c.goals.map(g => `
+          <div class="acc-goal ${g.done ? 'done' : ''}">
+            <label class="form-check"><input class="form-check-input" type="checkbox" data-goal-toggle="${escapeHtml(g.id)}" ${g.done ? 'checked' : ''}><span class="sr-only">Mark objective complete</span></label>
+            <div><span class="viz-badge">${escapeHtml(g.type)}</span> <span class="acc-goal-title">${escapeHtml(g.title)}</span></div>
+            <button class="btn btn-ghost" type="button" data-goal-delete="${escapeHtml(g.id)}" aria-label="Delete objective"><i data-lucide="x" aria-hidden="true"></i></button>
+          </div>`).join('');
+      }
+      function renderGoldChart(c) {
+        const points = [...c.snapshots].sort((a, b) => a.date.localeCompare(b.date));
+        const chart = root.querySelector('#acc-gold-chart');
+        if (!points.length) {
+          chart.innerHTML = '<div class="acc-empty">No gold snapshots yet.</div>';
+          return;
+        }
+        const width = 700, height = 190, left = 52, right = 18, top = 14, bottom = 32;
+        const maxGold = Math.max(1, ...points.map(p => Number(p.gold) || 0));
+        const x = i => points.length === 1 ? left : left + (i / (points.length - 1)) * (width - left - right);
+        const y = v => top + (1 - (Number(v) || 0) / maxGold) * (height - top - bottom);
+        const line = points.map((p, i) => `${i ? 'L' : 'M'} ${x(i).toFixed(1)} ${y(p.gold).toFixed(1)}`).join(' ');
+        const area = `${line} L ${x(points.length - 1).toFixed(1)} ${height - bottom} L ${x(0).toFixed(1)} ${height - bottom} Z`;
+        const labels = points.length > 1 ? [0, points.length - 1] : [0];
+        chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Gold balance over time, currently ${formatGold(c.gold)}">
+          <title>Gold balance over time</title><desc>${points.length} recorded balance snapshots. Current balance ${formatGold(c.gold)}.</desc>
+          <line class="axis-line" x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"></line>
+          <line class="grid-line" x1="${left}" y1="${top}" x2="${width-right}" y2="${top}"></line>
+          <text x="${left-8}" y="${top+4}" text-anchor="end">${Math.round(maxGold).toLocaleString()}g</text>
+          <text x="${left-8}" y="${height-bottom+4}" text-anchor="end">0g</text>
+          <path class="area" d="${area}"></path><path class="line" d="${line}"></path>
+          ${points.map((p,i) => `<circle class="dot" cx="${x(i)}" cy="${y(p.gold)}" r="4"><title>${escapeHtml(p.date)}: ${formatGold(p.gold)}</title></circle>`).join('')}
+          ${labels.map(i => `<text x="${x(i)}" y="${height-8}" text-anchor="${i === 0 ? 'start' : 'end'}">${escapeHtml(points[i].date)}</text>`).join('')}
+        </svg>`;
+        root.querySelector('#acc-chart-caption').textContent = `${points.length} balance snapshot${points.length === 1 ? '' : 's'} · ${formatGold(c.gold)} current`;
+      }
+      function renderCollections(c) {
+        root.querySelector('#acc-collections').innerHTML = collectionNames.map(name => {
+          const data = c.collections[name];
+          const pct = Math.max(0, Math.min(100, data.target ? data.owned / data.target * 100 : 0));
+          return `<div class="acc-collection-row" data-collection="${escapeHtml(name)}">
+            <div><strong>${escapeHtml(name)}</strong><div class="text-small text-muted">+${Math.max(0, data.owned - data.baseline).toLocaleString()} since baseline</div></div>
+            <div><div class="acc-inline text-small"><span>${data.owned.toLocaleString()}</span><span class="text-muted">of ${data.target.toLocaleString()} milestone</span></div><div class="acc-progress-track" role="progressbar" aria-label="${escapeHtml(name)} milestone" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><div class="acc-progress-fill" style="width:${pct}%"></div></div></div>
+            <div class="acc-inline"><label class="form-label">Owned<input class="form-control" data-collection-owned type="number" min="0" value="${data.owned}"></label><label class="form-label">Milestone<input class="form-control" data-collection-target type="number" min="1" value="${data.target}"></label></div>
+          </div>`;
+        }).join('');
+      }
+      function renderGold(c) {
+        const profit = item => Number(item.revenue || 0) - Number(item.cost || 0);
+        const totalProfit = c.ledger.reduce((sum, x) => sum + profit(x), 0);
+        const totalMinutes = c.ledger.reduce((sum, x) => sum + Number(x.minutes || 0), 0);
+        const measured = c.ledger.filter(x => Number(x.minutes) > 0);
+        const rates = measured.map(x => ({ ...x, rate: profit(x) / Number(x.minutes) * 60 }));
+        const best = rates.sort((a,b) => b.rate - a.rate)[0];
+        root.querySelector('#acc-profit-total').textContent = formatGold(totalProfit);
+        root.querySelector('#acc-farm-time').textContent = formatMinutes(totalMinutes);
+        root.querySelector('#acc-profit-hour').textContent = totalMinutes ? formatGold(totalProfit / totalMinutes * 60) : '—';
+        root.querySelector('#acc-best-activity').textContent = best ? best.activity : '—';
+        root.querySelector('#acc-best-rate').textContent = best ? `${formatGold(best.rate)}/hour` : 'No data yet';
+        const tbody = root.querySelector('#acc-ledger-body');
+        if (!c.ledger.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="acc-empty">No gold activities recorded.</td></tr>';
+        } else {
+          tbody.innerHTML = [...c.ledger].sort((a,b) => b.date.localeCompare(a.date)).map(x => {
+            const p = profit(x), rate = Number(x.minutes) ? p / Number(x.minutes) * 60 : null;
+            return `<tr><td class="text-nowrap">${escapeHtml(x.date)}</td><td>${escapeHtml(x.activity)}</td><td class="text-end">${formatGold(p)}</td><td class="text-end">${rate === null ? '—' : formatGold(rate)}</td><td><button class="btn btn-ghost" type="button" data-ledger-delete="${escapeHtml(x.id)}" aria-label="Delete ledger entry"><i data-lucide="x" aria-hidden="true"></i></button></td></tr>`;
+          }).join('');
+        }
+      }
+      function renderJournal(c) {
+        const target = root.querySelector('#acc-journal');
+        if (!c.sessions.length) {
+          target.innerHTML = '<div class="acc-empty">Carnitez’s first adventure is waiting to be logged.</div>';
+          return;
+        }
+        target.innerHTML = [...c.sessions].sort((a,b) => b.date.localeCompare(a.date)).map(s => `
+          <article class="acc-entry"><time class="text-muted">${escapeHtml(s.date)}</time><div class="acc-entry-body"><strong>${formatMinutes(s.minutes)}</strong> · ${Number(s.goldDelta) >= 0 ? '+' : ''}${formatGold(s.goldDelta)}<div>${escapeHtml(s.note || 'No notes')}</div></div><button class="btn btn-ghost" type="button" data-session-delete="${escapeHtml(s.id)}" aria-label="Delete journal entry"><i data-lucide="x" aria-hidden="true"></i></button></article>`).join('');
+      }
+      function openCharacterDialog(editing) {
+        const form = root.querySelector('#acc-character-form');
+        form.reset();
+        const c = editing ? character() : null;
+        root.querySelector('#acc-character-dialog-title').textContent = editing ? 'Edit character' : 'Add character';
+        const defaults = c || { id: '', name: '', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: '', className: '', spec: '', level: 1, gold: 0, location: '', professions: '' };
+        Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
+        root.querySelector('#acc-character-dialog').showModal();
+      }
+      root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => {
+        activeTab = button.dataset.tab;
+        root.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-pressed', String(x === button)));
+        root.querySelectorAll('[data-panel]').forEach(x => x.hidden = x.dataset.panel !== activeTab);
+      }));
+      root.querySelector('#acc-character-select').addEventListener('change', e => { state.activeId = e.target.value; saveState(); render(); });
+      root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
+      root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
+      root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));
+      root.querySelector('#acc-character-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget), existing = state.characters.find(c => c.id === f.get('id'));
+        if (existing) {
+          Object.assign(existing, { name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim() });
+          existing.snapshots.push({ date: today(), gold: existing.gold, level: existing.level });
+        } else {
+          const id = uid();
+          const c = { id, name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim(), playedMinutes: 0, createdAt: today(), collections: structuredClone(starterCollections), goals: [], sessions: [], ledger: [], snapshots: [{ date: today(), gold: Number(f.get('gold')), level: Number(f.get('level')) }] };
+          state.characters.push(c); state.activeId = id;
+        }
+        saveState(); root.querySelector('#acc-character-dialog').close(); render();
+      });
+      root.querySelector('#acc-quick-update').addEventListener('submit', e => {
+        e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
+        c.level = Number(f.get('level')); c.gold = Number(f.get('gold')); c.location = f.get('location').trim();
+        c.snapshots.push({ date: today(), gold: c.gold, level: c.level }); saveState(); render();
+      });
+      root.querySelector('#acc-session-form').addEventListener('submit', e => {
+        e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
+        const entry = { id: uid(), date: today(), minutes: Number(f.get('minutes')), goldDelta: Number(f.get('goldDelta')), note: f.get('note').trim() };
+        c.sessions.push(entry); c.playedMinutes += entry.minutes; c.gold = Math.max(0, Number(c.gold) + entry.goldDelta); c.snapshots.push({ date: today(), gold: c.gold, level: c.level });
+        saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; render();
+      });
+      root.querySelector('#acc-add-goal').addEventListener('click', () => root.querySelector('#acc-goal-dialog').showModal());
+      root.querySelector('#acc-goal-form').addEventListener('submit', e => {
+        e.preventDefault(); const f = new FormData(e.currentTarget); character().goals.push({ id: uid(), type: f.get('type'), title: f.get('title').trim(), done: false });
+        saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render();
+      });
+      root.querySelector('#acc-goals').addEventListener('change', e => {
+        const id = e.target.dataset.goalToggle; if (!id) return; const goal = character().goals.find(g => g.id === id); if (goal) goal.done = e.target.checked; saveState(); render();
+      });
+      root.querySelector('#acc-goals').addEventListener('click', e => {
+        const button = e.target.closest('[data-goal-delete]'); if (!button) return; character().goals = character().goals.filter(g => g.id !== button.dataset.goalDelete); saveState(); render();
+      });
+      root.querySelector('#acc-save-collections').addEventListener('click', () => {
+        root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); });
+        saveState(); render();
+      });
+      root.querySelector('#acc-set-baseline').addEventListener('click', () => {
+        root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); x.baseline = x.owned; });
+        saveState(); render();
+      });
+      root.querySelector('#acc-ledger-form').elements.date.value = today();
+      root.querySelector('#acc-ledger-form').addEventListener('submit', e => {
+        e.preventDefault(); const f = new FormData(e.currentTarget); character().ledger.push({ id: uid(), date: f.get('date'), activity: f.get('activity').trim(), minutes: Number(f.get('minutes')), revenue: Number(f.get('revenue')), cost: Number(f.get('cost')), notes: f.get('notes').trim() });
+        saveState(); e.currentTarget.reset(); e.currentTarget.elements.date.value = today(); e.currentTarget.elements.minutes.value = 0; e.currentTarget.elements.revenue.value = 0; e.currentTarget.elements.cost.value = 0; render();
+      });
+      root.querySelector('#acc-ledger-body').addEventListener('click', e => {
+        const button = e.target.closest('[data-ledger-delete]'); if (!button) return; character().ledger = character().ledger.filter(x => x.id !== button.dataset.ledgerDelete); saveState(); render();
+      });
+      root.querySelector('#acc-journal').addEventListener('click', e => {
+        const button = e.target.closest('[data-session-delete]'); if (!button) return; const c = character(); const entry = c.sessions.find(x => x.id === button.dataset.sessionDelete); if (entry) c.playedMinutes = Math.max(0, c.playedMinutes - Number(entry.minutes)); c.sessions = c.sessions.filter(x => x.id !== button.dataset.sessionDelete); saveState(); render();
+      });
+      root.querySelector('#acc-export').addEventListener('click', async () => {
+        const payload = JSON.stringify(state, null, 2);
+        try { await navigator.clipboard.writeText(payload); root.querySelector('#acc-export').textContent = 'Copied backup'; setTimeout(() => { root.querySelector('#acc-export').innerHTML = '<i data-lucide="download" aria-hidden="true"></i> Export backup'; refreshIcons(); }, 1600); }
+        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); }
+      });
+      root.querySelector('#acc-import').addEventListener('click', () => { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); });
+      root.querySelector('#acc-import-form').addEventListener('submit', e => {
+        e.preventDefault();
+        try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); if (!Array.isArray(incoming.characters) || !incoming.characters.length) throw new Error('No characters found in this backup.'); state = normalizeState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); }
+        catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; }
+      });
+      root.querySelector('#acc-delete-character').addEventListener('click', () => {
+        if (state.characters.length === 1) { alert('Keep at least one character in the campaign. Add another before deleting this one.'); return; }
+        if (!confirm(`Delete ${character().name} and all locally recorded progress?`)) return;
+        state.characters = state.characters.filter(c => c.id !== state.activeId); state.activeId = state.characters[0].id; saveState(); render();
+      });
+      render();
+    })();
+  </script>
+</div>
