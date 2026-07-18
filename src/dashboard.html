@@ -838,7 +838,57 @@
         transition: none;
       }
     }
+    #azeroth-command-center .acc-recovery {
+      display: grid;
+      min-height: min(34rem, 80vh);
+      place-items: center;
+      padding: 2rem 1rem;
+    }
+    #azeroth-command-center .acc-recovery[hidden] { display: none; }
+    #azeroth-command-center .acc-recovery-card {
+      width: min(34rem, 100%);
+      padding: clamp(1.25rem, 4vw, 2rem);
+      border: 1px solid color-mix(in srgb, var(--destructive) 35%, var(--border));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card) 96%, var(--destructive));
+      box-shadow: 0 18px 50px rgb(0 0 0 / 24%);
+    }
+    #azeroth-command-center .acc-recovery-card h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.35rem;
+    }
+    #azeroth-command-center .acc-recovery-card p { margin: 0 0 1rem; }
+    #azeroth-command-center .acc-recovery-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    #azeroth-command-center .acc-recovery-error {
+      margin: 0 0 1rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 6px;
+      color: #ffc8ba;
+      background: rgb(226 85 7 / 11%);
+      font-size: 0.78rem;
+    }
+    #azeroth-command-center .acc-recovery-note {
+      margin-top: 1rem;
+      color: var(--muted-foreground);
+      font-size: 0.75rem;
+    }
   </style>
+
+  <section class="acc-recovery" id="acc-recovery-state" hidden aria-live="polite">
+    <div class="acc-recovery-card">
+      <span class="acc-eyebrow">Campaign data protection</span>
+      <h1>We could not safely load this campaign</h1>
+      <p id="acc-recovery-message">Your saved data is still intact. Nothing has been replaced.</p>
+      <p class="acc-recovery-error" id="acc-recovery-error" hidden></p>
+      <div class="acc-recovery-actions">
+        <button class="btn" type="button" id="acc-recovery-export">Export saved data</button>
+        <button class="btn" type="button" id="acc-recovery-retry">Retry loading</button>
+        <button class="btn" type="button" id="acc-recovery-legacy" hidden>Use legacy data</button>
+        <button class="btn acc-btn-danger" type="button" id="acc-recovery-starter">Load starter data</button>
+      </div>
+      <p class="acc-recovery-note">Loading starter data is an explicit choice. It will not remove your recovery copy.</p>
+    </div>
+  </section>
 
   <div class="acc-shell">
     <aside class="acc-sidebar">
@@ -1037,15 +1087,23 @@
     </form>
   </dialog>
 
+  <dialog id="acc-starter-dialog">
+    <form method="dialog" id="acc-starter-form">
+      <div class="acc-dialog-head"><h2>Load starter data?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-starter-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <p class="acc-delete-copy">This starts a fresh local campaign view. Your unreadable saved value will be preserved in a recovery copy, but it will no longer be the active dataset.</p>
+      <div class="acc-actions"><button class="btn acc-btn-danger" type="submit">Load starter data</button><button class="btn" type="button" data-close-dialog="acc-starter-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
   <div class="acc-toast-region" id="acc-toast-region" aria-live="polite" aria-atomic="true" hidden></div>
 
-  <script>
+  <script type="module">
     (() => {
       const root = document.getElementById('azeroth-command-center');
-      const storageKey = 'azeroth-command-center-v1';
-      const today = () => new Date().toISOString().slice(0, 10);
-      const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
-      const collectionNames = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
+      const Core = globalThis.AzerothCore;
+      const collectionNames = Core.COLLECTION_NAMES;
+      const today = () => Core.localDateKey();
+      const uid = prefix => Core.createId(prefix);
       const defaultTheme = { primary: '#9ba39d', onPrimary: '#0e1110', secondary: '#8aa5b8', surfaceTint: '#18201c', active: '#b8c0ba', progress: '#9ba39d', glow: 'rgb(138 165 184 / 10%)', icon: 'shield', glyph: '◆', motif: 'stone' };
       const classThemes = Object.freeze({
         'death-knight': { primary: '#c41e3a', onPrimary: '#fff5f6', secondary: '#6f91a8', surfaceTint: '#21151a', active: '#e13d58', progress: '#c41e3a', glow: 'rgb(196 30 58 / 13%)', icon: 'skull', glyph: 'ᛉ', motif: 'rune' },
@@ -1071,46 +1129,55 @@
         gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
         journal: { title: 'Adventure journal', description: 'Review sessions and keep campaign data safe.' }
       });
-      const starterCollections = Object.fromEntries(collectionNames.map(name => [name, { owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }]));
-      const starterCharacter = {
-        id: 'carnitez-silvermoon-eu', name: 'Carnitez', realm: 'Silvermoon', region: 'EU', faction: 'Alliance',
-        race: 'Night Elf', className: 'Druid', spec: 'Guardian', professions: 'Herbalism, Mining', level: 1,
-        gold: 0, playedMinutes: 0, location: 'Shadowglen', createdAt: today(), collections: starterCollections,
-        goals: [
-          { id: uid(), type: 'Current content', title: 'Complete every available quest in Shadowglen', done: false },
-          { id: uid(), type: 'Collection', title: 'Capture the first account collection baseline', done: false },
-          { id: uid(), type: 'Gold', title: 'Earn the first 100 gold without outside help', done: false }
-        ],
-        sessions: [], ledger: [], snapshots: [{ date: today(), gold: 0, level: 1 }]
-      };
-      let state = loadState();
+      let state = null;
+      let recoveryState = null;
       let activeTab = 'overview';
       let toastTimer = null;
       let toastAction = null;
 
       function loadState() {
-        try {
-          const saved = JSON.parse(localStorage.getItem(storageKey));
-          if (saved && Array.isArray(saved.characters) && saved.characters.length) return normalizeState(saved);
-        } catch (_) {}
-        return { version: 1, activeId: starterCharacter.id, characters: [starterCharacter] };
-      }
-      function normalizeState(input) {
-        input.version = 1;
-        input.characters = input.characters.map(c => ({
-          ...c,
-          collections: Object.fromEntries(collectionNames.map(name => [name, { owned: 0, target: 10, baseline: 0, ...(c.collections?.[name] || {}) }])),
-          goals: Array.isArray(c.goals) ? c.goals : [], sessions: Array.isArray(c.sessions) ? c.sessions : [],
-          ledger: Array.isArray(c.ledger) ? c.ledger : [], snapshots: Array.isArray(c.snapshots) ? c.snapshots : []
-        }));
-        if (!input.characters.some(c => c.id === input.activeId)) input.activeId = input.characters[0].id;
-        return input;
+        const result = Core.loadPersistedState(localStorage, { now: new Date() });
+        recoveryState = result.status === 'recovery' ? result : null;
+        return result.status === 'ready' ? result.state : null;
       }
       function saveState() {
-        localStorage.setItem(storageKey, JSON.stringify(state));
+        if (!state) return false;
+        try {
+          Core.persistV2(localStorage, state);
+          return true;
+        } catch (error) {
+          showToast(`Could not save campaign data: ${error.message}`, { tone: 'warning', duration: 8000 });
+          return false;
+        }
       }
       function character() {
-        return state.characters.find(c => c.id === state.activeId) || state.characters[0];
+        return state.characters.find(c => c.id === state.activeCharacterId) || state.characters[0];
+      }
+      function goalsFor(c) {
+        return state.goals.filter(goal => goal.characterId === c.id);
+      }
+      function activitiesFor(c, kind = null) {
+        return state.activities.filter(activity => activity.characterId === c.id && (!kind || activity.kind === kind));
+      }
+      function progressFor(c, metric = null) {
+        return state.progressEvents.filter(event => event.entityId === c.id && (!metric || event.metric === metric));
+      }
+      function collectionsFor(c) {
+        return state.collectionTrackers.filter(tracker => tracker.characterId === c.id);
+      }
+      function ensureCollectionTrackers(c) {
+        const existing = collectionsFor(c);
+        if (existing.length) return existing;
+        const trackers = collectionNames.map(name => ({ id: Core.deterministicId('collection', [c.id, name]), scope: 'character', characterId: c.id, name, owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }));
+        state.collectionTrackers.push(...trackers);
+        return trackers;
+      }
+      function appendCurrentProgress(c) {
+        ['liquidGold', 'level'].forEach(metric => {
+          const latest = Core.currentProgressValue(state.progressEvents, c.id, metric);
+          const value = metric === 'liquidGold' ? Number(c.gold) : Number(c.level);
+          if (latest === null || Number(latest) !== value) state.progressEvents.push({ id: uid('progress'), entityType: 'character', entityId: c.id, metric, value, recordedAt: new Date().toISOString(), source: 'current-observation' });
+        });
       }
       function formatGold(value) {
         const n = Number(value) || 0;
@@ -1208,11 +1275,12 @@
         root.querySelector('#acc-stat-level').textContent = c.level;
         root.querySelector('#acc-stat-location').textContent = c.location || 'Location not recorded';
         root.querySelector('#acc-stat-gold').textContent = formatGold(c.gold);
-        const totalSessionDelta = c.sessions.reduce((sum, s) => sum + Number(s.goldDelta || 0), 0);
-        root.querySelector('#acc-stat-gold-change').textContent = c.sessions.length ? `${totalSessionDelta >= 0 ? '+' : ''}${formatGold(totalSessionDelta)} in logged sessions` : 'Fresh start';
+        const sessions = activitiesFor(c, 'session');
+        const totalSessionDelta = sessions.reduce((sum, session) => sum + Number(session.gold?.delta || 0), 0);
+        root.querySelector('#acc-stat-gold-change').textContent = sessions.length ? `${totalSessionDelta >= 0 ? '+' : ''}${formatGold(totalSessionDelta)} in logged sessions` : 'Fresh start';
         root.querySelector('#acc-stat-played').textContent = formatMinutes(c.playedMinutes);
-        root.querySelector('#acc-stat-sessions').textContent = c.sessions.length ? `${c.sessions.length} session${c.sessions.length === 1 ? '' : 's'} logged` : 'No sessions logged';
-        const gains = Object.values(c.collections).reduce((sum, x) => sum + Math.max(0, Number(x.owned) - Number(x.baseline)), 0);
+        root.querySelector('#acc-stat-sessions').textContent = sessions.length ? `${sessions.length} session${sessions.length === 1 ? '' : 's'} logged` : 'No sessions logged';
+        const gains = collectionsFor(c).reduce((sum, x) => sum + Math.max(0, Number(x.owned) - Number(x.baseline)), 0);
         root.querySelector('#acc-stat-collection').textContent = gains.toLocaleString();
         const quick = root.querySelector('#acc-quick-update');
         quick.elements.level.value = c.level;
@@ -1231,19 +1299,20 @@
       }
       function renderGoals(c) {
         const target = root.querySelector('#acc-goals');
-        if (!c.goals.length) {
+        const goals = goalsFor(c);
+        if (!goals.length) {
           target.innerHTML = '<div class="acc-empty">No active objectives. Add one clear next step.</div>';
           return;
         }
-        target.innerHTML = c.goals.map(g => `
-          <div class="acc-goal ${g.done ? 'done' : ''}">
-            <label class="form-check"><input class="form-check-input" type="checkbox" data-goal-toggle="${escapeHtml(g.id)}" ${g.done ? 'checked' : ''}><span class="sr-only">Mark objective complete</span></label>
-            <div><span class="viz-badge">${escapeHtml(g.type)}</span> <span class="acc-goal-title">${escapeHtml(g.title)}</span></div>
+        target.innerHTML = goals.map(g => `
+          <div class="acc-goal ${g.status === 'done' ? 'done' : ''}">
+            <label class="form-check"><input class="form-check-input" type="checkbox" data-goal-toggle="${escapeHtml(g.id)}" ${g.status === 'done' ? 'checked' : ''}><span class="sr-only">Mark objective complete</span></label>
+            <div><span class="viz-badge">${escapeHtml(g.category)}</span> <span class="acc-goal-title">${escapeHtml(g.title)}</span></div>
             <button class="btn btn-ghost" type="button" data-goal-delete="${escapeHtml(g.id)}" aria-label="Delete objective"><i data-lucide="x" aria-hidden="true"></i></button>
           </div>`).join('');
       }
       function renderGoldChart(c) {
-        const points = [...c.snapshots].sort((a, b) => a.date.localeCompare(b.date));
+        const points = progressFor(c, 'liquidGold').sort((a, b) => String(a.recordedAt).localeCompare(String(b.recordedAt))).map(event => ({ date: Core.localDateKey(event.recordedAt) || event.recordedAt, gold: event.value }));
         const chart = root.querySelector('#acc-gold-chart');
         if (!points.length) {
           chart.innerHTML = '<div class="acc-empty">No gold snapshots yet.</div>';
@@ -1269,8 +1338,9 @@
         root.querySelector('#acc-chart-caption').textContent = `${points.length} balance snapshot${points.length === 1 ? '' : 's'} · ${formatGold(c.gold)} current`;
       }
       function renderCollections(c) {
+        const trackers = ensureCollectionTrackers(c);
         root.querySelector('#acc-collections').innerHTML = collectionNames.map(name => {
-          const data = c.collections[name];
+          const data = trackers.find(tracker => tracker.name === name) || { owned: 0, target: 10, baseline: 0 };
           const pct = Math.max(0, Math.min(100, data.target ? data.owned / data.target * 100 : 0));
           return `<div class="acc-collection-row" data-collection="${escapeHtml(name)}">
             <div><strong>${escapeHtml(name)}</strong><div class="text-small text-muted">+${Math.max(0, data.owned - data.baseline).toLocaleString()} since baseline</div></div>
@@ -1280,35 +1350,32 @@
         }).join('');
       }
       function renderGold(c) {
-        const profit = item => Number(item.revenue || 0) - Number(item.cost || 0);
-        const totalProfit = c.ledger.reduce((sum, x) => sum + profit(x), 0);
-        const totalMinutes = c.ledger.reduce((sum, x) => sum + Number(x.minutes || 0), 0);
-        const measured = c.ledger.filter(x => Number(x.minutes) > 0);
-        const rates = measured.map(x => ({ ...x, rate: profit(x) / Number(x.minutes) * 60 }));
-        const best = rates.sort((a,b) => b.rate - a.rate)[0];
-        root.querySelector('#acc-profit-total').textContent = formatGold(totalProfit);
-        root.querySelector('#acc-farm-time').textContent = formatMinutes(totalMinutes);
-        root.querySelector('#acc-profit-hour').textContent = totalMinutes ? formatGold(totalProfit / totalMinutes * 60) : '—';
-        root.querySelector('#acc-best-activity').textContent = best ? best.activity : '—';
-        root.querySelector('#acc-best-rate').textContent = best ? `${formatGold(best.rate)}/hour` : 'No data yet';
+        const totals = Core.calculateGoldTotals(activitiesFor(c, 'gold'));
+        root.querySelector('#acc-profit-total').textContent = formatGold(totals.profit);
+        root.querySelector('#acc-farm-time').textContent = formatMinutes(totals.minutes);
+        root.querySelector('#acc-profit-hour').textContent = totals.hourlyRate === null ? '—' : formatGold(totals.hourlyRate);
+        root.querySelector('#acc-best-activity').textContent = totals.best ? totals.best.activity.title : '—';
+        root.querySelector('#acc-best-rate').textContent = totals.best ? `${formatGold(totals.best.rate)}/hour` : 'No data yet';
         const tbody = root.querySelector('#acc-ledger-body');
-        if (!c.ledger.length) {
+        const ledger = activitiesFor(c, 'gold');
+        if (!ledger.length) {
           tbody.innerHTML = '<tr><td colspan="5" class="acc-empty">No gold activities recorded.</td></tr>';
         } else {
-          tbody.innerHTML = [...c.ledger].sort((a,b) => b.date.localeCompare(a.date)).map(x => {
-            const p = profit(x), rate = Number(x.minutes) ? p / Number(x.minutes) * 60 : null;
-            return `<tr><td class="text-nowrap">${escapeHtml(x.date)}</td><td>${escapeHtml(x.activity)}</td><td class="text-end">${formatGold(p)}</td><td class="text-end">${rate === null ? '—' : formatGold(rate)}</td><td><button class="btn btn-ghost" type="button" data-ledger-delete="${escapeHtml(x.id)}" aria-label="Delete ledger entry"><i data-lucide="x" aria-hidden="true"></i></button></td></tr>`;
+          tbody.innerHTML = [...ledger].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(x => {
+            const p = Number(x.gold?.revenue || 0) - Number(x.gold?.cost || 0), rate = Number(x.durationMinutes) ? p / Number(x.durationMinutes) * 60 : null;
+            return `<tr><td class="text-nowrap">${escapeHtml(Core.localDateKey(x.occurredAt) || x.occurredAt)}</td><td>${escapeHtml(x.title)}</td><td class="text-end">${formatGold(p)}</td><td class="text-end">${rate === null ? '—' : formatGold(rate)}</td><td><button class="btn btn-ghost" type="button" data-ledger-delete="${escapeHtml(x.id)}" aria-label="Delete ledger entry"><i data-lucide="x" aria-hidden="true"></i></button></td></tr>`;
           }).join('');
         }
       }
       function renderJournal(c) {
         const target = root.querySelector('#acc-journal');
-        if (!c.sessions.length) {
-          target.innerHTML = '<div class="acc-empty">Carnitez’s first adventure is waiting to be logged.</div>';
+        const sessions = activitiesFor(c, 'session');
+        if (!sessions.length) {
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(c.name)}’s first adventure is waiting to be logged.</div>`;
           return;
         }
-        target.innerHTML = [...c.sessions].sort((a,b) => b.date.localeCompare(a.date)).map(s => `
-          <article class="acc-entry"><time class="text-muted">${escapeHtml(s.date)}</time><div class="acc-entry-body"><strong>${formatMinutes(s.minutes)}</strong> · ${Number(s.goldDelta) >= 0 ? '+' : ''}${formatGold(s.goldDelta)}<div>${escapeHtml(s.note || 'No notes')}</div></div><button class="btn btn-ghost" type="button" data-session-delete="${escapeHtml(s.id)}" aria-label="Delete journal entry"><i data-lucide="x" aria-hidden="true"></i></button></article>`).join('');
+        target.innerHTML = [...sessions].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(s => `
+          <article class="acc-entry"><time class="text-muted">${escapeHtml(Core.localDateKey(s.occurredAt) || s.occurredAt)}</time><div class="acc-entry-body"><strong>${formatMinutes(s.durationMinutes)}</strong> · ${Number(s.gold?.delta) >= 0 ? '+' : ''}${formatGold(s.gold?.delta)}<div>${escapeHtml(s.notes || 'No notes')}</div></div><button class="btn btn-ghost" type="button" data-session-delete="${escapeHtml(s.id)}" aria-label="Delete journal entry"><i data-lucide="x" aria-hidden="true"></i></button></article>`).join('');
       }
       function openCharacterDialog(editing) {
         const form = root.querySelector('#acc-character-form');
@@ -1329,119 +1396,94 @@
         root.querySelector('#acc-page-description').textContent = pageMeta[tabName].description;
         if (focusTab) activeButton?.focus();
       }
+      function renderRecovery() {
+        const recovery = root.querySelector('#acc-recovery-state');
+        const shell = root.querySelector('.acc-shell');
+        recovery.hidden = !recoveryState;
+        shell.hidden = Boolean(recoveryState);
+        if (!recoveryState) return;
+        root.querySelector('#acc-recovery-message').textContent = 'Your saved data is still intact. Nothing has been replaced. Export the raw value or retry before choosing starter data.';
+        const error = root.querySelector('#acc-recovery-error');
+        error.textContent = recoveryState.reason || 'The stored campaign data could not be validated.';
+        error.hidden = false;
+        root.querySelector('#acc-recovery-legacy').hidden = !recoveryState.legacyState;
+      }
+      async function exportRawRecovery() {
+        const payload = recoveryState?.raw || '';
+        try { await navigator.clipboard.writeText(payload); showToast('Raw saved data copied to clipboard.'); }
+        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-recovery-${today()}.json`; a.click(); URL.revokeObjectURL(url); }
+      }
+      function boot() {
+        state = loadState();
+        renderRecovery();
+        if (state) render();
+      }
       root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
       document.addEventListener('keydown', e => {
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         const tabName = ['overview', 'collections', 'gold', 'journal'][Number(e.key) - 1];
-        if (!tabName) return;
-        e.preventDefault();
-        activateTab(tabName, true);
+        if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
-      root.querySelector('#acc-character-select').addEventListener('change', e => { state.activeId = e.target.value; saveState(); render(); });
+      root.querySelector('#acc-character-select').addEventListener('change', e => { state.activeCharacterId = e.target.value; saveState(); render(); });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
       root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
       root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));
       root.querySelector('#acc-character-form').addEventListener('submit', e => {
         e.preventDefault();
         const f = new FormData(e.currentTarget), existing = state.characters.find(c => c.id === f.get('id'));
-        if (existing) {
-          Object.assign(existing, { name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim() });
-          existing.snapshots.push({ date: today(), gold: existing.gold, level: existing.level });
-        } else {
-          const id = uid();
-          const c = { id, name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim(), playedMinutes: 0, createdAt: today(), collections: structuredClone(starterCollections), goals: [], sessions: [], ledger: [], snapshots: [{ date: today(), gold: Number(f.get('gold')), level: Number(f.get('level')) }] };
-          state.characters.push(c); state.activeId = id;
+        const values = { name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim() };
+        if (existing) { Object.assign(existing, values); appendCurrentProgress(existing); }
+        else {
+          const id = uid('character');
+          const c = { id, ...values, playedMinutes: 0, createdAt: today() };
+          state.characters.push(c); state.activeCharacterId = id;
+          ensureCollectionTrackers(c); appendCurrentProgress(c);
         }
-        saveState(); root.querySelector('#acc-character-dialog').close(); render();
-        showToast(existing ? 'Character updated.' : 'Character added.');
+        saveState(); root.querySelector('#acc-character-dialog').close(); render(); showToast(existing ? 'Character updated.' : 'Character added.');
       });
       root.querySelector('#acc-quick-update').addEventListener('submit', e => {
         e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
         c.level = Number(f.get('level')); c.gold = Number(f.get('gold')); c.location = f.get('location').trim();
-        c.snapshots.push({ date: today(), gold: c.gold, level: c.level }); saveState(); render();
-        showToast('Progress saved.');
+        appendCurrentProgress(c); saveState(); render(); showToast('Progress saved.');
       });
       root.querySelector('#acc-session-form').addEventListener('submit', e => {
-        e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
-        const entry = { id: uid(), date: today(), minutes: Number(f.get('minutes')), goldDelta: Number(f.get('goldDelta')), note: f.get('note').trim() };
-        c.sessions.push(entry); c.playedMinutes += entry.minutes; c.gold = Math.max(0, Number(c.gold) + entry.goldDelta); c.snapshots.push({ date: today(), gold: c.gold, level: c.level });
-        saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; render();
-        showToast('Play session added.');
+        e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget); const minutes = Number(f.get('minutes')); const delta = Number(f.get('goldDelta'));
+        state.activities.push({ id: uid('activity-session'), characterId: c.id, kind: 'session', occurredAt: new Date().toISOString(), durationMinutes: minutes, title: 'Play session', notes: f.get('note').trim(), gold: { revenue: 0, cost: 0, delta, affectsBalance: true } });
+        c.playedMinutes += minutes; c.gold = Math.max(0, Number(c.gold) + delta); appendCurrentProgress(c);
+        saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; render(); showToast('Play session added.');
       });
       root.querySelector('#acc-add-goal').addEventListener('click', () => root.querySelector('#acc-goal-dialog').showModal());
       root.querySelector('#acc-goal-form').addEventListener('submit', e => {
-        e.preventDefault(); const f = new FormData(e.currentTarget); character().goals.push({ id: uid(), type: f.get('type'), title: f.get('title').trim(), done: false });
-        saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render();
-        showToast('Objective added.');
+        e.preventDefault(); const f = new FormData(e.currentTarget); const c = character(); state.goals.push({ id: uid('goal'), characterId: c.id, scope: 'character', category: f.get('type'), title: f.get('title').trim(), status: 'todo', priority: 0, dueDate: null, recurrence: null, estimatedMinutes: null, createdAt: new Date().toISOString(), completedAt: null, order: goalsFor(c).length });
+        saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render(); showToast('Objective added.');
       });
-      root.querySelector('#acc-goals').addEventListener('change', e => {
-        const id = e.target.dataset.goalToggle; if (!id) return; const goal = character().goals.find(g => g.id === id); if (goal) goal.done = e.target.checked; saveState(); render();
-        showToast(e.target.checked ? 'Objective completed.' : 'Objective reopened.');
-      });
-      root.querySelector('#acc-goals').addEventListener('click', e => {
-        const button = e.target.closest('[data-goal-delete]'); if (!button) return;
-        const c = character();
-        removeWithUndo(c.goals, button.dataset.goalDelete, 'Objective removed.', (item, index) => c.goals.splice(index, 0, item));
-      });
-      root.querySelector('#acc-save-collections').addEventListener('click', () => {
-        root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); });
-        saveState(); render();
-        showToast('Collection counts saved.');
-      });
-      root.querySelector('#acc-set-baseline').addEventListener('click', () => {
-        root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); x.baseline = x.owned; });
-        saveState(); render();
-        showToast('Collection baseline updated.');
-      });
+      root.querySelector('#acc-goals').addEventListener('change', e => { const id = e.target.dataset.goalToggle; if (!id) return; const goal = state.goals.find(g => g.id === id); if (goal) { goal.status = e.target.checked ? 'done' : 'todo'; goal.completedAt = e.target.checked ? new Date().toISOString() : null; } saveState(); render(); showToast(e.target.checked ? 'Objective completed.' : 'Objective reopened.'); });
+      root.querySelector('#acc-goals').addEventListener('click', e => { const button = e.target.closest('[data-goal-delete]'); if (!button) return; removeWithUndo(state.goals, button.dataset.goalDelete, 'Objective removed.', (item, index) => state.goals.splice(index, 0, item)); });
+      function updateCollections(setBaseline = false) {
+        const c = character(); const trackers = ensureCollectionTrackers(c);
+        root.querySelectorAll('[data-collection]').forEach(row => { const x = trackers.find(item => item.name === row.dataset.collection); if (!x) return; x.owned = Math.max(0, Number(row.querySelector('[data-collection-owned]').value)); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); if (setBaseline) x.baseline = x.owned; });
+        saveState(); render(); showToast(setBaseline ? 'Collection baseline updated.' : 'Collection counts saved.');
+      }
+      root.querySelector('#acc-save-collections').addEventListener('click', () => updateCollections(false));
+      root.querySelector('#acc-set-baseline').addEventListener('click', () => updateCollections(true));
       root.querySelector('#acc-ledger-form').elements.date.value = today();
       root.querySelector('#acc-ledger-form').addEventListener('submit', e => {
-        e.preventDefault(); const f = new FormData(e.currentTarget); character().ledger.push({ id: uid(), date: f.get('date'), activity: f.get('activity').trim(), minutes: Number(f.get('minutes')), revenue: Number(f.get('revenue')), cost: Number(f.get('cost')), notes: f.get('notes').trim() });
-        saveState(); e.currentTarget.reset(); e.currentTarget.elements.date.value = today(); e.currentTarget.elements.minutes.value = 0; e.currentTarget.elements.revenue.value = 0; e.currentTarget.elements.cost.value = 0; render();
-        showToast('Gold activity recorded.');
+        e.preventDefault(); const f = new FormData(e.currentTarget); const c = character(); const revenue = Number(f.get('revenue')); const cost = Number(f.get('cost'));
+        state.activities.push({ id: uid('activity-gold'), characterId: c.id, kind: 'gold', occurredAt: `${f.get('date')}T12:00:00`, durationMinutes: Number(f.get('minutes')), title: f.get('activity').trim(), notes: f.get('notes').trim(), gold: { revenue, cost, delta: revenue - cost, affectsBalance: false } });
+        saveState(); e.currentTarget.reset(); e.currentTarget.elements.date.value = today(); e.currentTarget.elements.minutes.value = 0; e.currentTarget.elements.revenue.value = 0; e.currentTarget.elements.cost.value = 0; render(); showToast('Gold activity recorded.');
       });
-      root.querySelector('#acc-ledger-body').addEventListener('click', e => {
-        const button = e.target.closest('[data-ledger-delete]'); if (!button) return;
-        const c = character();
-        removeWithUndo(c.ledger, button.dataset.ledgerDelete, 'Gold activity removed.', (item, index) => c.ledger.splice(index, 0, item));
-      });
-      root.querySelector('#acc-journal').addEventListener('click', e => {
-        const button = e.target.closest('[data-session-delete]'); if (!button) return;
-        const c = character();
-        const index = c.sessions.findIndex(item => item.id === button.dataset.sessionDelete);
-        if (index < 0) return;
-        const [removed] = c.sessions.splice(index, 1);
-        c.playedMinutes = Math.max(0, c.playedMinutes - Number(removed.minutes));
-        saveState();
-        render();
-        showToast('Journal entry removed.', { tone: 'warning', actionLabel: 'Undo', onAction: () => { c.sessions.splice(index, 0, removed); c.playedMinutes += Number(removed.minutes); saveState(); render(); showToast('Journal entry restored.'); } });
-      });
-      root.querySelector('#acc-export').addEventListener('click', async () => {
-        const payload = JSON.stringify(state, null, 2);
-        try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); }
-        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); }
-      });
+      root.querySelector('#acc-ledger-body').addEventListener('click', e => { const button = e.target.closest('[data-ledger-delete]'); if (!button) return; removeWithUndo(state.activities, button.dataset.ledgerDelete, 'Gold activity removed.', (item, index) => state.activities.splice(index, 0, item)); });
+      root.querySelector('#acc-journal').addEventListener('click', e => { const button = e.target.closest('[data-session-delete]'); if (!button) return; const index = state.activities.findIndex(item => item.id === button.dataset.sessionDelete); if (index < 0) return; const [removed] = state.activities.splice(index, 1); const c = character(); c.playedMinutes = Math.max(0, c.playedMinutes - Number(removed.durationMinutes)); c.gold = Math.max(0, Number(c.gold) - Number(removed.gold?.delta || 0)); saveState(); render(); showToast('Journal entry removed.', { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.activities.splice(index, 0, removed); c.playedMinutes += Number(removed.durationMinutes); c.gold += Number(removed.gold?.delta || 0); saveState(); render(); showToast('Journal entry restored.'); } }); });
+      root.querySelector('#acc-export').addEventListener('click', async () => { const payload = JSON.stringify(state, null, 2); try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); } catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); } });
       root.querySelector('#acc-import').addEventListener('click', () => { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); });
-      root.querySelector('#acc-import-form').addEventListener('submit', e => {
-        e.preventDefault();
-        try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); if (!Array.isArray(incoming.characters) || !incoming.characters.length) throw new Error('No characters found in this backup.'); const previous = structuredClone(state); state = normalizeState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); showToast('Backup imported.', { actionLabel: 'Undo', onAction: () => { state = previous; saveState(); render(); showToast('Previous campaign restored.'); } }); }
-        catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; }
-      });
-      root.querySelector('#acc-delete-character').addEventListener('click', () => {
-        if (state.characters.length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; }
-        root.querySelector('#acc-delete-character-name').textContent = character().name;
-        root.querySelector('#acc-delete-character-dialog').showModal();
-      });
-      root.querySelector('#acc-delete-character-form').addEventListener('submit', e => {
-        e.preventDefault();
-        const removed = character();
-        const index = state.characters.findIndex(c => c.id === removed.id);
-        state.characters.splice(index, 1);
-        state.activeId = state.characters[0].id;
-        saveState();
-        root.querySelector('#acc-delete-character-dialog').close();
-        render();
-        showToast(`${removed.name} deleted.`, { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.characters.splice(index, 0, removed); state.activeId = removed.id; saveState(); render(); showToast(`${removed.name} restored.`); } });
-      });
+      root.querySelector('#acc-import-form').addEventListener('submit', e => { e.preventDefault(); try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); const previous = structuredClone(state); state = Core.migrateState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); showToast('Backup imported.', { actionLabel: 'Undo', onAction: () => { state = previous; saveState(); render(); showToast('Previous campaign restored.'); } }); } catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; } });
+      root.querySelector('#acc-delete-character').addEventListener('click', () => { if (state.characters.length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; } root.querySelector('#acc-delete-character-name').textContent = character().name; root.querySelector('#acc-delete-character-dialog').showModal(); });
+      root.querySelector('#acc-delete-character-form').addEventListener('submit', e => { e.preventDefault(); const removed = character(); const index = state.characters.findIndex(c => c.id === removed.id); state.characters.splice(index, 1); state.goals = state.goals.filter(g => g.characterId !== removed.id); state.activities = state.activities.filter(a => a.characterId !== removed.id); state.progressEvents = state.progressEvents.filter(p => p.entityId !== removed.id); state.collectionTrackers = state.collectionTrackers.filter(t => t.characterId !== removed.id); state.activeCharacterId = state.characters[0].id; saveState(); root.querySelector('#acc-delete-character-dialog').close(); render(); showToast(`${removed.name} deleted.`, { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.characters.splice(index, 0, removed); state.activeCharacterId = removed.id; saveState(); render(); showToast(`${removed.name} restored.`); } }); });
+      root.querySelector('#acc-recovery-export').addEventListener('click', exportRawRecovery);
+      root.querySelector('#acc-recovery-retry').addEventListener('click', () => { boot(); });
+      root.querySelector('#acc-recovery-legacy').addEventListener('click', () => { if (!recoveryState?.legacyState) return; state = recoveryState.legacyState; recoveryState = null; Core.persistV2(localStorage, state, { overwriteInvalidV2: true }); renderRecovery(); render(); showToast('Legacy campaign loaded.'); });
+      root.querySelector('#acc-recovery-starter').addEventListener('click', () => root.querySelector('#acc-starter-dialog').showModal());
+      root.querySelector('#acc-starter-form').addEventListener('submit', e => { e.preventDefault(); state = Core.createStarterState(); recoveryState = null; Core.persistV2(localStorage, state, { overwriteInvalidV2: true }); root.querySelector('#acc-starter-dialog').close(); renderRecovery(); render(); showToast('Starter campaign loaded.'); });
       root.querySelector('#acc-toast-region').addEventListener('click', e => {
         const button = e.target.closest('[data-toast-action]');
         if (!button || !toastAction) return;
@@ -1449,7 +1491,7 @@
         dismissToast();
         action();
       });
-      render();
+      boot();
     })();
   </script>
 </div>

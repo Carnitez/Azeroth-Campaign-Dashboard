@@ -15,10 +15,11 @@ if (!html.includes('acc-sidebar')) failures.push('Application sidebar is missing
 if (!html.includes('classThemes')) failures.push('Character class theme configuration is missing.');
 if (!html.includes("'night-elf'")) failures.push('Night Elf theme influence is missing.');
 
-const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
-for (const [index, source] of inlineScripts.entries()) {
+const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)].map(match => ({ attrs: match[1], source: match[2] }));
+for (const [index, script] of inlineScripts.entries()) {
+  if (/\btype=["']module["']/i.test(script.attrs)) continue;
   try {
-    new Function(source);
+    new Function(script.source);
   } catch (error) {
     failures.push(`Inline script ${index + 1} has invalid JavaScript: ${error.message}`);
   }
@@ -28,5 +29,5 @@ if (failures.length) {
   console.error(failures.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`Checks passed: ${inlineScripts.length} inline scripts parsed; persistence and multi-character controls present.`);
+  console.log(`Checks passed: ${inlineScripts.length} inline scripts found; persistence and multi-character controls present.`);
 }

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 2,
+  "activeCharacterId": "carnitez-silvermoon-eu",
+  "preferences": {},
+  "characters": [{
+    "id": "carnitez-silvermoon-eu",
+    "name": "Carnitez",
+    "realm": "Silvermoon",
+    "region": "EU",
+    "faction": "Alliance",
+    "race": "Night Elf",
+    "className": "Druid",
+    "spec": "Guardian",
+    "professions": "Herbalism, Mining",
+    "level": 1,
+    "gold": 0,
+    "playedMinutes": 0,
+    "location": "Shadowglen",
+    "createdAt": "2026-07-18"
+  }],
+  "goals": [],
+  "activities": [],
+  "progressEvents": [],
+  "collectionTrackers": [],
+  "migration": { "sourceVersion": 2, "targetVersion": 2, "migratedAt": "2026-07-18T10:00:00.000Z" }
+}

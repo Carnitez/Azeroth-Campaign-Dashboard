@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "activeCharacterId": "c",
+  "preferences": {},
+  "characters": [{ "id": "c", "name": "Carnitez", "realm": "Silvermoon", "region": "EU", "faction": "Alliance", "race": "Night Elf", "className": "Druid", "spec": "Guardian", "level": 70, "gold": 10, "playedMinutes": 0, "location": "", "createdAt": "2026-07-18" }],
+  "goals": [{ "id": "bad", "characterId": "c", "scope": "character", "title": "", "status": "unknown", "priority": 0, "createdAt": "not-a-date" }],
+  "activities": [], "progressEvents": [], "collectionTrackers": [],
+  "migration": { "sourceVersion": 2, "targetVersion": 2, "migratedAt": "2026-07-18T10:00:00.000Z" }
+}

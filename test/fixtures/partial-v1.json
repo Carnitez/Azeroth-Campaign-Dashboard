@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "characters": [
+    { "name": "Missing Id", "realm": "Silvermoon", "level": 10, "gold": 42, "collections": {}, "goals": [], "sessions": [], "ledger": [], "snapshots": [] },
+    null,
+    { "id": "second", "name": "Second", "realm": "Draenor", "level": 20, "gold": 1, "goals": [{ "title": "Keep it", "done": true }], "sessions": [{ "minutes": 10, "goldDelta": 3 }], "ledger": [], "snapshots": [] }
+  ]
+}

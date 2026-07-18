@@ -44,3 +44,7 @@ The static site is generated in `dist/` and is ready for Vercel.
 ## Privacy
 
 Progress stays in the browser that recorded it. Export a JSON backup before clearing browser data or changing devices.
+
+## Data safety
+
+The dashboard now stores validated schema-v2 state under `azeroth-command-center-v2`. Existing `azeroth-command-center-v1` data is never changed or removed; it is migrated into v2 on first load and the exact original string is kept once under `azeroth-command-center-v1-recovery`. Malformed or future-version data opens an explicit recovery view instead of being replaced with starter data. Use `npm test` to run the migration, validation, persistence, gold, and local-date tests.

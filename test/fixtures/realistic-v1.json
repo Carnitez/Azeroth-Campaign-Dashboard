@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "activeId": "carnitez",
+  "preferences": { "density": "compact" },
+  "characters": [{
+    "id": "carnitez",
+    "name": "Carnitez",
+    "realm": "Silvermoon",
+    "region": "EU",
+    "faction": "Alliance",
+    "race": "Night Elf",
+    "className": "Druid",
+    "spec": "Guardian",
+    "professions": ["Herbalism", "Mining"],
+    "level": 70,
+    "gold": 12500,
+    "playedMinutes": 240,
+    "location": "Valdrakken",
+    "createdAt": "2025-01-02T12:00:00.000Z",
+    "milestones": ["Shadowlands complete"],
+    "objectives": { "weekly": "Finish world quests" },
+    "journal": { "note": "Started completionist run" },
+    "collections": {
+      "Mounts": { "owned": 12, "target": 20, "baseline": 10, "source": "armory" },
+      "Pets": { "owned": 5, "target": 10, "baseline": 5 }
+    },
+    "goals": [{ "id": "goal-existing", "type": "Gold", "title": "Reach 20k gold", "done": false, "createdAt": "2025-01-03" }],
+    "sessions": [{ "id": "session-existing", "date": "2025-01-04", "minutes": 60, "goldDelta": 500, "note": "Herbalism route", "timestamp": "2025-01-04T21:30:00+01:00" }],
+    "ledger": [{ "id": "ledger-existing", "date": "2025-01-05", "activity": "Old raid", "minutes": 30, "revenue": 1000, "cost": 100, "notes": "Sold drops", "transfer": true }],
+    "snapshots": [{ "id": "snapshot-existing", "date": "2025-01-03", "gold": 12000, "level": 70 }]
+  }]
+}

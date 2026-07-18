@@ -4,9 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const [baseCss, dashboard] = await Promise.all([
+const [baseCss, dashboard, core] = await Promise.all([
   readFile(resolve(root, 'src/base.css'), 'utf8'),
   readFile(resolve(root, 'src/dashboard.html'), 'utf8'),
+  readFile(resolve(root, 'src/core.mjs'), 'utf8'),
 ]);
 
 const document = `<!doctype html>
@@ -24,6 +25,9 @@ body { box-sizing: border-box; min-width: 320px; background: #0c0f0d; color: var
   </style>
 </head>
 <body>
+<script type="module">
+${core}
+</script>
 ${dashboard}
 <script id="lucide-library" src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <script>
