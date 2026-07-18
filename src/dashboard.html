@@ -203,6 +203,64 @@
       margin-top: 1.25rem;
       padding-top: 1rem;
     }
+    #azeroth-command-center .acc-btn-danger {
+      border-color: color-mix(in srgb, var(--destructive) 45%, var(--border));
+      color: var(--destructive);
+    }
+    #azeroth-command-center .acc-btn-danger:not(:disabled):hover {
+      border-color: var(--destructive);
+      background: color-mix(in srgb, var(--destructive) 10%, var(--secondary));
+    }
+    #azeroth-command-center .acc-delete-copy {
+      margin: 0;
+      line-height: 1.55;
+    }
+    #azeroth-command-center .acc-toast-region {
+      position: fixed;
+      z-index: 100;
+      right: clamp(1rem, 3vw, 2rem);
+      bottom: clamp(1rem, 3vw, 2rem);
+      width: min(25rem, calc(100vw - 2rem));
+      pointer-events: none;
+    }
+    #azeroth-command-center .acc-toast {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      color: var(--card-foreground);
+      background: var(--card);
+      box-shadow: 0 16px 42px rgb(0 0 0 / 24%);
+      pointer-events: auto;
+      animation: acc-toast-in 180ms ease-out;
+    }
+    #azeroth-command-center .acc-toast-icon {
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      border-radius: var(--radius-full);
+      color: var(--primary-foreground);
+      background: var(--primary);
+    }
+    #azeroth-command-center .acc-toast[data-tone="warning"] .acc-toast-icon {
+      color: var(--destructive);
+      background: color-mix(in srgb, var(--destructive) 14%, var(--card));
+    }
+    #azeroth-command-center .acc-toast-message {
+      line-height: 1.4;
+    }
+    #azeroth-command-center .acc-toast-action {
+      min-height: 2rem;
+      font-weight: var(--font-weight-medium);
+    }
+    @keyframes acc-toast-in {
+      from { opacity: 0; transform: translateY(0.5rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @media (max-width: 720px) {
       #azeroth-command-center .acc-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -231,31 +289,601 @@
     }
     @media (prefers-reduced-motion: reduce) {
       #azeroth-command-center .acc-progress-fill { transition: none; }
+      #azeroth-command-center .acc-toast { animation: none; }
+    }
+
+    /* Linear-inspired campaign shell. Character themes update these tokens at runtime. */
+    #azeroth-command-center {
+      --acc-primary: #ff7c0a;
+      --acc-on-primary: #17110b;
+      --acc-secondary: #8582ff;
+      --acc-surface-tint: #14221b;
+      --acc-active: #ff8b2b;
+      --acc-progress: #ff7c0a;
+      --acc-glow: rgb(118 113 255 / 12%);
+      --background: #0c0f0d;
+      --foreground: #eceeea;
+      --card: #141816;
+      --card-foreground: #eceeea;
+      --popover: #181d1a;
+      --popover-foreground: #eceeea;
+      --primary: var(--acc-primary);
+      --primary-foreground: var(--acc-on-primary);
+      --secondary: #1a1f1c;
+      --secondary-foreground: #eceeea;
+      --muted: rgb(255 255 255 / 6%);
+      --muted-foreground: #8d958f;
+      --accent: color-mix(in srgb, var(--acc-primary) 12%, transparent);
+      --accent-foreground: #ffd1a8;
+      --border: rgb(255 255 255 / 8%);
+      --input: rgb(255 255 255 / 11%);
+      --ring: var(--acc-active);
+      --viz-series-1: var(--acc-progress);
+      --radius: 6px;
+      min-height: 100vh;
+      color: var(--foreground);
+      background:
+        radial-gradient(circle at 82% 3%, var(--acc-glow), transparent 30rem),
+        radial-gradient(circle at 18% 100%, color-mix(in srgb, var(--acc-surface-tint) 45%, transparent), transparent 36rem),
+        linear-gradient(rgb(255 255 255 / 1.2%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(255 255 255 / 0.9%) 1px, transparent 1px),
+        var(--background);
+      background-size: auto, auto, 24px 24px, 24px 24px, auto;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #azeroth-command-center .acc-shell {
+      display: grid;
+      grid-template-columns: 232px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    #azeroth-command-center .acc-sidebar {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding: 1rem 0.75rem;
+      border-right: 1px solid var(--border);
+      background: color-mix(in srgb, #0d100e 94%, var(--acc-surface-tint));
+      box-shadow: 14px 0 40px rgb(0 0 0 / 8%);
+    }
+    #azeroth-command-center .acc-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+    #azeroth-command-center .acc-brand > span:last-child,
+    #azeroth-command-center .acc-sidebar-footer > span:last-child {
+      display: grid;
+      min-width: 0;
+    }
+    #azeroth-command-center .acc-brand small,
+    #azeroth-command-center .acc-sidebar-footer small {
+      color: var(--muted-foreground);
+      font-size: 0.68rem;
+      line-height: 1.35;
+    }
+    #azeroth-command-center .acc-brand-mark,
+    #azeroth-command-center .acc-character-avatar {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--acc-primary) 30%, var(--border));
+      border-radius: 7px;
+      color: var(--acc-primary);
+      background: color-mix(in srgb, var(--acc-primary) 8%, #111512);
+    }
+    #azeroth-command-center .acc-brand-mark {
+      width: 2rem;
+      height: 2rem;
+    }
+    #azeroth-command-center .acc-character-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0.7rem;
+      align-items: center;
+      padding: 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--acc-surface-tint) 55%, #121512), #111412);
+    }
+    #azeroth-command-center .acc-character-avatar {
+      width: 2.25rem;
+      height: 2.25rem;
+      box-shadow: 0 0 22px var(--acc-glow);
+    }
+    #azeroth-command-center .acc-identity {
+      overflow: hidden;
+    }
+    #azeroth-command-center .acc-name {
+      overflow: hidden;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #azeroth-command-center #acc-character-meta {
+      overflow: hidden;
+      font-size: 0.69rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-character-select {
+      grid-column: 1 / -1;
+      min-height: 2rem;
+      font-size: 0.75rem;
+    }
+    #azeroth-command-center .acc-tabs {
+      display: grid;
+      gap: 0.18rem;
+      margin: 0;
+    }
+    #azeroth-command-center .acc-tabs .btn {
+      display: grid;
+      grid-template-columns: 1.15rem minmax(0, 1fr) auto;
+      width: 100%;
+      min-height: 2.25rem;
+      justify-content: stretch;
+      gap: 0.55rem;
+      padding: 0 0.65rem;
+      border-color: transparent;
+      border-radius: 6px;
+      color: var(--muted-foreground);
+      background: transparent;
+      text-align: left;
+      transition: color 120ms ease, background 120ms ease;
+    }
+    #azeroth-command-center .acc-tabs .btn span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #azeroth-command-center .acc-tabs .btn kbd {
+      color: #666d68;
+      font: 0.64rem/1 ui-monospace, monospace;
+    }
+    #azeroth-command-center .acc-tabs .btn:hover {
+      color: var(--foreground);
+      background: rgb(255 255 255 / 4%);
+    }
+    #azeroth-command-center .acc-tabs .btn[aria-pressed="true"] {
+      border-color: transparent;
+      color: var(--foreground);
+      background: color-mix(in srgb, var(--acc-primary) 11%, rgb(255 255 255 / 3%));
+      box-shadow: inset 2px 0 0 var(--acc-active);
+    }
+    #azeroth-command-center .acc-tabs .btn[aria-pressed="true"] svg {
+      color: var(--acc-primary);
+    }
+    #azeroth-command-center .acc-sidebar-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: auto;
+      padding: 0.65rem 0.45rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+    }
+    #azeroth-command-center .acc-theme-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--acc-primary);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--acc-primary) 45%, transparent);
+    }
+    #azeroth-command-center .acc-workspace {
+      min-width: 0;
+    }
+    #azeroth-command-center .acc-page-header {
+      position: sticky;
+      z-index: 4;
+      top: 0;
+      display: flex;
+      min-height: 78px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem clamp(1rem, 2.6vw, 2rem);
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--background) 88%, transparent);
+      backdrop-filter: blur(16px);
+    }
+    #azeroth-command-center .acc-page-title {
+      display: grid;
+      gap: 0.12rem;
+    }
+    #azeroth-command-center .acc-eyebrow {
+      color: var(--acc-secondary);
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    #azeroth-command-center .acc-page-title h1 {
+      font-size: 1.15rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+    }
+    #azeroth-command-center .acc-page-title p {
+      font-size: 0.75rem;
+    }
+    #azeroth-command-center .acc-toolbar {
+      gap: 0.45rem;
+    }
+    #azeroth-command-center .acc-main {
+      width: min(100%, 1480px);
+      padding: clamp(1rem, 2.6vw, 2rem);
+    }
+    #azeroth-command-center .acc-panel {
+      animation: acc-panel-in 140ms ease-out;
+    }
+    #azeroth-command-center .acc-section {
+      margin-top: 1.5rem;
+    }
+    #azeroth-command-center .acc-section-head {
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    #azeroth-command-center .acc-section-head h2,
+    #azeroth-command-center .acc-section-head h3 {
+      position: relative;
+      padding-left: 0.72rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    #azeroth-command-center .acc-section-head h2::before,
+    #azeroth-command-center .acc-section-head h3::before {
+      position: absolute;
+      top: 0.35em;
+      left: 0;
+      width: 0.28rem;
+      height: 0.7rem;
+      border-radius: 2px;
+      background: linear-gradient(var(--acc-primary), var(--acc-secondary));
+      content: "";
+    }
+    #azeroth-command-center .card {
+      padding: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--card) 94%, var(--acc-surface-tint));
+      box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+    }
+    #azeroth-command-center .acc-stats {
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--card) 93%, var(--acc-surface-tint));
+      overflow: hidden;
+    }
+    #azeroth-command-center .acc-stats .card {
+      min-height: 92px;
+      padding: 0.9rem 1rem;
+      border: 0;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    #azeroth-command-center .acc-stats .card:last-child {
+      border-right: 0;
+    }
+    #azeroth-command-center .viz-stat-value {
+      color: var(--foreground);
+      font-size: 1.25rem;
+      font-weight: 630;
+      letter-spacing: -0.035em;
+    }
+    #azeroth-command-center .acc-main-grid {
+      grid-template-columns: minmax(0, 1.45fr) minmax(17rem, 0.55fr);
+      gap: 1.5rem;
+    }
+    #azeroth-command-center .acc-main-grid > .acc-stack:last-child {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-goals {
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-goal {
+      min-height: 2.9rem;
+      padding: 0.45rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 120ms ease;
+    }
+    #azeroth-command-center .acc-goal:hover {
+      background: rgb(255 255 255 / 2.5%);
+    }
+    #azeroth-command-center .viz-badge {
+      border: 1px solid color-mix(in srgb, var(--acc-secondary) 22%, transparent);
+      border-radius: 999px;
+      color: color-mix(in srgb, var(--acc-secondary) 78%, white);
+      background: color-mix(in srgb, var(--acc-secondary) 9%, transparent);
+      font-size: 0.64rem;
+      font-weight: 500;
+    }
+    #azeroth-command-center .acc-chart {
+      padding: 0.75rem 0 0;
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-chart .area {
+      fill: var(--acc-progress);
+      opacity: 0.08;
+    }
+    #azeroth-command-center .acc-chart .line,
+    #azeroth-command-center .acc-chart .dot {
+      stroke: var(--acc-progress);
+    }
+    #azeroth-command-center .acc-progress-track {
+      height: 0.35rem;
+      background: rgb(255 255 255 / 6%);
+    }
+    #azeroth-command-center .acc-progress-fill {
+      background: linear-gradient(90deg, color-mix(in srgb, var(--acc-progress) 70%, var(--acc-secondary)), var(--acc-progress));
+      box-shadow: 0 0 12px color-mix(in srgb, var(--acc-progress) 25%, transparent);
+    }
+    #azeroth-command-center .acc-collection-list {
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-collection-row {
+      min-height: 4.7rem;
+      padding: 0.65rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-collection-row > .acc-inline {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+    #azeroth-command-center .acc-collection-row > .acc-inline .form-label {
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    #azeroth-command-center .acc-entry {
+      padding: 0.65rem 0.25rem;
+    }
+    #azeroth-command-center .table thead th {
+      color: var(--muted-foreground);
+      font-size: 0.68rem;
+      font-weight: 520;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    #azeroth-command-center .table :is(th, td) {
+      border-bottom-color: var(--border);
+    }
+    #azeroth-command-center .btn {
+      min-height: 2rem;
+      padding: 0 0.65rem;
+      border-radius: 6px;
+      transition: border-color 120ms ease, color 120ms ease, background 120ms ease, transform 120ms ease;
+    }
+    #azeroth-command-center .btn-primary {
+      border-color: color-mix(in srgb, var(--acc-primary) 80%, white 10%);
+      color: var(--acc-on-primary);
+      background: var(--acc-primary);
+      font-weight: 600;
+    }
+    #azeroth-command-center .btn-primary:not(:disabled):hover {
+      background: color-mix(in srgb, var(--acc-primary) 88%, white);
+      transform: translateY(-1px);
+    }
+    #azeroth-command-center .form-control,
+    #azeroth-command-center .form-select {
+      min-height: 2rem;
+      border-radius: 6px;
+      background-color: #181c19;
+    }
+    #azeroth-command-center .form-control:focus-visible,
+    #azeroth-command-center .form-select:focus-visible {
+      border-color: var(--acc-active);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--acc-active) 18%, transparent);
+    }
+    #azeroth-command-center .form-check-input[type="checkbox"]:checked {
+      border-color: var(--acc-primary);
+      background-color: var(--acc-primary);
+    }
+    #azeroth-command-center dialog {
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--popover) 96%, var(--acc-surface-tint));
+      box-shadow: 0 24px 80px rgb(0 0 0 / 48%);
+    }
+    #azeroth-command-center dialog::backdrop {
+      background: rgb(4 6 5 / 78%);
+      backdrop-filter: blur(3px);
+    }
+    #azeroth-command-center .acc-toast {
+      border-radius: 7px;
+      background: #191e1a;
+    }
+    #azeroth-command-center .acc-toast-icon {
+      color: var(--acc-on-primary);
+      background: var(--acc-primary);
+    }
+    #azeroth-command-center .acc-empty {
+      position: relative;
+      min-height: 4rem;
+      padding: 1.2rem 1rem 1.2rem 2.2rem;
+      border: 1px dashed color-mix(in srgb, var(--acc-secondary) 20%, var(--border));
+      border-radius: 7px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--acc-surface-tint) 30%, transparent), transparent);
+    }
+    #azeroth-command-center .acc-empty::before {
+      position: absolute;
+      top: 1.25rem;
+      left: 0.9rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border: 1px solid var(--acc-secondary);
+      content: "";
+      opacity: 0.55;
+      transform: rotate(45deg);
+    }
+    @keyframes acc-panel-in {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 860px) {
+      #azeroth-command-center .acc-shell {
+        grid-template-columns: 1fr;
+      }
+      #azeroth-command-center .acc-sidebar {
+        position: relative;
+        height: auto;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+        box-shadow: none;
+      }
+      #azeroth-command-center .acc-brand {
+        display: none;
+      }
+      #azeroth-command-center .acc-character-card {
+        grid-template-columns: auto minmax(0, 1fr) minmax(9rem, 0.65fr);
+      }
+      #azeroth-command-center .acc-character-select {
+        grid-column: auto;
+      }
+      #azeroth-command-center .acc-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow-x: auto;
+      }
+      #azeroth-command-center .acc-tabs .btn {
+        grid-template-columns: auto minmax(0, auto);
+        justify-content: center;
+      }
+      #azeroth-command-center .acc-tabs .btn kbd,
+      #azeroth-command-center .acc-sidebar-footer {
+        display: none;
+      }
+      #azeroth-command-center .acc-page-header {
+        position: relative;
+      }
+    }
+    @media (max-width: 720px) {
+      #azeroth-command-center .acc-main-grid,
+      #azeroth-command-center .acc-two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #azeroth-command-center .acc-collection-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.45rem;
+      }
+      #azeroth-command-center .acc-stats .card:nth-child(2) {
+        border-right: 0;
+      }
+      #azeroth-command-center .acc-stats .card:nth-child(-n+2) {
+        border-bottom: 1px solid var(--border);
+      }
+      #azeroth-command-center .acc-main-grid > .acc-stack:last-child {
+        padding-top: 1.25rem;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+    }
+    @media (max-width: 560px) {
+      #azeroth-command-center .acc-character-card {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+      #azeroth-command-center .acc-character-select {
+        grid-column: 1 / -1;
+      }
+      #azeroth-command-center .acc-tabs {
+        grid-template-columns: repeat(4, minmax(5.25rem, 1fr));
+      }
+      #azeroth-command-center .acc-tabs .btn {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-height: 3.25rem;
+        font-size: 0.67rem;
+      }
+      #azeroth-command-center .acc-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      #azeroth-command-center .acc-toolbar {
+        width: 100%;
+      }
+      #azeroth-command-center .acc-toolbar .btn {
+        flex: 1;
+      }
+      #azeroth-command-center .acc-main {
+        padding: 1rem 0.75rem 1.5rem;
+      }
+      #azeroth-command-center .acc-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      #azeroth-command-center .acc-form-grid {
+        grid-template-columns: 1fr;
+      }
+      #azeroth-command-center .acc-form-grid .wide {
+        grid-column: auto;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #azeroth-command-center .acc-panel,
+      #azeroth-command-center .btn {
+        animation: none;
+        transition: none;
+      }
     }
   </style>
 
-  <header class="acc-top">
-    <div class="acc-identity" aria-live="polite">
-      <span class="acc-name" id="acc-character-name">Carnitez</span>
-      <span class="text-muted" id="acc-character-meta">Night Elf Druid · Silvermoon EU</span>
-    </div>
-    <div class="acc-toolbar">
-      <label class="form-label">Character
-        <select class="form-select" id="acc-character-select"></select>
-      </label>
-      <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit</button>
-      <button class="btn btn-primary" type="button" id="acc-add-character"><i data-lucide="user-plus" aria-hidden="true"></i> Add character</button>
-    </div>
-  </header>
+  <div class="acc-shell">
+    <aside class="acc-sidebar">
+      <div class="acc-brand">
+        <span class="acc-brand-mark" aria-hidden="true">✦</span>
+        <span><strong>Azeroth</strong><small>Campaign OS</small></span>
+      </div>
 
-  <nav class="acc-tabs" aria-label="Dashboard sections">
-    <button class="btn" type="button" data-tab="overview" aria-pressed="true">Overview</button>
-    <button class="btn" type="button" data-tab="collections" aria-pressed="false">Collections</button>
-    <button class="btn" type="button" data-tab="gold" aria-pressed="false">Gold</button>
-    <button class="btn" type="button" data-tab="journal" aria-pressed="false">Journal</button>
-  </nav>
+      <div class="acc-character-card">
+        <div class="acc-character-avatar" id="acc-class-icon" aria-hidden="true">☾</div>
+        <div class="acc-identity" aria-live="polite">
+          <span class="acc-name" id="acc-character-name">Carnitez</span>
+          <span class="text-muted" id="acc-character-meta">Night Elf Druid · Silvermoon EU</span>
+        </div>
+        <label class="sr-only" for="acc-character-select">Character</label>
+        <select class="form-select acc-character-select" id="acc-character-select" aria-label="Character"></select>
+      </div>
 
-  <main>
+      <nav class="acc-tabs" aria-label="Dashboard sections">
+        <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Overview</span><kbd>Alt 1</kbd></button>
+        <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 2</kbd></button>
+        <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 3</kbd></button>
+        <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 4</kbd></button>
+      </nav>
+
+      <div class="acc-sidebar-footer">
+        <span class="acc-theme-dot" aria-hidden="true"></span>
+        <span><strong id="acc-theme-label">Druid theme</strong><small>Stored locally · EU</small></span>
+      </div>
+    </aside>
+
+    <div class="acc-workspace">
+      <header class="acc-page-header">
+        <div class="acc-page-title">
+          <span class="acc-eyebrow">Campaign dashboard</span>
+          <h1 id="acc-page-title">Overview</h1>
+          <p class="text-muted" id="acc-page-description">A clear view of the next step and the journey so far.</p>
+        </div>
+        <div class="acc-toolbar">
+          <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
+          <button class="btn btn-primary" type="button" id="acc-add-character"><i data-lucide="user-plus" aria-hidden="true"></i> Add character</button>
+        </div>
+      </header>
+
+      <main class="acc-main">
     <section class="acc-panel" id="acc-panel-overview" data-panel="overview">
       <div class="acc-stats">
         <div class="card viz-stat"><span class="text-muted">Level</span><span class="viz-stat-value" id="acc-stat-level">1</span><span class="text-small text-muted" id="acc-stat-location">Shadowglen</span></div>
@@ -353,12 +981,14 @@
             <button class="btn" type="button" id="acc-import"><i data-lucide="upload" aria-hidden="true"></i> Import backup</button>
           </div>
           <div class="acc-danger-zone">
-            <button class="btn" type="button" id="acc-delete-character"><i data-lucide="trash-2" aria-hidden="true"></i> Delete current character</button>
+            <button class="btn acc-btn-danger" type="button" id="acc-delete-character"><i data-lucide="trash-2" aria-hidden="true"></i> Delete current character</button>
           </div>
         </section>
       </div>
     </section>
-  </main>
+      </main>
+    </div>
+  </div>
 
   <dialog id="acc-character-dialog">
     <form method="dialog" id="acc-character-form">
@@ -399,6 +1029,16 @@
     </form>
   </dialog>
 
+  <dialog id="acc-delete-character-dialog">
+    <form method="dialog" id="acc-delete-character-form">
+      <div class="acc-dialog-head"><h2>Delete character?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-delete-character-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <p class="acc-delete-copy">This removes <strong id="acc-delete-character-name"></strong> and all progress recorded for this character from this browser. You can undo the deletion immediately afterward.</p>
+      <div class="acc-actions"><button class="btn acc-btn-danger" type="submit"><i data-lucide="trash-2" aria-hidden="true"></i> Delete character</button><button class="btn" type="button" data-close-dialog="acc-delete-character-dialog">Keep character</button></div>
+    </form>
+  </dialog>
+
+  <div class="acc-toast-region" id="acc-toast-region" aria-live="polite" aria-atomic="true" hidden></div>
+
   <script>
     (() => {
       const root = document.getElementById('azeroth-command-center');
@@ -406,6 +1046,31 @@
       const today = () => new Date().toISOString().slice(0, 10);
       const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
       const collectionNames = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
+      const defaultTheme = { primary: '#9ba39d', onPrimary: '#0e1110', secondary: '#8aa5b8', surfaceTint: '#18201c', active: '#b8c0ba', progress: '#9ba39d', glow: 'rgb(138 165 184 / 10%)', icon: 'shield', glyph: '◆', motif: 'stone' };
+      const classThemes = Object.freeze({
+        'death-knight': { primary: '#c41e3a', onPrimary: '#fff5f6', secondary: '#6f91a8', surfaceTint: '#21151a', active: '#e13d58', progress: '#c41e3a', glow: 'rgb(196 30 58 / 13%)', icon: 'skull', glyph: 'ᛉ', motif: 'rune' },
+        'demon-hunter': { primary: '#a330c9', onPrimary: '#fff7ff', secondary: '#69c189', surfaceTint: '#1c1521', active: '#bd54dd', progress: '#a330c9', glow: 'rgb(163 48 201 / 14%)', icon: 'eye', glyph: '◉', motif: 'glaive' },
+        druid: { primary: '#ff7c0a', onPrimary: '#17110b', secondary: '#799d74', surfaceTint: '#14221b', active: '#ff8b2b', progress: '#ff7c0a', glow: 'rgb(118 113 255 / 12%)', icon: 'leaf', glyph: '☾', motif: 'crescent-leaf' },
+        evoker: { primary: '#33937f', onPrimary: '#f3fffc', secondary: '#b6a3dc', surfaceTint: '#13201e', active: '#4da994', progress: '#33937f', glow: 'rgb(51 147 127 / 12%)', icon: 'wind', glyph: '◇', motif: 'dragon-scale' },
+        hunter: { primary: '#aad372', onPrimary: '#10150c', secondary: '#8d7255', surfaceTint: '#182019', active: '#bce28d', progress: '#aad372', glow: 'rgb(170 211 114 / 10%)', icon: 'crosshair', glyph: '⌾', motif: 'track' },
+        mage: { primary: '#3fc7eb', onPrimary: '#071315', secondary: '#7486d8', surfaceTint: '#111d22', active: '#6ed5f1', progress: '#3fc7eb', glow: 'rgb(63 199 235 / 12%)', icon: 'snowflake', glyph: '✧', motif: 'arcane' },
+        monk: { primary: '#00ff98', onPrimary: '#05140d', secondary: '#c4aa67', surfaceTint: '#102019', active: '#35ffad', progress: '#00d981', glow: 'rgb(0 255 152 / 9%)', icon: 'circle-dot', glyph: '◐', motif: 'balance' },
+        paladin: { primary: '#f48cba', onPrimary: '#1c0c13', secondary: '#e2bd68', surfaceTint: '#21171d', active: '#f6a6c9', progress: '#f48cba', glow: 'rgb(244 140 186 / 11%)', icon: 'sun', glyph: '✦', motif: 'light' },
+        priest: { primary: '#e7e9e7', onPrimary: '#111312', secondary: '#c5b7e8', surfaceTint: '#1d1c22', active: '#ffffff', progress: '#d5d9d6', glow: 'rgb(197 183 232 / 10%)', icon: 'sparkles', glyph: '✣', motif: 'halo' },
+        rogue: { primary: '#fff468', onPrimary: '#171606', secondary: '#9f8b61', surfaceTint: '#201f13', active: '#fff78b', progress: '#e8dc45', glow: 'rgb(255 244 104 / 9%)', icon: 'eye-off', glyph: '⌁', motif: 'blade' },
+        shaman: { primary: '#0070dd', onPrimary: '#f3f9ff', secondary: '#64a6a0', surfaceTint: '#111a22', active: '#298aeb', progress: '#1680e8', glow: 'rgb(0 112 221 / 13%)', icon: 'waves', glyph: '≋', motif: 'totem' },
+        warlock: { primary: '#8788ee', onPrimary: '#0f0f1c', secondary: '#77a56b', surfaceTint: '#181725', active: '#a1a2f3', progress: '#8788ee', glow: 'rgb(135 136 238 / 13%)', icon: 'flame', glyph: '◈', motif: 'fel' },
+        warrior: { primary: '#c69b6d', onPrimary: '#17120d', secondary: '#8b6e59', surfaceTint: '#201a15', active: '#d7ae83', progress: '#c69b6d', glow: 'rgb(198 155 109 / 10%)', icon: 'shield', glyph: '◆', motif: 'steel' }
+      });
+      const raceInfluences = Object.freeze({
+        'night-elf': { secondary: '#8582ff', glow: 'rgb(112 108 255 / 14%)', motif: 'crescent-leaf' }
+      });
+      const pageMeta = Object.freeze({
+        overview: { title: 'Overview', description: 'A clear view of the next step and the journey so far.' },
+        collections: { title: 'Collections', description: 'Track account gains and keep the next milestone in reach.' },
+        gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
+        journal: { title: 'Adventure journal', description: 'Review sessions and keep campaign data safe.' }
+      });
       const starterCollections = Object.fromEntries(collectionNames.map(name => [name, { owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }]));
       const starterCharacter = {
         id: 'carnitez-silvermoon-eu', name: 'Carnitez', realm: 'Silvermoon', region: 'EU', faction: 'Alliance',
@@ -420,6 +1085,8 @@
       };
       let state = loadState();
       let activeTab = 'overview';
+      let toastTimer = null;
+      let toastAction = null;
 
       function loadState() {
         try {
@@ -461,8 +1128,80 @@
       function refreshIcons() {
         if (window.lucide?.createIcons) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
       }
+      function themeId(value) {
+        return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      }
+      function resolveCharacterTheme(c) {
+        const classId = themeId(c.className);
+        const raceId = themeId(c.race);
+        return { ...defaultTheme, ...(classThemes[classId] || {}), ...(raceInfluences[raceId] || {}), classId: classId || 'adventurer', raceId };
+      }
+      function applyCharacterTheme(c) {
+        const theme = resolveCharacterTheme(c);
+        const tokens = {
+          '--acc-primary': theme.primary,
+          '--acc-on-primary': theme.onPrimary,
+          '--acc-secondary': theme.secondary,
+          '--acc-surface-tint': theme.surfaceTint,
+          '--acc-active': theme.active,
+          '--acc-progress': theme.progress,
+          '--acc-glow': theme.glow,
+          '--primary': theme.primary,
+          '--primary-foreground': theme.onPrimary,
+          '--ring': theme.active,
+          '--viz-series-1': theme.progress
+        };
+        Object.entries(tokens).forEach(([name, value]) => root.style.setProperty(name, value));
+        root.dataset.classTheme = theme.classId;
+        root.dataset.raceTheme = theme.raceId;
+        root.dataset.motif = theme.motif;
+        const classIcon = root.querySelector('#acc-class-icon');
+        classIcon.textContent = theme.glyph;
+        classIcon.dataset.icon = theme.icon;
+        root.querySelector('#acc-theme-label').textContent = `${c.className || 'Adventurer'} · ${c.race || 'Campaign'} theme`;
+      }
+      function dismissToast() {
+        clearTimeout(toastTimer);
+        toastTimer = null;
+        toastAction = null;
+        const region = root.querySelector('#acc-toast-region');
+        region.hidden = true;
+        region.innerHTML = '';
+      }
+      function showToast(message, options = {}) {
+        clearTimeout(toastTimer);
+        toastAction = typeof options.onAction === 'function' ? options.onAction : null;
+        const region = root.querySelector('#acc-toast-region');
+        const icon = options.tone === 'warning' ? 'trash-2' : 'check';
+        region.innerHTML = `<div class="acc-toast" role="status" data-tone="${escapeHtml(options.tone || 'success')}">
+          <span class="acc-toast-icon"><i data-lucide="${icon}" aria-hidden="true"></i></span>
+          <span class="acc-toast-message">${escapeHtml(message)}</span>
+          ${toastAction ? `<button class="btn btn-ghost acc-toast-action" type="button" data-toast-action>${escapeHtml(options.actionLabel || 'Undo')}</button>` : ''}
+        </div>`;
+        region.hidden = false;
+        refreshIcons();
+        toastTimer = setTimeout(dismissToast, options.duration || (toastAction ? 7000 : 3600));
+      }
+      function removeWithUndo(collection, id, message, restore) {
+        const index = collection.findIndex(item => item.id === id);
+        if (index < 0) return;
+        const [removed] = collection.splice(index, 1);
+        saveState();
+        render();
+        showToast(message, {
+          tone: 'warning',
+          actionLabel: 'Undo',
+          onAction: () => {
+            restore(removed, index);
+            saveState();
+            render();
+            showToast('Restored.');
+          }
+        });
+      }
       function render() {
         const c = character();
+        applyCharacterTheme(c);
         renderCharacterSelect(c);
         root.querySelector('#acc-character-name').textContent = c.name;
         root.querySelector('#acc-character-meta').textContent = `${c.race} ${c.className} · ${c.realm} ${c.region}`;
@@ -580,11 +1319,24 @@
         Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
         root.querySelector('#acc-character-dialog').showModal();
       }
-      root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => {
-        activeTab = button.dataset.tab;
-        root.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-pressed', String(x === button)));
-        root.querySelectorAll('[data-panel]').forEach(x => x.hidden = x.dataset.panel !== activeTab);
-      }));
+      function activateTab(tabName, focusTab = false) {
+        if (!pageMeta[tabName]) return;
+        activeTab = tabName;
+        const activeButton = root.querySelector(`[data-tab="${tabName}"]`);
+        root.querySelectorAll('[data-tab]').forEach(button => button.setAttribute('aria-pressed', String(button === activeButton)));
+        root.querySelectorAll('[data-panel]').forEach(panel => panel.hidden = panel.dataset.panel !== activeTab);
+        root.querySelector('#acc-page-title').textContent = pageMeta[tabName].title;
+        root.querySelector('#acc-page-description').textContent = pageMeta[tabName].description;
+        if (focusTab) activeButton?.focus();
+      }
+      root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
+      document.addEventListener('keydown', e => {
+        if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+        const tabName = ['overview', 'collections', 'gold', 'journal'][Number(e.key) - 1];
+        if (!tabName) return;
+        e.preventDefault();
+        activateTab(tabName, true);
+      });
       root.querySelector('#acc-character-select').addEventListener('change', e => { state.activeId = e.target.value; saveState(); render(); });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
       root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
@@ -601,63 +1353,101 @@
           state.characters.push(c); state.activeId = id;
         }
         saveState(); root.querySelector('#acc-character-dialog').close(); render();
+        showToast(existing ? 'Character updated.' : 'Character added.');
       });
       root.querySelector('#acc-quick-update').addEventListener('submit', e => {
         e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
         c.level = Number(f.get('level')); c.gold = Number(f.get('gold')); c.location = f.get('location').trim();
         c.snapshots.push({ date: today(), gold: c.gold, level: c.level }); saveState(); render();
+        showToast('Progress saved.');
       });
       root.querySelector('#acc-session-form').addEventListener('submit', e => {
         e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
         const entry = { id: uid(), date: today(), minutes: Number(f.get('minutes')), goldDelta: Number(f.get('goldDelta')), note: f.get('note').trim() };
         c.sessions.push(entry); c.playedMinutes += entry.minutes; c.gold = Math.max(0, Number(c.gold) + entry.goldDelta); c.snapshots.push({ date: today(), gold: c.gold, level: c.level });
         saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; render();
+        showToast('Play session added.');
       });
       root.querySelector('#acc-add-goal').addEventListener('click', () => root.querySelector('#acc-goal-dialog').showModal());
       root.querySelector('#acc-goal-form').addEventListener('submit', e => {
         e.preventDefault(); const f = new FormData(e.currentTarget); character().goals.push({ id: uid(), type: f.get('type'), title: f.get('title').trim(), done: false });
         saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render();
+        showToast('Objective added.');
       });
       root.querySelector('#acc-goals').addEventListener('change', e => {
         const id = e.target.dataset.goalToggle; if (!id) return; const goal = character().goals.find(g => g.id === id); if (goal) goal.done = e.target.checked; saveState(); render();
+        showToast(e.target.checked ? 'Objective completed.' : 'Objective reopened.');
       });
       root.querySelector('#acc-goals').addEventListener('click', e => {
-        const button = e.target.closest('[data-goal-delete]'); if (!button) return; character().goals = character().goals.filter(g => g.id !== button.dataset.goalDelete); saveState(); render();
+        const button = e.target.closest('[data-goal-delete]'); if (!button) return;
+        const c = character();
+        removeWithUndo(c.goals, button.dataset.goalDelete, 'Objective removed.', (item, index) => c.goals.splice(index, 0, item));
       });
       root.querySelector('#acc-save-collections').addEventListener('click', () => {
         root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); });
         saveState(); render();
+        showToast('Collection counts saved.');
       });
       root.querySelector('#acc-set-baseline').addEventListener('click', () => {
         root.querySelectorAll('[data-collection]').forEach(row => { const x = character().collections[row.dataset.collection]; x.owned = Number(row.querySelector('[data-collection-owned]').value); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); x.baseline = x.owned; });
         saveState(); render();
+        showToast('Collection baseline updated.');
       });
       root.querySelector('#acc-ledger-form').elements.date.value = today();
       root.querySelector('#acc-ledger-form').addEventListener('submit', e => {
         e.preventDefault(); const f = new FormData(e.currentTarget); character().ledger.push({ id: uid(), date: f.get('date'), activity: f.get('activity').trim(), minutes: Number(f.get('minutes')), revenue: Number(f.get('revenue')), cost: Number(f.get('cost')), notes: f.get('notes').trim() });
         saveState(); e.currentTarget.reset(); e.currentTarget.elements.date.value = today(); e.currentTarget.elements.minutes.value = 0; e.currentTarget.elements.revenue.value = 0; e.currentTarget.elements.cost.value = 0; render();
+        showToast('Gold activity recorded.');
       });
       root.querySelector('#acc-ledger-body').addEventListener('click', e => {
-        const button = e.target.closest('[data-ledger-delete]'); if (!button) return; character().ledger = character().ledger.filter(x => x.id !== button.dataset.ledgerDelete); saveState(); render();
+        const button = e.target.closest('[data-ledger-delete]'); if (!button) return;
+        const c = character();
+        removeWithUndo(c.ledger, button.dataset.ledgerDelete, 'Gold activity removed.', (item, index) => c.ledger.splice(index, 0, item));
       });
       root.querySelector('#acc-journal').addEventListener('click', e => {
-        const button = e.target.closest('[data-session-delete]'); if (!button) return; const c = character(); const entry = c.sessions.find(x => x.id === button.dataset.sessionDelete); if (entry) c.playedMinutes = Math.max(0, c.playedMinutes - Number(entry.minutes)); c.sessions = c.sessions.filter(x => x.id !== button.dataset.sessionDelete); saveState(); render();
+        const button = e.target.closest('[data-session-delete]'); if (!button) return;
+        const c = character();
+        const index = c.sessions.findIndex(item => item.id === button.dataset.sessionDelete);
+        if (index < 0) return;
+        const [removed] = c.sessions.splice(index, 1);
+        c.playedMinutes = Math.max(0, c.playedMinutes - Number(removed.minutes));
+        saveState();
+        render();
+        showToast('Journal entry removed.', { tone: 'warning', actionLabel: 'Undo', onAction: () => { c.sessions.splice(index, 0, removed); c.playedMinutes += Number(removed.minutes); saveState(); render(); showToast('Journal entry restored.'); } });
       });
       root.querySelector('#acc-export').addEventListener('click', async () => {
         const payload = JSON.stringify(state, null, 2);
-        try { await navigator.clipboard.writeText(payload); root.querySelector('#acc-export').textContent = 'Copied backup'; setTimeout(() => { root.querySelector('#acc-export').innerHTML = '<i data-lucide="download" aria-hidden="true"></i> Export backup'; refreshIcons(); }, 1600); }
-        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); }
+        try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); }
+        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); }
       });
       root.querySelector('#acc-import').addEventListener('click', () => { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); });
       root.querySelector('#acc-import-form').addEventListener('submit', e => {
         e.preventDefault();
-        try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); if (!Array.isArray(incoming.characters) || !incoming.characters.length) throw new Error('No characters found in this backup.'); state = normalizeState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); }
+        try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); if (!Array.isArray(incoming.characters) || !incoming.characters.length) throw new Error('No characters found in this backup.'); const previous = structuredClone(state); state = normalizeState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); showToast('Backup imported.', { actionLabel: 'Undo', onAction: () => { state = previous; saveState(); render(); showToast('Previous campaign restored.'); } }); }
         catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; }
       });
       root.querySelector('#acc-delete-character').addEventListener('click', () => {
-        if (state.characters.length === 1) { alert('Keep at least one character in the campaign. Add another before deleting this one.'); return; }
-        if (!confirm(`Delete ${character().name} and all locally recorded progress?`)) return;
-        state.characters = state.characters.filter(c => c.id !== state.activeId); state.activeId = state.characters[0].id; saveState(); render();
+        if (state.characters.length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; }
+        root.querySelector('#acc-delete-character-name').textContent = character().name;
+        root.querySelector('#acc-delete-character-dialog').showModal();
+      });
+      root.querySelector('#acc-delete-character-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const removed = character();
+        const index = state.characters.findIndex(c => c.id === removed.id);
+        state.characters.splice(index, 1);
+        state.activeId = state.characters[0].id;
+        saveState();
+        root.querySelector('#acc-delete-character-dialog').close();
+        render();
+        showToast(`${removed.name} deleted.`, { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.characters.splice(index, 0, removed); state.activeId = removed.id; saveState(); render(); showToast(`${removed.name} restored.`); } });
+      });
+      root.querySelector('#acc-toast-region').addEventListener('click', e => {
+        const button = e.target.closest('[data-toast-action]');
+        if (!button || !toastAction) return;
+        const action = toastAction;
+        dismissToast();
+        action();
       });
       render();
     })();

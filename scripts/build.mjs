@@ -15,12 +15,12 @@ const document = `<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Track World of Warcraft characters, collection milestones, play sessions, goals, and gold-making experiments.">
-  <meta name="theme-color" content="#181818">
+  <meta name="theme-color" content="#0c0f0d">
   <title>Azeroth Campaign Dashboard</title>
   <style>
 ${baseCss}
 html, body { margin: 0; min-height: 100%; }
-body { box-sizing: border-box; max-width: 1180px; margin: 0 auto; padding: clamp(1rem, 3vw, 2rem); background: var(--background); color: var(--foreground); }
+body { box-sizing: border-box; min-width: 320px; background: #0c0f0d; color: var(--foreground); }
   </style>
 </head>
 <body>

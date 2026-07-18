@@ -14,8 +14,16 @@ A local-first World of Warcraft campaign tracker for completionists and gold mak
 - Gold activities with revenue, costs, profit, and measured profit per hour
 - Gold-balance history and collection gains since baseline
 - JSON backup export and import
+- Character-aware class and race accent themes
+- Recoverable deletion for objectives, journal entries, gold activities, and characters
 
 Carnitez-Silvermoon EU is included as the initial campaign character. All data is stored in the browser with `localStorage`; no account or login is required.
+
+## Interface
+
+The dashboard uses a compact campaign-management shell with a persistent desktop sidebar and a responsive mobile navigation layout. The active character's class selects the accent, progress, focus, surface, motif, and icon tokens; Night Elf characters add a restrained moonlit influence. Theme selection is derived from existing character fields, so older saved campaigns remain compatible.
+
+Use `Alt+1` through `Alt+4` to move between Overview, Collections, Gold, and Journal from the keyboard.
 
 ## Run locally
 

@@ -8,6 +8,12 @@ if (!html.includes('id="azeroth-command-center"')) failures.push('Dashboard root
 if (html.includes('<iframe')) failures.push('Unexpected iframe wrapper found.');
 if (!html.includes('localStorage')) failures.push('Local persistence code is missing.');
 if (!html.includes('acc-add-character')) failures.push('Multi-character controls are missing.');
+if (!html.includes('acc-toast-region')) failures.push('Save and deletion feedback is missing.');
+if (!html.includes('acc-delete-character-dialog')) failures.push('Character deletion confirmation is missing.');
+if (/\b(?:alert|confirm)\s*\(/.test(html)) failures.push('Native alert or confirm prompts found.');
+if (!html.includes('acc-sidebar')) failures.push('Application sidebar is missing.');
+if (!html.includes('classThemes')) failures.push('Character class theme configuration is missing.');
+if (!html.includes("'night-elf'")) failures.push('Night Elf theme influence is missing.');
 
 const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
 for (const [index, source] of inlineScripts.entries()) {
