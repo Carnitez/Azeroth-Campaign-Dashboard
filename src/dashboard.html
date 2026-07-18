@@ -872,6 +872,351 @@
       color: var(--muted-foreground);
       font-size: 0.75rem;
     }
+    #azeroth-command-center .acc-command-header {
+      display: grid;
+      grid-template-columns: minmax(16rem, 1fr) auto;
+      gap: 1.25rem;
+      align-items: center;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background:
+        linear-gradient(110deg, color-mix(in srgb, var(--acc-surface-tint) 60%, #111512), color-mix(in srgb, var(--card) 96%, transparent)),
+        var(--card);
+    }
+    #azeroth-command-center .acc-command-identity {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    #azeroth-command-center .acc-command-identity .acc-character-avatar {
+      width: 2.7rem;
+      height: 2.7rem;
+    }
+    #azeroth-command-center .acc-command-title {
+      display: grid;
+      min-width: 0;
+      gap: 0.1rem;
+    }
+    #azeroth-command-center .acc-command-title h2 {
+      overflow: hidden;
+      font-size: 1.05rem;
+      font-weight: 640;
+      letter-spacing: -0.02em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-command-meta {
+      display: flex;
+      gap: 0.35rem 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.72rem;
+    }
+    #azeroth-command-center .acc-command-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(4.6rem, auto)) minmax(9rem, 12rem);
+      gap: 0;
+      align-items: center;
+    }
+    #azeroth-command-center .acc-command-fact {
+      display: grid;
+      gap: 0.1rem;
+      padding: 0 0.8rem;
+      border-left: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-command-fact span:first-child {
+      color: var(--muted-foreground);
+      font-size: 0.64rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    #azeroth-command-center .acc-command-fact strong {
+      font-size: 0.83rem;
+      font-variant-numeric: tabular-nums;
+    }
+    #azeroth-command-center .acc-command-switcher {
+      min-width: 0;
+      padding-left: 0.8rem;
+      border-left: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-command-switcher .form-select {
+      font-size: 0.72rem;
+    }
+    #azeroth-command-center .acc-quick-actions {
+      display: flex;
+      gap: 0.35rem;
+      margin-top: 0.6rem;
+      padding: 0.45rem 0;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    #azeroth-command-center .acc-quick-actions .btn {
+      flex: 0 0 auto;
+      min-height: 1.9rem;
+      color: var(--muted-foreground);
+      background: transparent;
+    }
+    #azeroth-command-center .acc-quick-actions .btn:hover,
+    #azeroth-command-center .acc-quick-actions .btn:focus-visible {
+      color: var(--foreground);
+      background: rgb(255 255 255 / 4%);
+    }
+    #azeroth-command-center .acc-command-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.65fr);
+      gap: 1.4rem;
+      align-items: start;
+      margin-top: 1rem;
+    }
+    #azeroth-command-center .acc-command-column {
+      display: grid;
+      min-width: 0;
+      gap: 1.25rem;
+    }
+    #azeroth-command-center .acc-command-side {
+      padding-left: 1.4rem;
+      border-left: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-command-section {
+      min-width: 0;
+    }
+    #azeroth-command-center .acc-command-list {
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-next-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.7rem;
+      align-items: center;
+      min-height: 3.7rem;
+      padding: 0.55rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-next-rank {
+      display: grid;
+      width: 1.6rem;
+      height: 1.6rem;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--acc-primary) 25%, var(--border));
+      border-radius: 5px;
+      color: var(--acc-primary);
+      background: color-mix(in srgb, var(--acc-primary) 7%, transparent);
+      font-size: 0.68rem;
+      font-weight: 650;
+    }
+    #azeroth-command-center .acc-row-copy {
+      display: grid;
+      min-width: 0;
+      gap: 0.15rem;
+    }
+    #azeroth-command-center .acc-row-title {
+      overflow: hidden;
+      font-size: 0.79rem;
+      font-weight: 560;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-row-meta {
+      display: flex;
+      min-width: 0;
+      gap: 0.25rem 0.55rem;
+      flex-wrap: wrap;
+      align-items: center;
+      color: var(--muted-foreground);
+      font-size: 0.67rem;
+    }
+    #azeroth-command-center .acc-mini-progress {
+      display: flex;
+      width: min(11rem, 100%);
+      align-items: center;
+      gap: 0.4rem;
+    }
+    #azeroth-command-center .acc-mini-progress .acc-progress-track {
+      flex: 1;
+    }
+    #azeroth-command-center .acc-command-goal {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      align-items: center;
+      min-height: 3.2rem;
+      padding: 0.5rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-row-actions {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+    }
+    #azeroth-command-center .acc-status {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.12rem 0.38rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted-foreground);
+      background: rgb(255 255 255 / 2%);
+      font-size: 0.62rem;
+    }
+    #azeroth-command-center .acc-status[data-state="Active"],
+    #azeroth-command-center .acc-status[data-state="Recently completed"] {
+      color: color-mix(in srgb, var(--acc-secondary) 78%, white);
+      border-color: color-mix(in srgb, var(--acc-secondary) 22%, var(--border));
+      background: color-mix(in srgb, var(--acc-secondary) 7%, transparent);
+    }
+    #azeroth-command-center .acc-roster-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.6rem;
+      align-items: center;
+      min-height: 3.5rem;
+      padding: 0.55rem 0.15rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-roster-row[aria-current="true"] .acc-row-title {
+      color: var(--acc-primary);
+    }
+    #azeroth-command-center .acc-momentum-scope {
+      width: auto;
+      min-width: 8.4rem;
+      font-size: 0.68rem;
+    }
+    #azeroth-command-center .acc-momentum-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-momentum-item {
+      display: grid;
+      gap: 0.1rem;
+      min-width: 0;
+      padding: 0.65rem 0.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-momentum-item strong {
+      font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+    }
+    #azeroth-command-center .acc-momentum-item span {
+      overflow: hidden;
+      color: var(--muted-foreground);
+      font-size: 0.62rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-momentum-strip {
+      display: flex;
+      height: 0.28rem;
+      margin-top: 0.5rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgb(255 255 255 / 5%);
+    }
+    #azeroth-command-center .acc-momentum-strip span {
+      min-width: 0.18rem;
+      background: var(--acc-progress);
+    }
+    #azeroth-command-center .acc-momentum-strip span:nth-child(2) { background: var(--acc-secondary); }
+    #azeroth-command-center .acc-momentum-strip span:nth-child(3) { background: color-mix(in srgb, var(--acc-primary) 45%, var(--acc-secondary)); }
+    #azeroth-command-center .acc-recent {
+      margin-top: 1.25rem;
+    }
+    #azeroth-command-center .acc-activity-row {
+      display: grid;
+      grid-template-columns: 6.8rem auto minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      align-items: center;
+      min-height: 3.1rem;
+      padding: 0.45rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-activity-row time {
+      color: var(--muted-foreground);
+      font-size: 0.66rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-activity-mark {
+      display: grid;
+      width: 1.65rem;
+      height: 1.65rem;
+      place-items: center;
+      border-radius: 999px;
+      color: var(--acc-secondary);
+      background: color-mix(in srgb, var(--acc-secondary) 9%, transparent);
+    }
+    #azeroth-command-center .acc-activity-value {
+      color: var(--muted-foreground);
+      font-size: 0.68rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-empty .acc-actions {
+      margin-top: 0.65rem;
+    }
+    #azeroth-command-center .acc-goal-dialog-actions {
+      justify-content: space-between;
+    }
+    @media (max-width: 1120px) {
+      #azeroth-command-center .acc-command-header {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #azeroth-command-center .acc-command-facts {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(10rem, 1fr);
+      }
+    }
+    @media (max-width: 920px) {
+      #azeroth-command-center .acc-command-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      #azeroth-command-center .acc-command-side {
+        padding-top: 1.25rem;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+    }
+    @media (max-width: 620px) {
+      #azeroth-command-center .acc-command-header {
+        padding: 0.75rem;
+      }
+      #azeroth-command-center .acc-command-facts {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      #azeroth-command-center .acc-command-switcher {
+        grid-column: 1 / -1;
+        padding-top: 0.65rem;
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+      #azeroth-command-center .acc-command-fact {
+        padding: 0 0.45rem;
+      }
+      #azeroth-command-center .acc-command-fact:first-child { border-left: 0; padding-left: 0; }
+      #azeroth-command-center .acc-next-row,
+      #azeroth-command-center .acc-command-goal {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+      #azeroth-command-center .acc-next-row > .btn,
+      #azeroth-command-center .acc-command-goal > .acc-row-actions {
+        grid-column: 2;
+        justify-self: start;
+      }
+      #azeroth-command-center .acc-activity-row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+      }
+      #azeroth-command-center .acc-activity-row time {
+        grid-column: 2 / -1;
+        grid-row: 1;
+      }
+      #azeroth-command-center .acc-activity-mark { grid-row: 2; }
+      #azeroth-command-center .acc-activity-row .acc-row-copy { grid-row: 2; }
+      #azeroth-command-center .acc-activity-value { grid-row: 2; }
+    }
   </style>
 
   <section class="acc-recovery" id="acc-recovery-state" hidden aria-live="polite">
@@ -908,7 +1253,7 @@
       </div>
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
-        <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Overview</span><kbd>Alt 1</kbd></button>
+        <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Command Center</span><kbd>Alt 1</kbd></button>
         <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 2</kbd></button>
         <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 3</kbd></button>
         <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 4</kbd></button>
@@ -924,8 +1269,8 @@
       <header class="acc-page-header">
         <div class="acc-page-title">
           <span class="acc-eyebrow">Campaign dashboard</span>
-          <h1 id="acc-page-title">Overview</h1>
-          <p class="text-muted" id="acc-page-description">A clear view of the next step and the journey so far.</p>
+          <h1 id="acc-page-title">Command Center</h1>
+          <p class="text-muted" id="acc-page-description">Decide what to do next from real campaign progress.</p>
         </div>
         <div class="acc-toolbar">
           <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
@@ -935,45 +1280,66 @@
 
       <main class="acc-main">
     <section class="acc-panel" id="acc-panel-overview" data-panel="overview">
-      <div class="acc-stats">
-        <div class="card viz-stat"><span class="text-muted">Level</span><span class="viz-stat-value" id="acc-stat-level">1</span><span class="text-small text-muted" id="acc-stat-location">Shadowglen</span></div>
-        <div class="card viz-stat"><span class="text-muted">Liquid gold</span><span class="viz-stat-value" id="acc-stat-gold">0g</span><span class="text-small text-muted" id="acc-stat-gold-change">Fresh start</span></div>
-        <div class="card viz-stat"><span class="text-muted">Time played</span><span class="viz-stat-value" id="acc-stat-played">0m</span><span class="text-small text-muted" id="acc-stat-sessions">No sessions logged</span></div>
-        <div class="card viz-stat"><span class="text-muted">Collection gains</span><span class="viz-stat-value" id="acc-stat-collection">0</span><span class="text-small text-muted">Since baseline</span></div>
+      <section class="acc-command-header" aria-labelledby="acc-command-name">
+        <div class="acc-command-identity">
+          <div class="acc-character-avatar" id="acc-command-class-icon" aria-hidden="true">☾</div>
+          <div class="acc-command-title">
+            <span class="acc-eyebrow">Active campaign</span>
+            <h2 id="acc-command-name">Carnitez</h2>
+            <div class="acc-command-meta text-muted"><span id="acc-command-profile">Night Elf Druid · Silvermoon EU</span><span id="acc-command-context">Guardian · Shadowglen</span></div>
+          </div>
+        </div>
+        <div class="acc-command-facts">
+          <div class="acc-command-fact"><span>Level</span><strong id="acc-command-level">1</strong></div>
+          <div class="acc-command-fact"><span>Gold</span><strong id="acc-command-gold">0g</strong></div>
+          <div class="acc-command-fact"><span>Played</span><strong id="acc-command-played">0m</strong></div>
+          <div class="acc-command-switcher">
+            <label class="sr-only" for="acc-command-character-select">Switch active character</label>
+            <select class="form-select" id="acc-command-character-select" aria-label="Switch active character"></select>
+          </div>
+        </div>
+      </section>
+
+      <nav class="acc-quick-actions" aria-label="Quick actions">
+        <button class="btn" type="button" data-command-action="log-session"><i data-lucide="timer" aria-hidden="true"></i> Log session</button>
+        <button class="btn" type="button" data-command-action="add-goal"><i data-lucide="circle-plus" aria-hidden="true"></i> Add goal</button>
+        <button class="btn" type="button" data-command-action="log-gold"><i data-lucide="coins" aria-hidden="true"></i> Log gold</button>
+        <button class="btn" type="button" data-command-action="collections"><i data-lucide="gem" aria-hidden="true"></i> Collections</button>
+        <button class="btn" type="button" data-command-action="update-progress"><i data-lucide="map-pin" aria-hidden="true"></i> Update progress</button>
+        <button class="btn" type="button" data-command-action="edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
+        <button class="btn" type="button" data-command-action="switch-character"><i data-lucide="users" aria-hidden="true"></i> Switch</button>
+        <button class="btn" type="button" data-command-action="export"><i data-lucide="download" aria-hidden="true"></i> Export</button>
+      </nav>
+
+      <div class="acc-command-grid">
+        <div class="acc-command-column">
+          <section class="acc-command-section" aria-labelledby="acc-next-up-heading">
+            <div class="acc-section-head"><div><h2 id="acc-next-up-heading">Next Up</h2><span class="text-muted text-small">The strongest next actions from your saved campaign.</span></div></div>
+            <div class="acc-command-list" id="acc-next-up"></div>
+          </section>
+          <section class="acc-command-section" aria-labelledby="acc-active-goals-heading">
+            <div class="acc-section-head"><div><h2 id="acc-active-goals-heading">Active goals</h2><span class="text-muted text-small">Up to five unfinished goals, ordered by status and priority.</span></div><button class="btn" type="button" id="acc-add-goal"><i data-lucide="plus" aria-hidden="true"></i> Add goal</button></div>
+            <div class="acc-command-list" id="acc-command-goals"></div>
+          </section>
+        </div>
+
+        <aside class="acc-command-column acc-command-side">
+          <section class="acc-command-section" aria-labelledby="acc-momentum-heading">
+            <div class="acc-section-head"><div><h2 id="acc-momentum-heading">Weekly momentum</h2><span class="text-muted text-small" id="acc-momentum-dates"></span></div><select class="form-select acc-momentum-scope" id="acc-momentum-scope" aria-label="Weekly momentum scope"><option value="active">Active character</option><option value="all">All characters</option></select></div>
+            <div class="acc-momentum-grid" id="acc-momentum"></div>
+            <div class="acc-momentum-strip" id="acc-momentum-strip" aria-hidden="true"></div>
+          </section>
+          <section class="acc-command-section" aria-labelledby="acc-roster-heading">
+            <div class="acc-section-head"><div><h2 id="acc-roster-heading">Character attention</h2><span class="text-muted text-small">Campaign status across the active roster.</span></div></div>
+            <div class="acc-command-list" id="acc-roster"></div>
+          </section>
+        </aside>
       </div>
 
-      <div class="acc-main-grid acc-section">
-        <div class="acc-stack">
-          <section>
-            <div class="acc-section-head"><h2>Gold journey</h2><span class="text-muted text-small" id="acc-chart-caption">Start logging sessions to draw the journey.</span></div>
-            <div class="acc-chart" id="acc-gold-chart"></div>
-          </section>
-          <section>
-            <div class="acc-section-head"><h2>Active objectives</h2><button class="btn" type="button" id="acc-add-goal"><i data-lucide="plus" aria-hidden="true"></i> Add objective</button></div>
-            <div class="acc-goals" id="acc-goals"></div>
-          </section>
-        </div>
-        <div class="acc-stack">
-          <section class="card">
-            <div class="acc-section-head"><h3>Update progress</h3></div>
-            <form id="acc-quick-update" class="acc-form-grid">
-              <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" required></label>
-              <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" required></label>
-              <label class="form-label wide">Current location<input class="form-control" name="location" type="text" maxlength="80" required></label>
-              <button class="btn btn-primary wide" type="submit">Save progress</button>
-            </form>
-          </section>
-          <section class="card">
-            <div class="acc-section-head"><h3>Log play session</h3></div>
-            <form id="acc-session-form" class="acc-form-grid">
-              <label class="form-label">Minutes<input class="form-control" name="minutes" type="number" min="1" required></label>
-              <label class="form-label">Gold change<input class="form-control" name="goldDelta" type="number" step="0.01" value="0" required></label>
-              <label class="form-label wide">What happened?<textarea class="form-control" name="note" rows="3" maxlength="240" placeholder="Quests, drops, discoveries…"></textarea></label>
-              <button class="btn btn-primary wide" type="submit">Add session</button>
-            </form>
-          </section>
-        </div>
-      </div>
+      <section class="acc-command-section acc-recent" aria-labelledby="acc-recent-heading">
+        <div class="acc-section-head"><div><h2 id="acc-recent-heading">Recent activity</h2><span class="text-muted text-small">Sessions, progress, completions, and collection updates.</span></div></div>
+        <div class="acc-command-list" id="acc-recent-activity"></div>
+      </section>
     </section>
 
     <section class="acc-panel" id="acc-panel-collections" data-panel="collections" hidden>
@@ -1061,12 +1427,41 @@
     </form>
   </dialog>
 
+  <dialog id="acc-progress-dialog">
+    <form method="dialog" id="acc-quick-update">
+      <div class="acc-dialog-head"><h2>Update campaign progress</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-progress-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <div class="acc-form-grid">
+        <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" required></label>
+        <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" required></label>
+        <label class="form-label wide">Current location<input class="form-control" name="location" type="text" maxlength="80" required></label>
+      </div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Save progress</button><button class="btn" type="button" data-close-dialog="acc-progress-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-session-dialog">
+    <form method="dialog" id="acc-session-form">
+      <div class="acc-dialog-head"><h2>Log play session</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <div class="acc-form-grid">
+        <label class="form-label">Minutes<input class="form-control" name="minutes" type="number" min="1" required></label>
+        <label class="form-label">Gold change<input class="form-control" name="goldDelta" type="number" step="0.01" value="0" required></label>
+        <label class="form-label wide">What happened?<textarea class="form-control" name="note" rows="3" maxlength="240" placeholder="Quests, drops, discoveries…"></textarea></label>
+      </div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Add session</button><button class="btn" type="button" data-close-dialog="acc-session-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
   <dialog id="acc-goal-dialog">
     <form method="dialog" id="acc-goal-form">
-      <div class="acc-dialog-head"><h2>Add objective</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-goal-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
-      <label class="form-label">Category<select class="form-select" name="type"><option>Current content</option><option>Collection</option><option>Gold</option><option>Personal</option></select></label>
-      <label class="form-label">Objective<input class="form-control" name="title" maxlength="120" required></label>
-      <div class="acc-actions"><button class="btn btn-primary" type="submit">Add objective</button><button class="btn" type="button" data-close-dialog="acc-goal-dialog">Cancel</button></div>
+      <div class="acc-dialog-head"><h2 id="acc-goal-dialog-title">Add goal</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-goal-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="id">
+      <div class="acc-form-grid">
+        <label class="form-label">Category<select class="form-select" name="type"><option>Current content</option><option>Collection</option><option>Gold</option><option>Personal</option></select></label>
+        <label class="form-label">Status<select class="form-select" name="status"><option value="todo">To do</option><option value="in_progress">In progress</option><option value="done">Complete</option></select></label>
+        <label class="form-label">Priority<select class="form-select" name="priority"><option value="0">Normal</option><option value="1">High</option><option value="2">Critical</option></select></label>
+        <label class="form-label wide">Goal<input class="form-control" name="title" maxlength="120" required></label>
+      </div>
+      <div class="acc-actions acc-goal-dialog-actions"><button class="btn acc-btn-danger" type="button" id="acc-goal-delete" hidden>Delete goal</button><span class="acc-actions"><button class="btn btn-primary" type="submit" id="acc-goal-submit">Add goal</button><button class="btn" type="button" data-close-dialog="acc-goal-dialog">Cancel</button></span></div>
     </form>
   </dialog>
 
@@ -1082,7 +1477,7 @@
   <dialog id="acc-delete-character-dialog">
     <form method="dialog" id="acc-delete-character-form">
       <div class="acc-dialog-head"><h2>Delete character?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-delete-character-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
-      <p class="acc-delete-copy">This removes <strong id="acc-delete-character-name"></strong> and all progress recorded for this character from this browser. You can undo the deletion immediately afterward.</p>
+      <p class="acc-delete-copy">This removes <strong id="acc-delete-character-name"></strong> from the active roster while preserving its campaign records. You can undo the change immediately afterward.</p>
       <div class="acc-actions"><button class="btn acc-btn-danger" type="submit"><i data-lucide="trash-2" aria-hidden="true"></i> Delete character</button><button class="btn" type="button" data-close-dialog="acc-delete-character-dialog">Keep character</button></div>
     </form>
   </dialog>
@@ -1101,6 +1496,7 @@
     (() => {
       const root = document.getElementById('azeroth-command-center');
       const Core = globalThis.AzerothCore;
+      const Selectors = globalThis.AzerothSelectors;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -1124,7 +1520,7 @@
         'night-elf': { secondary: '#8582ff', glow: 'rgb(112 108 255 / 14%)', motif: 'crescent-leaf' }
       });
       const pageMeta = Object.freeze({
-        overview: { title: 'Overview', description: 'A clear view of the next step and the journey so far.' },
+        overview: { title: 'Command Center', description: 'Decide what to do next from real campaign progress.' },
         collections: { title: 'Collections', description: 'Track account gains and keep the next milestone in reach.' },
         gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
         journal: { title: 'Adventure journal', description: 'Review sessions and keep campaign data safe.' }
@@ -1132,6 +1528,7 @@
       let state = null;
       let recoveryState = null;
       let activeTab = 'overview';
+      let momentumScope = 'active';
       let toastTimer = null;
       let toastAction = null;
 
@@ -1151,7 +1548,11 @@
         }
       }
       function character() {
-        return state.characters.find(c => c.id === state.activeCharacterId) || state.characters[0];
+        const roster = state.characters.filter(c => !c.archivedAt);
+        return roster.find(c => c.id === state.activeCharacterId) || roster[0] || state.characters[0];
+      }
+      function rosterCharacters() {
+        return state.characters.filter(c => !c.archivedAt);
       }
       function goalsFor(c) {
         return state.goals.filter(goal => goal.characterId === c.id);
@@ -1172,11 +1573,11 @@
         state.collectionTrackers.push(...trackers);
         return trackers;
       }
-      function appendCurrentProgress(c) {
+      function appendCurrentProgress(c, sourceActivityId = null) {
         ['liquidGold', 'level'].forEach(metric => {
           const latest = Core.currentProgressValue(state.progressEvents, c.id, metric);
           const value = metric === 'liquidGold' ? Number(c.gold) : Number(c.level);
-          if (latest === null || Number(latest) !== value) state.progressEvents.push({ id: uid('progress'), entityType: 'character', entityId: c.id, metric, value, recordedAt: new Date().toISOString(), source: 'current-observation' });
+          if (latest === null || Number(latest) !== value) state.progressEvents.push({ id: uid('progress'), entityType: 'character', entityId: c.id, metric, value, recordedAt: new Date().toISOString(), source: 'current-observation', ...(sourceActivityId ? { sourceActivityId } : {}) });
         });
       }
       function formatGold(value) {
@@ -1225,6 +1626,8 @@
         const classIcon = root.querySelector('#acc-class-icon');
         classIcon.textContent = theme.glyph;
         classIcon.dataset.icon = theme.icon;
+        const commandIcon = root.querySelector('#acc-command-class-icon');
+        if (commandIcon) { commandIcon.textContent = theme.glyph; commandIcon.dataset.icon = theme.icon; }
         root.querySelector('#acc-theme-label').textContent = `${c.className || 'Adventurer'} · ${c.race || 'Campaign'} theme`;
       }
       function dismissToast() {
@@ -1272,44 +1675,119 @@
         renderCharacterSelect(c);
         root.querySelector('#acc-character-name').textContent = c.name;
         root.querySelector('#acc-character-meta').textContent = `${c.race} ${c.className} · ${c.realm} ${c.region}`;
-        root.querySelector('#acc-stat-level').textContent = c.level;
-        root.querySelector('#acc-stat-location').textContent = c.location || 'Location not recorded';
-        root.querySelector('#acc-stat-gold').textContent = formatGold(c.gold);
-        const sessions = activitiesFor(c, 'session');
-        const totalSessionDelta = sessions.reduce((sum, session) => sum + Number(session.gold?.delta || 0), 0);
-        root.querySelector('#acc-stat-gold-change').textContent = sessions.length ? `${totalSessionDelta >= 0 ? '+' : ''}${formatGold(totalSessionDelta)} in logged sessions` : 'Fresh start';
-        root.querySelector('#acc-stat-played').textContent = formatMinutes(c.playedMinutes);
-        root.querySelector('#acc-stat-sessions').textContent = sessions.length ? `${sessions.length} session${sessions.length === 1 ? '' : 's'} logged` : 'No sessions logged';
-        const gains = collectionsFor(c).reduce((sum, x) => sum + Math.max(0, Number(x.owned) - Number(x.baseline)), 0);
-        root.querySelector('#acc-stat-collection').textContent = gains.toLocaleString();
         const quick = root.querySelector('#acc-quick-update');
         quick.elements.level.value = c.level;
         quick.elements.gold.value = c.gold;
         quick.elements.location.value = c.location || '';
-        renderGoals(c);
-        renderGoldChart(c);
+        renderCommandCenter(c);
         renderCollections(c);
         renderGold(c);
         renderJournal(c);
         refreshIcons();
       }
       function renderCharacterSelect(c) {
-        const select = root.querySelector('#acc-character-select');
-        select.innerHTML = state.characters.map(x => `<option value="${escapeHtml(x.id)}"${x.id === c.id ? ' selected' : ''}>${escapeHtml(x.name)} — ${escapeHtml(x.realm)}</option>`).join('');
+        const options = rosterCharacters().map(x => `<option value="${escapeHtml(x.id)}"${x.id === c.id ? ' selected' : ''}>${escapeHtml(x.name)} — ${escapeHtml(x.realm)}</option>`).join('');
+        root.querySelector('#acc-character-select').innerHTML = options;
+        root.querySelector('#acc-command-character-select').innerHTML = options;
       }
-      function renderGoals(c) {
-        const target = root.querySelector('#acc-goals');
-        const goals = goalsFor(c);
-        if (!goals.length) {
-          target.innerHTML = '<div class="acc-empty">No active objectives. Add one clear next step.</div>';
+      function formatLocalDateTime(value) {
+        const date = Core.localDateTime(value);
+        return date ? new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date) : 'Unknown date';
+      }
+      function progressMarkup(progress) {
+        if (!progress || !Number(progress.target)) return '';
+        const pct = Math.max(0, Math.min(100, Number(progress.current) / Number(progress.target) * 100));
+        return `<span class="acc-mini-progress"><span class="acc-progress-track"><span class="acc-progress-fill" style="display:block;width:${pct}%"></span></span><span>${Number(progress.current).toLocaleString()}/${Number(progress.target).toLocaleString()}</span></span>`;
+      }
+      function renderCommandCenter(c) {
+        root.querySelector('#acc-command-name').textContent = c.name;
+        root.querySelector('#acc-command-profile').textContent = `${c.race || 'Race not set'} ${c.className || 'Class not set'} · ${c.realm || 'Realm not set'} ${c.region || ''}`.trim();
+        root.querySelector('#acc-command-context').textContent = `${c.spec || 'Specialisation not set'} · ${c.location || 'Location not recorded'}`;
+        root.querySelector('#acc-command-level').textContent = c.level;
+        root.querySelector('#acc-command-gold').textContent = formatGold(c.gold);
+        root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
+        renderNextUp();
+        renderActiveGoals();
+        renderMomentum();
+        renderRoster();
+        renderRecentActivity();
+      }
+      function renderNextUp() {
+        const target = root.querySelector('#acc-next-up');
+        const recommendations = Selectors.selectNextUp(state, { limit: 5, now: new Date() });
+        if (!recommendations.length) {
+          target.innerHTML = '<div class="acc-empty">Nothing needs attention yet. Add a goal to give the Command Center a clear direction.<div class="acc-actions"><button class="btn" type="button" data-command-action="add-goal">Add first goal</button></div></div>';
           return;
         }
-        target.innerHTML = goals.map(g => `
-          <div class="acc-goal ${g.status === 'done' ? 'done' : ''}">
-            <label class="form-check"><input class="form-check-input" type="checkbox" data-goal-toggle="${escapeHtml(g.id)}" ${g.status === 'done' ? 'checked' : ''}><span class="sr-only">Mark objective complete</span></label>
-            <div><span class="viz-badge">${escapeHtml(g.category)}</span> <span class="acc-goal-title">${escapeHtml(g.title)}</span></div>
-            <button class="btn btn-ghost" type="button" data-goal-delete="${escapeHtml(g.id)}" aria-label="Delete objective"><i data-lucide="x" aria-hidden="true"></i></button>
-          </div>`).join('');
+        target.innerHTML = recommendations.map((item, index) => `<article class="acc-next-row">
+          <span class="acc-next-rank" aria-hidden="true">${index + 1}</span>
+          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.title)}</span><span class="acc-row-meta"><span>${escapeHtml(item.character?.name || 'Account')}</span><span>·</span><span>${escapeHtml(item.category)}</span><span>·</span><span>${escapeHtml(item.reason)}</span>${progressMarkup(item.progress)}</span></div>
+          <button class="btn" type="button" data-command-action="${escapeHtml(item.action)}" data-character-id="${escapeHtml(item.characterId || '')}" data-source-id="${escapeHtml(item.sourceId || '')}">${escapeHtml(item.actionLabel)}</button>
+        </article>`).join('');
+      }
+      function renderActiveGoals() {
+        const target = root.querySelector('#acc-command-goals');
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        const goals = Selectors.selectActiveGoals(state, { limit: 5 });
+        if (!goals.length) {
+          target.innerHTML = '<div class="acc-empty">Goals drive focused Next Up recommendations. Add one concrete outcome to begin.<div class="acc-actions"><button class="btn" type="button" data-command-action="add-goal">Create a goal</button></div></div>';
+          return;
+        }
+        target.innerHTML = goals.map(goal => {
+          const owner = characterMap.get(goal.characterId);
+          const priority = Number(goal.priority) >= 2 ? 'Critical' : Number(goal.priority) === 1 ? 'High' : 'Normal';
+          const status = goal.status === 'in_progress' ? 'In progress' : 'To do';
+          return `<article class="acc-command-goal">
+            <label class="form-check"><input class="form-check-input" type="checkbox" data-command-goal-toggle="${escapeHtml(goal.id)}"><span class="sr-only">Mark ${escapeHtml(goal.title)} complete</span></label>
+            <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(goal.title)}</span><span class="acc-row-meta"><span>${escapeHtml(goal.scope === 'account' ? 'Account' : owner?.name || 'Character')}</span><span>·</span><span>${escapeHtml(goal.category || 'Goal')}</span><span>·</span><span>${status}</span><span>·</span><span>${priority}</span>${progressMarkup(goal.progress || (Number.isFinite(Number(goal.current)) && Number.isFinite(Number(goal.target)) ? { current: Number(goal.current), target: Number(goal.target) } : null))}</span></div>
+            <span class="acc-row-actions">${owner ? `<button class="btn btn-ghost" type="button" data-command-switch="${escapeHtml(owner.id)}" aria-label="Switch to ${escapeHtml(owner.name)}"><i data-lucide="user-round" aria-hidden="true"></i></button>` : ''}<button class="btn" type="button" data-command-edit-goal="${escapeHtml(goal.id)}">Edit</button></span>
+          </article>`;
+        }).join('');
+      }
+      function renderMomentum() {
+        const momentum = Selectors.selectWeeklyMomentum(state, { scope: momentumScope, activeCharacterId: state.activeCharacterId, now: new Date() });
+        root.querySelector('#acc-momentum-scope').value = momentumScope;
+        root.querySelector('#acc-momentum-dates').textContent = `${momentum.bounds.startKey} – ${momentum.bounds.endKey}`;
+        const metrics = [
+          ['Sessions', momentum.sessions, String(momentum.sessions)],
+          ['Time played', momentum.minutesPlayed, formatMinutes(momentum.minutesPlayed)],
+          ['Completed', momentum.completed, String(momentum.completed)],
+          ['Gold earned', momentum.goldEarned, formatGold(momentum.goldEarned)],
+          ['Gold spent', momentum.goldSpent, formatGold(momentum.goldSpent)],
+          ['Net gold', Math.abs(momentum.netGold), `${momentum.netGold >= 0 ? '+' : '−'}${formatGold(Math.abs(momentum.netGold))}`],
+          ['Collections', momentum.collectionUpdates, String(momentum.collectionUpdates)],
+          ['Active characters', momentum.activeCharacters, String(momentum.activeCharacters)]
+        ].filter(([, value]) => Number(value) !== 0);
+        const target = root.querySelector('#acc-momentum');
+        target.innerHTML = metrics.length ? metrics.map(([label,, display]) => `<div class="acc-momentum-item"><strong>${escapeHtml(display)}</strong><span>${escapeHtml(label)}</span></div>`).join('') : '<div class="acc-empty" style="grid-column:1/-1">No activity has been logged in the current local week.</div>';
+        const stripValues = [momentum.sessions, momentum.completed, momentum.collectionUpdates].filter(value => value > 0);
+        const total = stripValues.reduce((sum, value) => sum + value, 0);
+        root.querySelector('#acc-momentum-strip').innerHTML = total ? stripValues.map(value => `<span style="width:${value / total * 100}%"></span>`).join('') : '';
+      }
+      function renderRoster() {
+        const target = root.querySelector('#acc-roster');
+        const roster = Selectors.selectCharacterAttention(state, { now: new Date() });
+        target.innerHTML = roster.map(item => `<article class="acc-roster-row" aria-current="${item.character.id === state.activeCharacterId}">
+          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.character.name)} <span class="text-muted">· ${Number(item.character.level) || 1}</span></span><span class="acc-row-meta"><span>${escapeHtml(item.character.race)} ${escapeHtml(item.character.className)}</span><span>·</span><span>${escapeHtml(item.character.realm)} ${escapeHtml(item.character.region)}</span><span>·</span><span>${formatGold(item.character.gold)}</span><span>·</span><span>${item.lastActivity ? formatLocalDateTime(item.lastActivity.at) : 'No activity yet'}</span><span>·</span><span>${item.unfinished} unfinished</span><span class="acc-status" data-state="${escapeHtml(item.attention)}">${escapeHtml(item.attention)}</span></span></div>
+          <button class="btn btn-ghost" type="button" data-command-switch="${escapeHtml(item.character.id)}" ${item.character.id === state.activeCharacterId ? 'disabled' : ''}>${item.character.id === state.activeCharacterId ? 'Selected' : 'Select'}</button>
+        </article>`).join('');
+      }
+      function renderRecentActivity() {
+        const target = root.querySelector('#acc-recent-activity');
+        const feed = Selectors.selectRecentActivity(state, { limit: 10 });
+        if (!feed.length) {
+          target.innerHTML = '<div class="acc-empty">Sessions and progress updates will appear here as the campaign moves forward.<div class="acc-actions"><button class="btn" type="button" data-command-action="log-session">Log a session</button></div></div>';
+          return;
+        }
+        const icons = { session: 'timer', gold: 'coins', goal: 'circle-check', progress: 'trending-up', collection: 'gem', note: 'notebook-pen' };
+        target.innerHTML = feed.map(entry => {
+          let value = '';
+          if (entry.kind === 'session') value = `${formatMinutes(entry.durationMinutes)}${entry.goldDelta ? ` · ${entry.goldDelta > 0 ? '+' : '−'}${formatGold(Math.abs(entry.goldDelta))}` : ''}`;
+          else if (entry.kind === 'gold') value = `${entry.goldDelta >= 0 ? '+' : '−'}${formatGold(Math.abs(entry.goldDelta))}`;
+          else if (entry.metric === 'level') value = `Level ${entry.value}`;
+          const action = entry.kind === 'goal' ? `<button class="btn btn-ghost" type="button" data-command-reopen-goal="${escapeHtml(entry.goalId)}">Undo completion</button>` : `<button class="btn btn-ghost" type="button" data-command-tab="${escapeHtml(entry.relatedTab)}" data-character-id="${escapeHtml(entry.characterId || '')}">Open</button>`;
+          return `<article class="acc-activity-row"><time datetime="${escapeHtml(entry.occurredAt)}">${escapeHtml(formatLocalDateTime(entry.occurredAt))}</time><span class="acc-activity-mark"><i data-lucide="${icons[entry.kind] || 'sparkles'}" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(entry.title)}</span><span class="acc-row-meta"><span>${escapeHtml(entry.character?.name || 'Character')}</span><span>·</span><span>${escapeHtml(entry.category)}</span>${entry.detail ? `<span>·</span><span>${escapeHtml(entry.detail)}</span>` : ''}</span></div><span class="acc-row-actions"><span class="acc-activity-value">${escapeHtml(value)}</span>${action}</span></article>`;
+        }).join('');
       }
       function renderGoldChart(c) {
         const points = progressFor(c, 'liquidGold').sort((a, b) => String(a.recordedAt).localeCompare(String(b.recordedAt))).map(event => ({ date: Core.localDateKey(event.recordedAt) || event.recordedAt, gold: event.value }));
@@ -1386,6 +1864,71 @@
         Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
         root.querySelector('#acc-character-dialog').showModal();
       }
+      function openGoalDialog(goalId = null) {
+        const form = root.querySelector('#acc-goal-form');
+        form.reset();
+        const goal = goalId ? state.goals.find(item => item.id === goalId) : null;
+        root.querySelector('#acc-goal-dialog-title').textContent = goal ? 'Edit goal' : 'Add goal';
+        root.querySelector('#acc-goal-submit').textContent = goal ? 'Save goal' : 'Add goal';
+        root.querySelector('#acc-goal-delete').hidden = !goal;
+        form.elements.id.value = goal?.id || '';
+        form.elements.title.value = goal?.title || '';
+        form.elements.status.value = goal?.status || 'todo';
+        const priority = String(Number(goal?.priority) || 0);
+        if (![...form.elements.priority.options].some(option => option.value === priority)) form.elements.priority.add(new Option(`Priority ${priority}`, priority));
+        form.elements.priority.value = priority;
+        const category = goal?.category || 'Current content';
+        if (![...form.elements.type.options].some(option => option.value === category)) form.elements.type.add(new Option(category, category));
+        form.elements.type.value = category;
+        root.querySelector('#acc-goal-dialog').showModal();
+      }
+      function selectCharacter(characterId) {
+        const next = rosterCharacters().find(item => item.id === characterId);
+        if (!next) return false;
+        state.activeCharacterId = next.id;
+        saveState();
+        render();
+        return true;
+      }
+      function completeGoal(goalId) {
+        const goal = state.goals.find(item => item.id === goalId);
+        if (!goal || goal.status === 'done') return;
+        const previous = { status: goal.status, completedAt: goal.completedAt ?? null, updatedAt: goal.updatedAt ?? null };
+        const completedAt = new Date().toISOString();
+        goal.status = 'done';
+        goal.completedAt = completedAt;
+        goal.updatedAt = completedAt;
+        saveState();
+        render();
+        showToast('Goal completed.', { actionLabel: 'Undo', onAction: () => { goal.status = previous.status; goal.completedAt = previous.completedAt; if (previous.updatedAt) goal.updatedAt = previous.updatedAt; else delete goal.updatedAt; saveState(); render(); showToast('Goal reopened.'); } });
+      }
+      function reopenGoal(goalId) {
+        const goal = state.goals.find(item => item.id === goalId);
+        if (!goal || goal.status !== 'done') return;
+        goal.status = 'todo';
+        goal.completedAt = null;
+        goal.updatedAt = new Date().toISOString();
+        saveState();
+        render();
+        showToast('Goal reopened.');
+      }
+      async function exportBackup() {
+        const payload = JSON.stringify(state, null, 2);
+        try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); }
+        catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); }
+      }
+      function performCommandAction(action, characterId = '', sourceId = '') {
+        if (characterId && characterId !== state.activeCharacterId) selectCharacter(characterId);
+        if (action === 'open-goal') openGoalDialog(sourceId);
+        else if (action === 'open-collections' || action === 'collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
+        else if (action === 'edit-character') openCharacterDialog(true);
+        else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
+        else if (action === 'add-goal') openGoalDialog();
+        else if (action === 'log-session') root.querySelector('#acc-session-dialog').showModal();
+        else if (action === 'update-progress') root.querySelector('#acc-progress-dialog').showModal();
+        else if (action === 'log-gold') { activateTab('gold'); requestAnimationFrame(() => root.querySelector('#acc-ledger-form [name="activity"]')?.focus()); }
+        else if (action === 'export') exportBackup();
+      }
       function activateTab(tabName, focusTab = false) {
         if (!pageMeta[tabName]) return;
         activeTab = tabName;
@@ -1416,7 +1959,14 @@
       function boot() {
         state = loadState();
         renderRecovery();
-        if (state) render();
+        if (state) {
+          const active = character();
+          if (active && active.id !== state.activeCharacterId) {
+            state.activeCharacterId = active.id;
+            saveState();
+          }
+          render();
+        }
       }
       root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
       document.addEventListener('keydown', e => {
@@ -1424,7 +1974,8 @@
         const tabName = ['overview', 'collections', 'gold', 'journal'][Number(e.key) - 1];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
-      root.querySelector('#acc-character-select').addEventListener('change', e => { state.activeCharacterId = e.target.value; saveState(); render(); });
+      root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
       root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
       root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));
@@ -1444,24 +1995,52 @@
       root.querySelector('#acc-quick-update').addEventListener('submit', e => {
         e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget);
         c.level = Number(f.get('level')); c.gold = Number(f.get('gold')); c.location = f.get('location').trim();
-        appendCurrentProgress(c); saveState(); render(); showToast('Progress saved.');
+        appendCurrentProgress(c); saveState(); root.querySelector('#acc-progress-dialog').close(); render(); showToast('Progress saved.');
       });
       root.querySelector('#acc-session-form').addEventListener('submit', e => {
         e.preventDefault(); const c = character(); const f = new FormData(e.currentTarget); const minutes = Number(f.get('minutes')); const delta = Number(f.get('goldDelta'));
-        state.activities.push({ id: uid('activity-session'), characterId: c.id, kind: 'session', occurredAt: new Date().toISOString(), durationMinutes: minutes, title: 'Play session', notes: f.get('note').trim(), gold: { revenue: 0, cost: 0, delta, affectsBalance: true } });
-        c.playedMinutes += minutes; c.gold = Math.max(0, Number(c.gold) + delta); appendCurrentProgress(c);
-        saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; render(); showToast('Play session added.');
+        const activityId = uid('activity-session');
+        state.activities.push({ id: activityId, characterId: c.id, kind: 'session', occurredAt: new Date().toISOString(), durationMinutes: minutes, title: 'Play session', notes: f.get('note').trim(), gold: { revenue: 0, cost: 0, delta, affectsBalance: true } });
+        c.playedMinutes += minutes; c.gold = Math.max(0, Number(c.gold) + delta); appendCurrentProgress(c, activityId);
+        saveState(); e.currentTarget.reset(); e.currentTarget.elements.goldDelta.value = 0; root.querySelector('#acc-session-dialog').close(); render(); showToast('Play session added.');
       });
-      root.querySelector('#acc-add-goal').addEventListener('click', () => root.querySelector('#acc-goal-dialog').showModal());
+      root.querySelector('#acc-add-goal').addEventListener('click', () => openGoalDialog());
       root.querySelector('#acc-goal-form').addEventListener('submit', e => {
-        e.preventDefault(); const f = new FormData(e.currentTarget); const c = character(); state.goals.push({ id: uid('goal'), characterId: c.id, scope: 'character', category: f.get('type'), title: f.get('title').trim(), status: 'todo', priority: 0, dueDate: null, recurrence: null, estimatedMinutes: null, createdAt: new Date().toISOString(), completedAt: null, order: goalsFor(c).length });
-        saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render(); showToast('Objective added.');
+        e.preventDefault(); const f = new FormData(e.currentTarget); const c = character(); const existing = state.goals.find(goal => goal.id === f.get('id')); const now = new Date().toISOString(); const status = f.get('status');
+        if (existing) {
+          existing.category = f.get('type'); existing.title = f.get('title').trim(); existing.status = status; existing.priority = Number(f.get('priority')); existing.updatedAt = now;
+          existing.completedAt = status === 'done' ? (existing.completedAt || now) : null;
+        } else {
+          state.goals.push({ id: uid('goal'), characterId: c.id, scope: 'character', category: f.get('type'), title: f.get('title').trim(), status, priority: Number(f.get('priority')), dueDate: null, recurrence: null, estimatedMinutes: null, createdAt: now, completedAt: status === 'done' ? now : null, order: goalsFor(c).length });
+        }
+        saveState(); e.currentTarget.reset(); root.querySelector('#acc-goal-dialog').close(); render(); showToast(existing ? 'Goal updated.' : 'Goal added.');
       });
-      root.querySelector('#acc-goals').addEventListener('change', e => { const id = e.target.dataset.goalToggle; if (!id) return; const goal = state.goals.find(g => g.id === id); if (goal) { goal.status = e.target.checked ? 'done' : 'todo'; goal.completedAt = e.target.checked ? new Date().toISOString() : null; } saveState(); render(); showToast(e.target.checked ? 'Objective completed.' : 'Objective reopened.'); });
-      root.querySelector('#acc-goals').addEventListener('click', e => { const button = e.target.closest('[data-goal-delete]'); if (!button) return; removeWithUndo(state.goals, button.dataset.goalDelete, 'Objective removed.', (item, index) => state.goals.splice(index, 0, item)); });
+      root.querySelector('#acc-goal-delete').addEventListener('click', () => {
+        const id = root.querySelector('#acc-goal-form').elements.id.value;
+        if (!id) return;
+        root.querySelector('#acc-goal-dialog').close();
+        removeWithUndo(state.goals, id, 'Goal removed.', (item, index) => state.goals.splice(index, 0, item));
+      });
+      root.querySelector('#acc-panel-overview').addEventListener('change', e => {
+        if (e.target.matches('[data-command-goal-toggle]')) completeGoal(e.target.dataset.commandGoalToggle);
+      });
+      root.querySelector('#acc-panel-overview').addEventListener('click', e => {
+        const action = e.target.closest('[data-command-action]');
+        if (action) { performCommandAction(action.dataset.commandAction, action.dataset.characterId, action.dataset.sourceId); return; }
+        const edit = e.target.closest('[data-command-edit-goal]');
+        if (edit) { openGoalDialog(edit.dataset.commandEditGoal); return; }
+        const reopen = e.target.closest('[data-command-reopen-goal]');
+        if (reopen) { reopenGoal(reopen.dataset.commandReopenGoal); return; }
+        const tabAction = e.target.closest('[data-command-tab]');
+        if (tabAction) { if (tabAction.dataset.characterId) selectCharacter(tabAction.dataset.characterId); activateTab(tabAction.dataset.commandTab); return; }
+        const switcher = e.target.closest('[data-command-switch]');
+        if (switcher) selectCharacter(switcher.dataset.commandSwitch);
+      });
+      root.querySelector('#acc-momentum-scope').addEventListener('change', e => { momentumScope = e.target.value === 'all' ? 'all' : 'active'; renderMomentum(); });
       function updateCollections(setBaseline = false) {
         const c = character(); const trackers = ensureCollectionTrackers(c);
-        root.querySelectorAll('[data-collection]').forEach(row => { const x = trackers.find(item => item.name === row.dataset.collection); if (!x) return; x.owned = Math.max(0, Number(row.querySelector('[data-collection-owned]').value)); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); if (setBaseline) x.baseline = x.owned; });
+        const recordedAt = new Date().toISOString();
+        root.querySelectorAll('[data-collection]').forEach(row => { const x = trackers.find(item => item.name === row.dataset.collection); if (!x) return; const previousOwned = Number(x.owned); x.owned = Math.max(0, Number(row.querySelector('[data-collection-owned]').value)); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); if (setBaseline) x.baseline = x.owned; if (x.owned !== previousOwned) state.progressEvents.push({ id: uid('progress-collection'), entityType: 'character', entityId: c.id, metric: `collection:${String(x.name).toLowerCase()}:owned`, value: x.owned, recordedAt, source: 'collection-update' }); });
         saveState(); render(); showToast(setBaseline ? 'Collection baseline updated.' : 'Collection counts saved.');
       }
       root.querySelector('#acc-save-collections').addEventListener('click', () => updateCollections(false));
@@ -1474,11 +2053,11 @@
       });
       root.querySelector('#acc-ledger-body').addEventListener('click', e => { const button = e.target.closest('[data-ledger-delete]'); if (!button) return; removeWithUndo(state.activities, button.dataset.ledgerDelete, 'Gold activity removed.', (item, index) => state.activities.splice(index, 0, item)); });
       root.querySelector('#acc-journal').addEventListener('click', e => { const button = e.target.closest('[data-session-delete]'); if (!button) return; const index = state.activities.findIndex(item => item.id === button.dataset.sessionDelete); if (index < 0) return; const [removed] = state.activities.splice(index, 1); const c = character(); c.playedMinutes = Math.max(0, c.playedMinutes - Number(removed.durationMinutes)); c.gold = Math.max(0, Number(c.gold) - Number(removed.gold?.delta || 0)); saveState(); render(); showToast('Journal entry removed.', { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.activities.splice(index, 0, removed); c.playedMinutes += Number(removed.durationMinutes); c.gold += Number(removed.gold?.delta || 0); saveState(); render(); showToast('Journal entry restored.'); } }); });
-      root.querySelector('#acc-export').addEventListener('click', async () => { const payload = JSON.stringify(state, null, 2); try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); } catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); } });
+      root.querySelector('#acc-export').addEventListener('click', exportBackup);
       root.querySelector('#acc-import').addEventListener('click', () => { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); });
       root.querySelector('#acc-import-form').addEventListener('submit', e => { e.preventDefault(); try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); const previous = structuredClone(state); state = Core.migrateState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); showToast('Backup imported.', { actionLabel: 'Undo', onAction: () => { state = previous; saveState(); render(); showToast('Previous campaign restored.'); } }); } catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; } });
-      root.querySelector('#acc-delete-character').addEventListener('click', () => { if (state.characters.length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; } root.querySelector('#acc-delete-character-name').textContent = character().name; root.querySelector('#acc-delete-character-dialog').showModal(); });
-      root.querySelector('#acc-delete-character-form').addEventListener('submit', e => { e.preventDefault(); const removed = character(); const index = state.characters.findIndex(c => c.id === removed.id); state.characters.splice(index, 1); state.goals = state.goals.filter(g => g.characterId !== removed.id); state.activities = state.activities.filter(a => a.characterId !== removed.id); state.progressEvents = state.progressEvents.filter(p => p.entityId !== removed.id); state.collectionTrackers = state.collectionTrackers.filter(t => t.characterId !== removed.id); state.activeCharacterId = state.characters[0].id; saveState(); root.querySelector('#acc-delete-character-dialog').close(); render(); showToast(`${removed.name} deleted.`, { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.characters.splice(index, 0, removed); state.activeCharacterId = removed.id; saveState(); render(); showToast(`${removed.name} restored.`); } }); });
+      root.querySelector('#acc-delete-character').addEventListener('click', () => { if (rosterCharacters().length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; } root.querySelector('#acc-delete-character-name').textContent = character().name; root.querySelector('#acc-delete-character-dialog').showModal(); });
+      root.querySelector('#acc-delete-character-form').addEventListener('submit', e => { e.preventDefault(); const removed = character(); removed.archivedAt = new Date().toISOString(); state.activeCharacterId = rosterCharacters()[0].id; saveState(); root.querySelector('#acc-delete-character-dialog').close(); render(); showToast(`${removed.name} removed from the active roster.`, { tone: 'warning', actionLabel: 'Undo', onAction: () => { delete removed.archivedAt; state.activeCharacterId = removed.id; saveState(); render(); showToast(`${removed.name} restored.`); } }); });
       root.querySelector('#acc-recovery-export').addEventListener('click', exportRawRecovery);
       root.querySelector('#acc-recovery-retry').addEventListener('click', () => { boot(); });
       root.querySelector('#acc-recovery-legacy').addEventListener('click', () => { if (!recoveryState?.legacyState) return; state = recoveryState.legacyState; recoveryState = null; Core.persistV2(localStorage, state, { overwriteInvalidV2: true }); renderRecovery(); render(); showToast('Legacy campaign loaded.'); });

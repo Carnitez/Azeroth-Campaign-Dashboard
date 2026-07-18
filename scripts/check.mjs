@@ -14,6 +14,9 @@ if (/\b(?:alert|confirm)\s*\(/.test(html)) failures.push('Native alert or confir
 if (!html.includes('acc-sidebar')) failures.push('Application sidebar is missing.');
 if (!html.includes('classThemes')) failures.push('Character class theme configuration is missing.');
 if (!html.includes("'night-elf'")) failures.push('Night Elf theme influence is missing.');
+if (!html.includes('AzerothSelectors')) failures.push('Command Center selectors are missing.');
+if (!html.includes('acc-next-up')) failures.push('Command Center recommendations are missing.');
+if (!html.includes('acc-momentum')) failures.push('Weekly momentum is missing.');
 
 const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)].map(match => ({ attrs: match[1], source: match[2] }));
 for (const [index, script] of inlineScripts.entries()) {
