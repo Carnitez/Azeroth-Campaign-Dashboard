@@ -1217,6 +1217,263 @@
       #azeroth-command-center .acc-activity-row .acc-row-copy { grid-row: 2; }
       #azeroth-command-center .acc-activity-value { grid-row: 2; }
     }
+
+    /* Global command palette and Activities Engine. */
+    #azeroth-command-center .acc-command-trigger {
+      min-width: 8.5rem;
+      justify-content: space-between;
+      color: var(--muted-foreground);
+    }
+    #azeroth-command-center .acc-command-trigger kbd {
+      color: var(--muted-foreground);
+      font-size: 0.62rem;
+    }
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed {
+      grid-template-columns: 68px minmax(0, 1fr);
+    }
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar {
+      padding-inline: 0.55rem;
+    }
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-brand span:last-child, .acc-character-card .acc-identity, .acc-character-select, .acc-tabs span, .acc-tabs kbd, .acc-sidebar-footer span:last-child) {
+      display: none;
+    }
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-brand, .acc-character-card, .acc-tabs .btn, .acc-sidebar-footer) {
+      justify-content: center;
+    }
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-character-card {
+      display: flex;
+      padding: 0.45rem;
+    }
+    #azeroth-command-center .acc-activity-head,
+    #azeroth-command-center .acc-activity-toolbar,
+    #azeroth-command-center .acc-view-tabs,
+    #azeroth-command-center .acc-activity-actions,
+    #azeroth-command-center .acc-planner-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    #azeroth-command-center .acc-activity-head {
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+    }
+    #azeroth-command-center .acc-view-tabs {
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-view-tabs .btn[aria-pressed="true"] {
+      color: var(--foreground);
+      border-color: color-mix(in srgb, var(--acc-primary) 40%, var(--border));
+      background: color-mix(in srgb, var(--acc-primary) 10%, transparent);
+    }
+    #azeroth-command-center .acc-activity-filters {
+      display: grid;
+      grid-template-columns: minmax(11rem, 1.6fr) repeat(5, minmax(8rem, 0.7fr));
+      gap: 0.5rem;
+      padding: 0.75rem 0;
+    }
+    #azeroth-command-center .acc-activity-filters .form-label {
+      margin: 0;
+      min-width: 0;
+    }
+    #azeroth-command-center .acc-activity-list {
+      border-top: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-activity-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 4.2rem;
+      padding: 0.65rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+    #azeroth-command-center .acc-activity-row:hover,
+    #azeroth-command-center .acc-activity-row:focus-within {
+      background: rgb(255 255 255 / 2.5%);
+      border-bottom-color: color-mix(in srgb, var(--acc-primary) 22%, var(--border));
+    }
+    #azeroth-command-center .acc-activity-check {
+      display: grid;
+      width: 1.8rem;
+      height: 1.8rem;
+      place-items: center;
+      padding: 0;
+      border-radius: 50%;
+    }
+    #azeroth-command-center .acc-activity-row[data-status="completed"] .acc-row-title {
+      color: var(--muted-foreground);
+      text-decoration: line-through;
+    }
+    #azeroth-command-center .acc-activity-estimate {
+      color: var(--muted-foreground);
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.25rem;
+      padding: 0 0.38rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted-foreground);
+      font-size: 0.62rem;
+      white-space: nowrap;
+    }
+    #azeroth-command-center .acc-chip[data-priority="3"] { color: #f4a8a8; border-color: rgb(244 168 168 / 22%); }
+    #azeroth-command-center .acc-chip[data-priority="2"] { color: #f2c27b; border-color: rgb(242 194 123 / 22%); }
+    #azeroth-command-center .acc-activity-menu {
+      position: relative;
+    }
+    #azeroth-command-center .acc-activity-menu > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    #azeroth-command-center .acc-activity-menu > summary::-webkit-details-marker { display: none; }
+    #azeroth-command-center .acc-activity-menu-popover {
+      position: absolute;
+      z-index: 12;
+      top: calc(100% + 0.3rem);
+      right: 0;
+      display: grid;
+      width: 10.5rem;
+      padding: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--popover);
+      box-shadow: 0 14px 36px rgb(0 0 0 / 36%);
+    }
+    #azeroth-command-center .acc-activity-menu-popover .btn { justify-content: flex-start; border-color: transparent; }
+    #azeroth-command-center .acc-planner-presets {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+    #azeroth-command-center .acc-planner-presets .btn[aria-pressed="true"] {
+      color: var(--acc-primary);
+      border-color: color-mix(in srgb, var(--acc-primary) 45%, var(--border));
+      background: color-mix(in srgb, var(--acc-primary) 9%, transparent);
+    }
+    #azeroth-command-center .acc-planner-summary {
+      justify-content: space-between;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-plan-list { display: grid; }
+    #azeroth-command-center .acc-plan-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-plan-order { display: grid; grid-template-columns: repeat(2, 1.7rem); gap: 0.2rem; }
+    #azeroth-command-center .acc-plan-order .btn { min-height: 1.7rem; padding: 0; }
+    #azeroth-command-center #acc-command-dialog {
+      width: min(44rem, calc(100% - 2rem));
+      padding: 0;
+      overflow: hidden;
+    }
+    #azeroth-command-center .acc-command-search-wrap {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-command-search-wrap .form-control {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      box-shadow: none;
+      font-size: 0.95rem;
+    }
+    #azeroth-command-center .acc-command-results {
+      display: grid;
+      max-height: min(28rem, 62vh);
+      padding: 0.4rem;
+      overflow-y: auto;
+    }
+    #azeroth-command-center .acc-command-result {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.7rem;
+      width: 100%;
+      min-height: 3rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--foreground);
+      background: transparent;
+      text-align: left;
+    }
+    #azeroth-command-center .acc-command-result:is(:hover, [aria-selected="true"]) {
+      border-color: color-mix(in srgb, var(--acc-primary) 25%, var(--border));
+      background: color-mix(in srgb, var(--acc-primary) 8%, var(--secondary));
+    }
+    #azeroth-command-center .acc-command-result-icon {
+      display: grid;
+      width: 1.8rem;
+      height: 1.8rem;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted-foreground);
+    }
+    #azeroth-command-center .acc-command-result-copy { display: grid; gap: 0.08rem; }
+    #azeroth-command-center .acc-command-result-copy small { color: var(--muted-foreground); }
+    #azeroth-command-center .acc-command-result mark {
+      color: var(--acc-active);
+      background: transparent;
+      font-weight: 700;
+    }
+    #azeroth-command-center .acc-command-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem 0.9rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted-foreground);
+      font-size: 0.65rem;
+    }
+    #azeroth-command-center .acc-shortcut-list { display: grid; }
+    #azeroth-command-center .acc-shortcut-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 1100px) {
+      #azeroth-command-center .acc-activity-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-activity-filters .acc-filter-search { grid-column: 1 / -1; }
+    }
+    @media (max-width: 860px) {
+      #azeroth-command-center .acc-shell.acc-sidebar-collapsed { grid-template-columns: 1fr; }
+      #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-character-card .acc-identity, .acc-character-select, .acc-tabs span) { display: initial; }
+      #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar { padding: 0.75rem; }
+      #azeroth-command-center .acc-tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      #azeroth-command-center .acc-command-trigger { min-width: 2rem; }
+      #azeroth-command-center .acc-command-trigger span { display: none; }
+      #azeroth-command-center .acc-tabs .btn { min-width: 0; padding-inline: 0.15rem; }
+      #azeroth-command-center .acc-tabs .btn span { white-space: normal; text-align: center; line-height: 1.05; overflow-wrap: anywhere; }
+      #azeroth-command-center .acc-activity-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-activity-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+      #azeroth-command-center .acc-activity-row > .acc-row-copy { grid-column: 2; grid-row: 1 / span 2; }
+      #azeroth-command-center .acc-activity-check { grid-column: 1; grid-row: 1; }
+      #azeroth-command-center .acc-activity-actions { grid-column: 3; grid-row: 1; }
+      #azeroth-command-center .acc-activity-estimate { grid-column: 3; grid-row: 2; justify-self: end; }
+      #azeroth-command-center .acc-planner-presets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-command-footer { display: none; }
+    }
   </style>
 
   <section class="acc-recovery" id="acc-recovery-state" hidden aria-live="polite">
@@ -1254,6 +1511,7 @@
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
         <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Command Center</span><kbd>Alt 1</kbd></button>
+        <button class="btn" type="button" data-tab="activities" aria-pressed="false" aria-keyshortcuts="Alt+5"><i data-lucide="list-checks" aria-hidden="true"></i><span>Activities</span><kbd>Alt 5</kbd></button>
         <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 2</kbd></button>
         <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 3</kbd></button>
         <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 4</kbd></button>
@@ -1273,6 +1531,7 @@
           <p class="text-muted" id="acc-page-description">Decide what to do next from real campaign progress.</p>
         </div>
         <div class="acc-toolbar">
+          <button class="btn acc-command-trigger" type="button" id="acc-open-command" aria-label="Open command palette" aria-keyshortcuts="Control+K Meta+K"><span><i data-lucide="search" aria-hidden="true"></i> Search commands</span><kbd>Ctrl K</kbd></button>
           <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
           <button class="btn btn-primary" type="button" id="acc-add-character"><i data-lucide="user-plus" aria-hidden="true"></i> Add character</button>
         </div>
@@ -1340,6 +1599,32 @@
         <div class="acc-section-head"><div><h2 id="acc-recent-heading">Recent activity</h2><span class="text-muted text-small">Sessions, progress, completions, and collection updates.</span></div></div>
         <div class="acc-command-list" id="acc-recent-activity"></div>
       </section>
+    </section>
+
+    <section class="acc-panel" id="acc-panel-activities" data-panel="activities" hidden>
+      <div class="acc-activity-head">
+        <div><h2 style="margin:0">Activities</h2><span class="text-muted text-small" id="acc-activity-count">0 activities</span></div>
+        <div class="acc-activity-toolbar">
+          <button class="btn" type="button" id="acc-open-planner"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
+          <button class="btn btn-primary" type="button" id="acc-create-activity"><i data-lucide="plus" aria-hidden="true"></i> Create activity</button>
+        </div>
+      </div>
+      <nav class="acc-view-tabs" aria-label="Activity views">
+        <button class="btn" type="button" data-activity-view="today" aria-pressed="true">Today</button>
+        <button class="btn" type="button" data-activity-view="upcoming" aria-pressed="false">Upcoming</button>
+        <button class="btn" type="button" data-activity-view="completed" aria-pressed="false">Completed</button>
+        <button class="btn" type="button" data-activity-view="all" aria-pressed="false">All activities</button>
+      </nav>
+      <div class="acc-activity-filters" aria-label="Activity filters">
+        <label class="form-label acc-filter-search"><span class="sr-only">Search activities</span><input class="form-control" id="acc-activity-search" type="search" placeholder="Search activities…"></label>
+        <label class="form-label"><span class="sr-only">Filter by character</span><select class="form-select" id="acc-activity-character-filter" aria-label="Filter by character"><option value="">All characters</option></select></label>
+        <label class="form-label"><span class="sr-only">Filter by category</span><select class="form-select" id="acc-activity-category-filter" aria-label="Filter by category"><option value="">All categories</option></select></label>
+        <label class="form-label"><span class="sr-only">Filter by priority</span><select class="form-select" id="acc-activity-priority-filter" aria-label="Filter by priority"><option value="">All priorities</option><option value="3">Critical</option><option value="2">High</option><option value="1">Normal</option><option value="0">Low</option></select></label>
+        <label class="form-label"><span class="sr-only">Filter by status</span><select class="form-select" id="acc-activity-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
+        <label class="form-label"><span class="sr-only">Filter by tags</span><input class="form-control" id="acc-activity-tags-filter" placeholder="Tags"></label>
+        <label class="form-label"><span class="sr-only">Sort activities</span><select class="form-select" id="acc-activity-sort" aria-label="Sort activities"><option value="priority">Priority</option><option value="recent">Recently updated</option><option value="estimated">Estimated time</option><option value="alphabetical">Alphabetical</option></select></label>
+      </div>
+      <div class="acc-activity-list" id="acc-activity-list" aria-live="polite"></div>
     </section>
 
     <section class="acc-panel" id="acc-panel-collections" data-panel="collections" hidden>
@@ -1465,6 +1750,67 @@
     </form>
   </dialog>
 
+  <dialog id="acc-activity-dialog" aria-labelledby="acc-activity-dialog-title">
+    <form method="dialog" id="acc-activity-form">
+      <div class="acc-dialog-head"><h2 id="acc-activity-dialog-title">Create activity</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-activity-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="id">
+      <div class="acc-form-grid">
+        <label class="form-label wide">Title<input class="form-control" name="title" maxlength="120" required></label>
+        <label class="form-label wide">Description<textarea class="form-control" name="description" rows="2" maxlength="320"></textarea></label>
+        <label class="form-label">Character<select class="form-select" name="characterId" required></select></label>
+        <label class="form-label">Category<select class="form-select" name="category" required></select></label>
+        <label class="form-label">Priority<select class="form-select" name="priority"><option value="0">Low</option><option value="1" selected>Normal</option><option value="2">High</option><option value="3">Critical</option></select></label>
+        <label class="form-label">Status<select class="form-select" name="status"><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
+        <label class="form-label">Estimated minutes<input class="form-control" name="estimatedMinutes" type="number" min="1" max="1440" value="30" required></label>
+        <label class="form-label">Repeat<select class="form-select" name="repeatType"><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="manual">Manual</option></select></label>
+        <label class="form-label">Scheduled date<input class="form-control" name="scheduledFor" type="date"></label>
+        <label class="form-label">Tags<input class="form-control" name="tags" maxlength="160" placeholder="campaign, solo, weekly"></label>
+        <label class="form-label wide">Notes<textarea class="form-control" name="notes" rows="3" maxlength="400"></textarea></label>
+      </div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit" id="acc-activity-submit">Create activity</button><button class="btn" type="button" data-close-dialog="acc-activity-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-delete-activity-dialog" aria-labelledby="acc-delete-activity-title">
+    <form method="dialog" id="acc-delete-activity-form">
+      <div class="acc-dialog-head"><h2 id="acc-delete-activity-title">Delete activity?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-delete-activity-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="id">
+      <p class="acc-delete-copy">Delete <strong id="acc-delete-activity-name"></strong>? You can undo this immediately afterward.</p>
+      <div class="acc-actions"><button class="btn acc-btn-danger" type="submit"><i data-lucide="trash-2" aria-hidden="true"></i> Delete activity</button><button class="btn" type="button" data-close-dialog="acc-delete-activity-dialog">Keep activity</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-planner-dialog" aria-labelledby="acc-planner-title">
+    <div class="acc-dialog-head"><div><h2 id="acc-planner-title">Plan a play session</h2><span class="text-muted text-small">Build a deterministic plan from existing activities.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-planner-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+    <div class="acc-planner-presets" aria-label="Available time">
+      <button class="btn" type="button" data-planner-minutes="15">15m</button><button class="btn" type="button" data-planner-minutes="30">30m</button><button class="btn" type="button" data-planner-minutes="60">60m</button><button class="btn" type="button" data-planner-minutes="90">90m</button><button class="btn" type="button" data-planner-minutes="120">120m</button>
+    </div>
+    <div class="acc-inline"><label class="form-label" style="margin:0;flex:1">Available minutes<input class="form-control" id="acc-planner-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-generate-plan">Generate plan</button></div>
+    <div class="acc-planner-summary" id="acc-planner-summary" hidden></div>
+    <div class="acc-plan-list" id="acc-plan-list" aria-live="polite"></div>
+    <div class="acc-actions"><button class="btn" type="button" id="acc-regenerate-plan" hidden><i data-lucide="refresh-cw" aria-hidden="true"></i> Regenerate unlocked</button><button class="btn" type="button" data-close-dialog="acc-planner-dialog">Done</button></div>
+  </dialog>
+
+  <dialog id="acc-command-dialog" aria-labelledby="acc-command-title" aria-modal="true">
+    <h2 class="sr-only" id="acc-command-title">Command palette</h2>
+    <div class="acc-command-search-wrap"><i data-lucide="search" aria-hidden="true"></i><input class="form-control" id="acc-command-search" type="search" role="combobox" aria-label="Search commands" aria-controls="acc-command-results" aria-expanded="true" aria-autocomplete="list" placeholder="Search commands, characters, goals, and activities…"><button class="btn btn-ghost" type="button" data-close-dialog="acc-command-dialog" aria-label="Close command palette"><kbd>Esc</kbd></button></div>
+    <div class="acc-command-results" id="acc-command-results" role="listbox" aria-label="Command results"></div>
+    <div class="acc-command-footer"><span>↑↓ Navigate · Enter Run · Tab Cycle</span><span id="acc-command-mode">Recent commands</span></div>
+  </dialog>
+
+  <dialog id="acc-shortcuts-dialog" aria-labelledby="acc-shortcuts-title">
+    <div class="acc-dialog-head"><h2 id="acc-shortcuts-title">Keyboard shortcuts</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-shortcuts-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+    <div class="acc-shortcut-list">
+      <div class="acc-shortcut-row"><span>Open command palette</span><kbd>Ctrl / Cmd K</kbd></div>
+      <div class="acc-shortcut-row"><span>Command Center</span><kbd>Alt 1</kbd></div>
+      <div class="acc-shortcut-row"><span>Collections</span><kbd>Alt 2</kbd></div>
+      <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 3</kbd></div>
+      <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 4</kbd></div>
+      <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 5</kbd></div>
+      <div class="acc-shortcut-row"><span>Close dialog</span><kbd>Escape</kbd></div>
+    </div>
+  </dialog>
+
   <dialog id="acc-import-dialog">
     <form method="dialog" id="acc-import-form">
       <div class="acc-dialog-head"><h2>Import backup</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-import-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
@@ -1497,6 +1843,7 @@
       const root = document.getElementById('azeroth-command-center');
       const Core = globalThis.AzerothCore;
       const Selectors = globalThis.AzerothSelectors;
+      const ActivityEngine = globalThis.AzerothActivities;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -1521,6 +1868,7 @@
       });
       const pageMeta = Object.freeze({
         overview: { title: 'Command Center', description: 'Decide what to do next from real campaign progress.' },
+        activities: { title: 'Activities', description: 'Plan and complete the work that moves your campaign forward.' },
         collections: { title: 'Collections', description: 'Track account gains and keep the next milestone in reach.' },
         gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
         journal: { title: 'Adventure journal', description: 'Review sessions and keep campaign data safe.' }
@@ -1529,6 +1877,10 @@
       let recoveryState = null;
       let activeTab = 'overview';
       let momentumScope = 'active';
+      let activityView = 'today';
+      let plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+      let commandResults = [];
+      let commandIndex = 0;
       let toastTimer = null;
       let toastAction = null;
 
@@ -1680,6 +2032,7 @@
         quick.elements.gold.value = c.gold;
         quick.elements.location.value = c.location || '';
         renderCommandCenter(c);
+        renderActivities();
         renderCollections(c);
         renderGold(c);
         renderJournal(c);
@@ -1779,11 +2132,12 @@
           target.innerHTML = '<div class="acc-empty">Sessions and progress updates will appear here as the campaign moves forward.<div class="acc-actions"><button class="btn" type="button" data-command-action="log-session">Log a session</button></div></div>';
           return;
         }
-        const icons = { session: 'timer', gold: 'coins', goal: 'circle-check', progress: 'trending-up', collection: 'gem', note: 'notebook-pen' };
+        const icons = { session: 'timer', gold: 'coins', goal: 'circle-check', progress: 'trending-up', collection: 'gem', note: 'notebook-pen', activity: 'list-checks' };
         target.innerHTML = feed.map(entry => {
           let value = '';
           if (entry.kind === 'session') value = `${formatMinutes(entry.durationMinutes)}${entry.goldDelta ? ` · ${entry.goldDelta > 0 ? '+' : '−'}${formatGold(Math.abs(entry.goldDelta))}` : ''}`;
           else if (entry.kind === 'gold') value = `${entry.goldDelta >= 0 ? '+' : '−'}${formatGold(Math.abs(entry.goldDelta))}`;
+          else if (entry.kind === 'activity') value = formatMinutes(entry.durationMinutes);
           else if (entry.metric === 'level') value = `Level ${entry.value}`;
           const action = entry.kind === 'goal' ? `<button class="btn btn-ghost" type="button" data-command-reopen-goal="${escapeHtml(entry.goalId)}">Undo completion</button>` : `<button class="btn btn-ghost" type="button" data-command-tab="${escapeHtml(entry.relatedTab)}" data-character-id="${escapeHtml(entry.characterId || '')}">Open</button>`;
           return `<article class="acc-activity-row"><time datetime="${escapeHtml(entry.occurredAt)}">${escapeHtml(formatLocalDateTime(entry.occurredAt))}</time><span class="acc-activity-mark"><i data-lucide="${icons[entry.kind] || 'sparkles'}" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(entry.title)}</span><span class="acc-row-meta"><span>${escapeHtml(entry.character?.name || 'Character')}</span><span>·</span><span>${escapeHtml(entry.category)}</span>${entry.detail ? `<span>·</span><span>${escapeHtml(entry.detail)}</span>` : ''}</span></div><span class="acc-row-actions"><span class="acc-activity-value">${escapeHtml(value)}</span>${action}</span></article>`;
@@ -1855,6 +2209,117 @@
         target.innerHTML = [...sessions].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(s => `
           <article class="acc-entry"><time class="text-muted">${escapeHtml(Core.localDateKey(s.occurredAt) || s.occurredAt)}</time><div class="acc-entry-body"><strong>${formatMinutes(s.durationMinutes)}</strong> · ${Number(s.gold?.delta) >= 0 ? '+' : ''}${formatGold(s.gold?.delta)}<div>${escapeHtml(s.notes || 'No notes')}</div></div><button class="btn btn-ghost" type="button" data-session-delete="${escapeHtml(s.id)}" aria-label="Delete journal entry"><i data-lucide="x" aria-hidden="true"></i></button></article>`).join('');
       }
+      const activityStatusLabels = { todo: 'Todo', in_progress: 'In progress', completed: 'Completed', skipped: 'Skipped' };
+      const activityPriorityLabels = ['Low', 'Normal', 'High', 'Critical'];
+      const activityRepeatLabels = { one_time: 'One-time', daily: 'Daily', weekly: 'Weekly', manual: 'Manual' };
+      function renderActivityOptions() {
+        const roster = rosterCharacters();
+        const filter = root.querySelector('#acc-activity-character-filter');
+        const selectedFilter = filter.value;
+        filter.innerHTML = `<option value="">All characters</option>${roster.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}`;
+        filter.value = roster.some(item => item.id === selectedFilter) ? selectedFilter : '';
+        const formCharacter = root.querySelector('#acc-activity-form').elements.characterId;
+        const selectedCharacter = formCharacter.value || state.activeCharacterId;
+        formCharacter.innerHTML = roster.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)} — ${escapeHtml(item.realm)}</option>`).join('');
+        formCharacter.value = roster.some(item => item.id === selectedCharacter) ? selectedCharacter : state.activeCharacterId;
+        const categoryFilter = root.querySelector('#acc-activity-category-filter');
+        const selectedCategory = categoryFilter.value;
+        categoryFilter.innerHTML = `<option value="">All categories</option>${ActivityEngine.ACTIVITY_CATEGORIES.map(value => `<option>${escapeHtml(value)}</option>`).join('')}`;
+        categoryFilter.value = ActivityEngine.ACTIVITY_CATEGORIES.includes(selectedCategory) ? selectedCategory : '';
+        const categoryForm = root.querySelector('#acc-activity-form').elements.category;
+        const formCategory = categoryForm.value || 'Campaign';
+        categoryForm.innerHTML = ActivityEngine.ACTIVITY_CATEGORIES.map(value => `<option>${escapeHtml(value)}</option>`).join('');
+        categoryForm.value = ActivityEngine.ACTIVITY_CATEGORIES.includes(formCategory) ? formCategory : 'Campaign';
+      }
+      function currentActivityFilters() {
+        return {
+          view: activityView,
+          characterId: root.querySelector('#acc-activity-character-filter').value,
+          category: root.querySelector('#acc-activity-category-filter').value,
+          priority: root.querySelector('#acc-activity-priority-filter').value,
+          status: root.querySelector('#acc-activity-status-filter').value,
+          tags: root.querySelector('#acc-activity-tags-filter').value,
+          search: root.querySelector('#acc-activity-search').value,
+          sort: root.querySelector('#acc-activity-sort').value,
+          now: new Date()
+        };
+      }
+      function renderActivities() {
+        renderActivityOptions();
+        root.querySelectorAll('[data-activity-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.activityView === activityView)));
+        const activities = ActivityEngine.selectPlannedActivities(state, currentActivityFilters());
+        root.querySelector('#acc-activity-count').textContent = `${activities.length} activit${activities.length === 1 ? 'y' : 'ies'}`;
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        const target = root.querySelector('#acc-activity-list');
+        if (!activities.length) {
+          const copy = activityView === 'completed' ? 'Completed activities will collect here as you finish campaign work.' : activityView === 'upcoming' ? 'No activities are scheduled for a future date.' : 'Create the first real activity to give Next Up and the Session Planner something concrete to use.';
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn" type="button" data-activity-action="create">Create activity</button></div></div>`;
+          return;
+        }
+        target.innerHTML = activities.map(activity => {
+          const owner = characterMap.get(activity.characterId);
+          const completed = activity.effectiveStatus === 'completed';
+          const skipped = activity.effectiveStatus === 'skipped';
+          const completeLabel = completed || skipped ? 'Undo' : 'Complete';
+          const tags = activity.tags.slice(0, 3).map(tag => `<span class="acc-chip">${escapeHtml(tag)}</span>`).join('');
+          return `<article class="acc-activity-row" data-activity-id="${escapeHtml(activity.id)}" data-status="${escapeHtml(activity.effectiveStatus)}">
+            <button class="btn btn-ghost acc-activity-check" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}" aria-label="${completeLabel} ${escapeHtml(activity.title)}"><i data-lucide="${completed ? 'circle-check-big' : skipped ? 'rotate-ccw' : 'circle'}" aria-hidden="true"></i></button>
+            <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Character')}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(activityStatusLabels[activity.effectiveStatus] || activity.effectiveStatus)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span>${activity.repeatType !== 'one_time' ? `<span class="acc-chip">${escapeHtml(activityRepeatLabels[activity.repeatType])}</span>` : ''}${tags}</span>${activity.description ? `<span class="text-small text-muted">${escapeHtml(activity.description)}</span>` : ''}</div>
+            <span class="acc-activity-estimate">${formatMinutes(activity.estimatedMinutes)}</span>
+            <span class="acc-activity-actions"><button class="btn" type="button" data-activity-action="edit">Open</button><details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover"><button class="btn btn-ghost" type="button" data-activity-action="edit">Edit</button><button class="btn btn-ghost" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}">${completeLabel}</button><button class="btn btn-ghost" type="button" data-activity-action="duplicate">Duplicate</button><button class="btn btn-ghost acc-btn-danger" type="button" data-activity-action="delete">Delete</button></div></details></span>
+          </article>`;
+        }).join('');
+      }
+      function openActivityDialog(activityId = null, defaults = {}) {
+        const form = root.querySelector('#acc-activity-form');
+        form.reset();
+        renderActivityOptions();
+        const activity = activityId ? state.activities.find(item => item.id === activityId && ActivityEngine.isPlannedActivity(item)) : null;
+        root.querySelector('#acc-activity-dialog-title').textContent = activity ? 'Edit activity' : 'Create activity';
+        root.querySelector('#acc-activity-submit').textContent = activity ? 'Save activity' : 'Create activity';
+        const values = activity || { characterId: state.activeCharacterId, category: 'Campaign', priority: 1, status: 'todo', estimatedMinutes: 30, repeatType: 'one_time', tags: [], scheduledFor: '', ...defaults };
+        for (const [key, value] of Object.entries(values)) {
+          if (!form.elements[key]) continue;
+          form.elements[key].value = key === 'tags' ? (Array.isArray(value) ? value.join(', ') : value || '') : value ?? '';
+        }
+        root.querySelector('#acc-activity-dialog').showModal();
+        requestAnimationFrame(() => form.elements.title.focus());
+      }
+      function replaceActivity(activityId, updater) {
+        const index = state.activities.findIndex(item => item.id === activityId && ActivityEngine.isPlannedActivity(item));
+        if (index < 0) return null;
+        const previous = state.activities[index];
+        state.activities[index] = updater(previous);
+        saveState();
+        render();
+        return previous;
+      }
+      function setActivityStatus(activityId, status) {
+        const previous = replaceActivity(activityId, activity => ActivityEngine.setPlannedActivityStatus(activity, status));
+        if (!previous) return;
+        showToast(status === 'completed' ? 'Activity completed.' : 'Activity reopened.', { actionLabel: 'Undo', onAction: () => { const index = state.activities.findIndex(item => item.id === activityId); if (index >= 0) state.activities[index] = previous; saveState(); render(); showToast('Activity restored.'); } });
+      }
+      function generatePlanner({ reset = false } = {}) {
+        if (reset) plannerState = { ...plannerState, lockedIds: new Set(), excludedIds: new Set(), order: [] };
+        plannerState.budgetMinutes = Math.max(1, Number(root.querySelector('#acc-planner-minutes').value) || 30);
+        plannerState.result = ActivityEngine.planSession(state, { budgetMinutes: plannerState.budgetMinutes, activeCharacterId: state.activeCharacterId, lockedIds: [...plannerState.lockedIds], excludedIds: [...plannerState.excludedIds], currentOrder: plannerState.order, now: new Date() });
+        plannerState.order = plannerState.result.items.map(item => item.activity.id);
+        renderPlanner();
+      }
+      function renderPlanner() {
+        const result = plannerState.result;
+        const summary = root.querySelector('#acc-planner-summary');
+        const target = root.querySelector('#acc-plan-list');
+        root.querySelectorAll('[data-planner-minutes]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.plannerMinutes) === Number(plannerState.budgetMinutes))));
+        root.querySelector('#acc-regenerate-plan').hidden = !result;
+        if (!result) { summary.hidden = true; target.innerHTML = '<div class="acc-empty">Choose the time available, then generate a plan from your existing activities.</div>'; return; }
+        summary.hidden = false;
+        summary.innerHTML = `<span><strong>${formatMinutes(result.totalMinutes)}</strong> planned · ${result.items.length} activit${result.items.length === 1 ? 'y' : 'ies'}</span><span class="text-muted text-small">${result.characterIds.length} character${result.characterIds.length === 1 ? '' : 's'} · ${result.categories.map(escapeHtml).join(', ') || 'No categories'}</span>`;
+        if (!result.items.length) { target.innerHTML = '<div class="acc-empty">No eligible activities fit this time budget. Create an activity or increase the available time.</div>'; return; }
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        target.innerHTML = result.items.map((item, index) => `<article class="acc-plan-row" data-plan-id="${escapeHtml(item.activity.id)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.activity.characterId)?.name || 'Character')}</span><span>·</span><span>${escapeHtml(item.activity.category)}</span><span>·</span><span>${formatMinutes(item.activity.estimatedMinutes)}</span><span>·</span><span>${escapeHtml(item.reason)}</span></span></div><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-plan-action="lock" aria-pressed="${String(plannerState.lockedIds.has(item.activity.id))}" aria-label="${plannerState.lockedIds.has(item.activity.id) ? 'Unlock' : 'Lock'} ${escapeHtml(item.activity.title)}"><i data-lucide="${plannerState.lockedIds.has(item.activity.id) ? 'lock-keyhole' : 'lock-keyhole-open'}" aria-hidden="true"></i></button><span class="acc-plan-order"><button class="btn btn-ghost" type="button" data-plan-action="up" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-action="down" ${index === result.items.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} down"><i data-lucide="chevron-down" aria-hidden="true"></i></button></span><button class="btn btn-ghost" type="button" data-plan-action="remove" aria-label="Remove ${escapeHtml(item.activity.title)} from plan"><i data-lucide="x" aria-hidden="true"></i></button></span></article>`).join('');
+        refreshIcons();
+      }
       function openCharacterDialog(editing) {
         const form = root.querySelector('#acc-character-form');
         form.reset();
@@ -1864,7 +2329,7 @@
         Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
         root.querySelector('#acc-character-dialog').showModal();
       }
-      function openGoalDialog(goalId = null) {
+      function openGoalDialog(goalId = null, defaults = {}) {
         const form = root.querySelector('#acc-goal-form');
         form.reset();
         const goal = goalId ? state.goals.find(item => item.id === goalId) : null;
@@ -1872,12 +2337,12 @@
         root.querySelector('#acc-goal-submit').textContent = goal ? 'Save goal' : 'Add goal';
         root.querySelector('#acc-goal-delete').hidden = !goal;
         form.elements.id.value = goal?.id || '';
-        form.elements.title.value = goal?.title || '';
+        form.elements.title.value = goal?.title || defaults.title || '';
         form.elements.status.value = goal?.status || 'todo';
         const priority = String(Number(goal?.priority) || 0);
         if (![...form.elements.priority.options].some(option => option.value === priority)) form.elements.priority.add(new Option(`Priority ${priority}`, priority));
         form.elements.priority.value = priority;
-        const category = goal?.category || 'Current content';
+        const category = goal?.category || defaults.category || 'Current content';
         if (![...form.elements.type.options].some(option => option.value === category)) form.elements.type.add(new Option(category, category));
         form.elements.type.value = category;
         root.querySelector('#acc-goal-dialog').showModal();
@@ -1917,6 +2382,67 @@
         try { await navigator.clipboard.writeText(payload); showToast('Backup copied to clipboard.'); }
         catch (_) { const blob = new Blob([payload], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `azeroth-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup downloaded.'); }
       }
+      function highlightedCommandLabel(label, query) {
+        const text = String(label);
+        const index = text.toLowerCase().indexOf(String(query || '').trim().toLowerCase());
+        if (index < 0 || !String(query || '').trim()) return escapeHtml(text);
+        const length = String(query).trim().length;
+        return `${escapeHtml(text.slice(0, index))}<mark>${escapeHtml(text.slice(index, index + length))}</mark>${escapeHtml(text.slice(index + length))}`;
+      }
+      function renderCommandPalette() {
+        const query = root.querySelector('#acc-command-search').value;
+        const catalog = ActivityEngine.buildCommandCatalog(state);
+        commandResults = ActivityEngine.searchCommands(catalog, query, { history: state.preferences?.commandPalette || {}, limit: 12 });
+        commandIndex = commandResults.length ? Math.max(0, Math.min(commandIndex, commandResults.length - 1)) : -1;
+        root.querySelector('#acc-command-mode').textContent = query.trim() ? `${commandResults.length} matching command${commandResults.length === 1 ? '' : 's'}` : 'Recent and frequently used';
+        const target = root.querySelector('#acc-command-results');
+        target.innerHTML = commandResults.length ? commandResults.map((item, index) => `<button class="acc-command-result" type="button" role="option" id="acc-command-option-${index}" aria-selected="${String(index === commandIndex)}" data-command-index="${index}"><span class="acc-command-result-icon"><i data-lucide="${escapeHtml(item.icon || 'search')}" aria-hidden="true"></i></span><span class="acc-command-result-copy"><span>${highlightedCommandLabel(item.label, query)}</span><small>${escapeHtml(item.category)}${item.character ? ` · ${escapeHtml(item.character)}` : ''}</small></span><kbd>↵</kbd></button>`).join('') : '<div class="acc-empty">No real campaign record or command matches this search.</div>';
+        const input = root.querySelector('#acc-command-search');
+        if (commandIndex >= 0) input.setAttribute('aria-activedescendant', `acc-command-option-${commandIndex}`); else input.removeAttribute('aria-activedescendant');
+        refreshIcons();
+      }
+      function openCommandPalette(initialQuery = '') {
+        const dialog = root.querySelector('#acc-command-dialog');
+        const input = root.querySelector('#acc-command-search');
+        input.value = initialQuery;
+        commandIndex = 0;
+        renderCommandPalette();
+        if (!dialog.open) dialog.showModal();
+        requestAnimationFrame(() => input.focus());
+      }
+      function focusAfterNavigation(selector) {
+        requestAnimationFrame(() => { const target = root.querySelector(selector); if (!target) return; if (!target.matches('button,input,select,textarea,a[href]')) target.tabIndex = -1; target.focus(); target.scrollIntoView({ block: 'center', behavior: 'smooth' }); });
+      }
+      function executePaletteCommand(item) {
+        if (!item) return;
+        state.preferences = ActivityEngine.recordCommandUse(state.preferences, item.id);
+        saveState();
+        root.querySelector('#acc-command-dialog').close();
+        if (item.action === 'navigate') activateTab(item.target, true);
+        else if (item.action === 'navigate-focus') {
+          if (item.target === 'campaign') { activateTab('overview'); focusAfterNavigation('#acc-next-up-heading'); }
+          else if (item.target === 'analytics') { activateTab('overview'); focusAfterNavigation('#acc-momentum-scope'); }
+          else if (item.target === 'settings') { activateTab('journal'); focusAfterNavigation('#acc-export'); }
+        } else if (item.action === 'focus-characters') focusAfterNavigation('#acc-character-select');
+        else if (item.action === 'edit-character') openCharacterDialog(true);
+        else if (item.action === 'add-character') openCharacterDialog(false);
+        else if (item.action === 'switch-character') selectCharacter(item.target);
+        else if (item.action === 'edit-specific-character') { selectCharacter(item.target); openCharacterDialog(true); }
+        else if (item.action === 'add-goal') openGoalDialog();
+        else if (item.action === 'add-objective') openGoalDialog(null, { category: 'Current content' });
+        else if (item.action === 'log-session') root.querySelector('#acc-session-dialog').showModal();
+        else if (item.action === 'log-gold') { activateTab('gold'); focusAfterNavigation('#acc-ledger-form [name="activity"]'); }
+        else if (item.action === 'update-collection') { activateTab('collections'); focusAfterNavigation('[data-collection-owned]'); }
+        else if (item.action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
+        else if (item.action === 'open-activity') { const activity = state.activities.find(value => value.id === item.target); if (activity) selectCharacter(activity.characterId); activateTab('activities'); openActivityDialog(item.target); }
+        else if (item.action === 'open-goal') { const goal = state.goals.find(value => value.id === item.target); if (goal) selectCharacter(goal.characterId); openGoalDialog(item.target); }
+        else if (item.action === 'open-gold') { const entry = state.activities.find(value => value.id === item.target); if (entry) selectCharacter(entry.characterId); activateTab('gold'); focusAfterNavigation('#acc-ledger-body'); }
+        else if (item.action === 'open-collection') { const tracker = state.collectionTrackers.find(value => value.id === item.target); if (tracker) selectCharacter(tracker.characterId); activateTab('collections'); focusAfterNavigation(`[data-collection="${CSS.escape(tracker?.name || '')}"]`); }
+        else if (item.action === 'export') exportBackup();
+        else if (item.action === 'import') { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); }
+        else if (item.action === 'toggle-sidebar') { const shell = root.querySelector('.acc-shell'); const collapsed = shell.classList.toggle('acc-sidebar-collapsed'); state.preferences = { ...state.preferences, sidebarCollapsed: collapsed }; saveState(); }
+        else if (item.action === 'shortcuts') root.querySelector('#acc-shortcuts-dialog').showModal();
+      }
       function performCommandAction(action, characterId = '', sourceId = '') {
         if (characterId && characterId !== state.activeCharacterId) selectCharacter(characterId);
         if (action === 'open-goal') openGoalDialog(sourceId);
@@ -1924,6 +2450,7 @@
         else if (action === 'edit-character') openCharacterDialog(true);
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
         else if (action === 'add-goal') openGoalDialog();
+        else if (action === 'open-activity') { activateTab('activities'); openActivityDialog(sourceId); }
         else if (action === 'log-session') root.querySelector('#acc-session-dialog').showModal();
         else if (action === 'update-progress') root.querySelector('#acc-progress-dialog').showModal();
         else if (action === 'log-gold') { activateTab('gold'); requestAnimationFrame(() => root.querySelector('#acc-ledger-form [name="activity"]')?.focus()); }
@@ -1960,6 +2487,7 @@
         state = loadState();
         renderRecovery();
         if (state) {
+          root.querySelector('.acc-shell').classList.toggle('acc-sidebar-collapsed', Boolean(state.preferences?.sidebarCollapsed));
           const active = character();
           if (active && active.id !== state.activeCharacterId) {
             state.activeCharacterId = active.id;
@@ -1970,10 +2498,12 @@
       }
       root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
       document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); return; }
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-        const tabName = ['overview', 'collections', 'gold', 'journal'][Number(e.key) - 1];
+        const tabName = ({ '1': 'overview', '2': 'collections', '3': 'gold', '4': 'journal', '5': 'activities' })[e.key];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
+      root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
@@ -2020,6 +2550,60 @@
         if (!id) return;
         root.querySelector('#acc-goal-dialog').close();
         removeWithUndo(state.goals, id, 'Goal removed.', (item, index) => state.goals.splice(index, 0, item));
+      });
+      root.querySelector('#acc-create-activity').addEventListener('click', () => openActivityDialog());
+      root.querySelectorAll('[data-activity-view]').forEach(button => button.addEventListener('click', () => { activityView = button.dataset.activityView; renderActivities(); refreshIcons(); }));
+      ['acc-activity-character-filter', 'acc-activity-category-filter', 'acc-activity-priority-filter', 'acc-activity-status-filter', 'acc-activity-sort'].forEach(id => root.querySelector(`#${id}`).addEventListener('change', () => { renderActivities(); refreshIcons(); }));
+      ['acc-activity-search', 'acc-activity-tags-filter'].forEach(id => root.querySelector(`#${id}`).addEventListener('input', () => { renderActivities(); refreshIcons(); }));
+      root.querySelector('#acc-activity-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const form = e.currentTarget, data = new FormData(form), id = data.get('id');
+        const input = { title: data.get('title'), description: data.get('description'), characterId: data.get('characterId'), category: data.get('category'), priority: Number(data.get('priority')), status: data.get('status'), estimatedMinutes: Number(data.get('estimatedMinutes')), repeatType: data.get('repeatType'), scheduledFor: data.get('scheduledFor') || null, tags: data.get('tags'), notes: data.get('notes') };
+        const index = state.activities.findIndex(item => item.id === id && ActivityEngine.isPlannedActivity(item));
+        if (index >= 0) state.activities[index] = ActivityEngine.updatePlannedActivity(state.activities[index], input);
+        else state.activities.push(ActivityEngine.createPlannedActivity(input, { id: uid('activity-plan') }));
+        saveState(); form.reset(); root.querySelector('#acc-activity-dialog').close(); render(); showToast(index >= 0 ? 'Activity updated.' : 'Activity created.');
+      });
+      root.querySelector('#acc-activity-list').addEventListener('click', e => {
+        const action = e.target.closest('[data-activity-action]');
+        if (!action) return;
+        if (action.dataset.activityAction === 'create') { openActivityDialog(); return; }
+        const row = action.closest('[data-activity-id]'), id = row?.dataset.activityId;
+        const activity = state.activities.find(item => item.id === id && ActivityEngine.isPlannedActivity(item));
+        if (!activity) return;
+        if (action.dataset.activityAction === 'edit') openActivityDialog(id);
+        else if (action.dataset.activityAction === 'complete') setActivityStatus(id, 'completed');
+        else if (action.dataset.activityAction === 'undo') setActivityStatus(id, 'todo');
+        else if (action.dataset.activityAction === 'duplicate') { state.activities.push(ActivityEngine.duplicatePlannedActivity(activity, { id: uid('activity-plan') })); saveState(); render(); showToast('Activity duplicated.'); }
+        else if (action.dataset.activityAction === 'delete') { root.querySelector('#acc-delete-activity-form').elements.id.value = id; root.querySelector('#acc-delete-activity-name').textContent = activity.title; root.querySelector('#acc-delete-activity-dialog').showModal(); }
+      });
+      root.querySelector('#acc-delete-activity-form').addEventListener('submit', e => { e.preventDefault(); const id = e.currentTarget.elements.id.value; root.querySelector('#acc-delete-activity-dialog').close(); removeWithUndo(state.activities, id, 'Activity deleted.', (item, index) => state.activities.splice(index, 0, item)); });
+      root.querySelector('#acc-open-planner').addEventListener('click', () => { plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null }; root.querySelector('#acc-planner-minutes').value = 60; renderPlanner(); root.querySelector('#acc-planner-dialog').showModal(); });
+      root.querySelectorAll('[data-planner-minutes]').forEach(button => button.addEventListener('click', () => { plannerState.budgetMinutes = Number(button.dataset.plannerMinutes); root.querySelector('#acc-planner-minutes').value = plannerState.budgetMinutes; renderPlanner(); }));
+      root.querySelector('#acc-generate-plan').addEventListener('click', () => generatePlanner({ reset: true }));
+      root.querySelector('#acc-regenerate-plan').addEventListener('click', () => generatePlanner());
+      root.querySelector('#acc-plan-list').addEventListener('click', e => {
+        const button = e.target.closest('[data-plan-action]'), row = button?.closest('[data-plan-id]');
+        if (!button || !row || !plannerState.result) return;
+        const id = row.dataset.planId, index = plannerState.result.items.findIndex(item => item.activity.id === id);
+        if (button.dataset.planAction === 'lock') { if (plannerState.lockedIds.has(id)) plannerState.lockedIds.delete(id); else plannerState.lockedIds.add(id); renderPlanner(); }
+        else if (button.dataset.planAction === 'remove') { plannerState.excludedIds.add(id); generatePlanner(); }
+        else if (button.dataset.planAction === 'up' || button.dataset.planAction === 'down') { const nextIndex = index + (button.dataset.planAction === 'up' ? -1 : 1); plannerState.result = { ...plannerState.result, items: ActivityEngine.reorderPlan(plannerState.result.items, index, nextIndex) }; plannerState.order = plannerState.result.items.map(item => item.activity.id); renderPlanner(); }
+      });
+      root.querySelector('#acc-command-search').addEventListener('input', () => { commandIndex = 0; renderCommandPalette(); });
+      root.querySelector('#acc-command-search').addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); commandIndex = ActivityEngine.moveCommandSelection(commandIndex, e.key === 'ArrowDown' ? 1 : -1, commandResults.length); renderCommandPalette(); }
+        else if (e.key === 'Enter') { e.preventDefault(); executePaletteCommand(commandResults[commandIndex]); }
+      });
+      root.querySelector('#acc-command-results').addEventListener('mousemove', e => { const option = e.target.closest('[data-command-index]'); if (!option) return; const index = Number(option.dataset.commandIndex); if (index !== commandIndex) { commandIndex = index; renderCommandPalette(); } });
+      root.querySelector('#acc-command-results').addEventListener('click', e => { const option = e.target.closest('[data-command-index]'); if (option) executePaletteCommand(commandResults[Number(option.dataset.commandIndex)]); });
+      root.querySelector('#acc-command-dialog').addEventListener('keydown', e => {
+        if (e.key !== 'Tab') return;
+        const focusable = [...root.querySelector('#acc-command-dialog').querySelectorAll('button:not(:disabled), input:not(:disabled)')].filter(item => item.offsetParent !== null);
+        if (!focusable.length) return;
+        const first = focusable[0], last = focusable.at(-1);
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       });
       root.querySelector('#acc-panel-overview').addEventListener('change', e => {
         if (e.target.matches('[data-command-goal-toggle]')) completeGoal(e.target.dataset.commandGoalToggle);

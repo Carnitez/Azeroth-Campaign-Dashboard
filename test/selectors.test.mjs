@@ -135,6 +135,24 @@ test('weekly momentum respects local Monday boundaries', () => {
   assert.equal(momentum.netGold, 15);
 });
 
+test('unfinished planned activities do not count as weekly activity', () => {
+  const campaign = state({ activities: [{
+    id: 'planned', kind: 'planned', characterId: 'a', title: 'Future work', description: '',
+    category: 'Weekly', priority: 2, status: 'todo', estimatedMinutes: 30,
+    repeatType: 'one_time', tags: [], notes: '', scheduledFor: null,
+    createdAt: iso(20), updatedAt: iso(20), completedAt: null
+  }, {
+    id: 'incomplete-completion', kind: 'planned', characterId: 'a', title: 'Missing timestamp', description: '',
+    category: 'Weekly', priority: 1, status: 'completed', estimatedMinutes: 15,
+    repeatType: 'one_time', tags: [], notes: '', scheduledFor: null,
+    createdAt: iso(20), updatedAt: iso(20)
+  }] });
+  const momentum = selectWeeklyMomentum(campaign, { now: at(22) });
+  assert.equal(momentum.sessions, 0);
+  assert.equal(momentum.completed, 0);
+  assert.equal(momentum.activeCharacters, 0);
+});
+
 test('weekly gold totals combine recorded revenue, costs and session balance changes', () => {
   const campaign = state({ activities: [
     { id: 'farm', characterId: 'a', kind: 'gold', occurredAt: iso(21), durationMinutes: 60, gold: { revenue: 1000, cost: 250, delta: 750, affectsBalance: false } },

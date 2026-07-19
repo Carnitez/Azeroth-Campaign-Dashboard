@@ -17,6 +17,9 @@ A local-first World of Warcraft campaign tracker for completionists and gold mak
 - Character-aware class and race accent themes
 - Recoverable deletion for objectives, journal entries, gold activities, and characters
 - A decision-oriented Command Center with ranked next actions, active goals, weekly momentum, roster attention, and a unified activity feed
+- Character-scoped activities with priorities, schedules, repeat cadence, tags, completion, and filtering
+- A deterministic play-session planner for 15- to 120-minute sessions
+- A global command palette that searches live campaign records and runs existing dashboard actions
 
 Carnitez-Silvermoon EU is included as the initial campaign character. All data is stored in the browser with `localStorage`; no account or login is required.
 
@@ -24,7 +27,7 @@ Carnitez-Silvermoon EU is included as the initial campaign character. All data i
 
 The dashboard uses a compact campaign-management shell with a persistent desktop sidebar and a responsive mobile navigation layout. The Command Center derives its recommendations and weekly summaries from canonical v2 campaign data without storing a second copy. The active character's class selects the accent, progress, focus, surface, motif, and icon tokens; Night Elf characters add a restrained moonlit influence. Theme selection is derived from existing character fields, so older saved campaigns remain compatible.
 
-Use `Alt+1` through `Alt+4` to move between Command Center, Collections, Gold, and Journal from the keyboard.
+Use `Ctrl+K` or `Cmd+K` to open the command palette. Use `Alt+1` through `Alt+5` to move between Command Center, Collections, Gold, Journal, and Activities from the keyboard.
 
 ## Run locally
 

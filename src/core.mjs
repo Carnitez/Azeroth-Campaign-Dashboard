@@ -11,6 +11,9 @@ export const V2_RECOVERY_KEY = 'azeroth-command-center-v2-recovery';
 export const V2_SCHEMA_VERSION = 2;
 
 export const COLLECTION_NAMES = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
+export const PLANNED_ACTIVITY_CATEGORIES = ['Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Transmog', 'Achievements', 'Events', 'Custom'];
+export const PLANNED_ACTIVITY_STATUSES = ['todo', 'in_progress', 'completed', 'skipped'];
+export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'manual'];
 
 const KNOWN_CHARACTER_FIELDS = new Set([
   'id', 'name', 'realm', 'region', 'faction', 'race', 'raceId', 'className', 'classId', 'spec',
@@ -142,9 +145,25 @@ function validateActivity(activity, index, errors) {
   }
   if (typeof activity.id !== 'string' || !activity.id) addError(errors, `${path}.id`, 'must be a non-empty string');
   if (typeof activity.characterId !== 'string' || !activity.characterId) addError(errors, `${path}.characterId`, 'must identify a character');
-  if (!['session', 'gold', 'collection', 'note'].includes(activity.kind)) addError(errors, `${path}.kind`, 'has an unknown activity type');
-  if (!validDateValue(activity.occurredAt)) addError(errors, `${path}.occurredAt`, 'must be a valid date or timestamp');
-  if (!isFiniteNumber(activity.durationMinutes, { min: 0 })) addError(errors, `${path}.durationMinutes`, 'must be a non-negative number');
+  if (!['session', 'gold', 'collection', 'note', 'planned'].includes(activity.kind)) addError(errors, `${path}.kind`, 'has an unknown activity type');
+  if (activity.kind === 'planned') {
+    if (typeof activity.title !== 'string' || !activity.title.trim()) addError(errors, `${path}.title`, 'must be a non-empty string');
+    if (typeof activity.description !== 'string') addError(errors, `${path}.description`, 'must be a string');
+    if (!PLANNED_ACTIVITY_CATEGORIES.includes(activity.category)) addError(errors, `${path}.category`, 'has an unknown category');
+    if (!isFiniteNumber(activity.priority, { min: 0, max: 3 })) addError(errors, `${path}.priority`, 'must be a number from 0 to 3');
+    if (!PLANNED_ACTIVITY_STATUSES.includes(activity.status)) addError(errors, `${path}.status`, 'has an unknown status');
+    if (!isFiniteNumber(activity.estimatedMinutes, { min: 1 })) addError(errors, `${path}.estimatedMinutes`, 'must be a positive number');
+    if (!PLANNED_ACTIVITY_REPEAT_TYPES.includes(activity.repeatType)) addError(errors, `${path}.repeatType`, 'has an unknown repeat type');
+    if (!Array.isArray(activity.tags) || activity.tags.some(tag => typeof tag !== 'string')) addError(errors, `${path}.tags`, 'must be an array of strings');
+    if (typeof activity.notes !== 'string') addError(errors, `${path}.notes`, 'must be a string');
+    if (!validDateValue(activity.createdAt)) addError(errors, `${path}.createdAt`, 'must be a valid date or timestamp');
+    if (!validDateValue(activity.updatedAt)) addError(errors, `${path}.updatedAt`, 'must be a valid date or timestamp');
+    if (activity.completedAt !== null && activity.completedAt !== undefined && !validDateValue(activity.completedAt)) addError(errors, `${path}.completedAt`, 'must be null or a valid date');
+    if (activity.scheduledFor !== null && activity.scheduledFor !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(activity.scheduledFor)) addError(errors, `${path}.scheduledFor`, 'must be null or a local date');
+  } else {
+    if (!validDateValue(activity.occurredAt)) addError(errors, `${path}.occurredAt`, 'must be a valid date or timestamp');
+    if (!isFiniteNumber(activity.durationMinutes, { min: 0 })) addError(errors, `${path}.durationMinutes`, 'must be a non-negative number');
+  }
   if (activity.gold !== undefined) {
     if (!isPlainObject(activity.gold)) addError(errors, `${path}.gold`, 'must be an object');
     else {

@@ -4,6 +4,7 @@
  */
 
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
+const Activities = globalThis.AzerothActivities ?? await import('./activity-engine.mjs');
 
 const DAY_MS = 86_400_000;
 const RECENT_DAYS = 7;
@@ -73,8 +74,12 @@ export function selectGoalObjectiveCounts(state) {
 function activityCandidatesForCharacter(state, characterId) {
   const candidates = [];
   for (const activity of list(state?.activities)) {
-    if (activity.characterId !== characterId || !timestamp(activity.occurredAt)) continue;
-    candidates.push({ type: 'activity', id: activity.id, at: activity.occurredAt, record: activity });
+    if (activity.characterId !== characterId) continue;
+    if (Activities.isPlannedActivity(activity)) {
+      if (activity.status === 'completed' && activity.completedAt && timestamp(activity.completedAt)) candidates.push({ type: 'planned', id: activity.id, at: activity.completedAt, record: activity });
+      continue;
+    }
+    if (timestamp(activity.occurredAt)) candidates.push({ type: 'activity', id: activity.id, at: activity.occurredAt, record: activity });
   }
   for (const event of list(state?.progressEvents)) {
     if (event.entityId !== characterId || ['starter', 'legacy-current-observation'].includes(event.source) || !timestamp(event.recordedAt)) continue;
@@ -136,6 +141,23 @@ export function selectRecentActivity(state, { limit = 10 } = {}) {
   const entries = [];
 
   activities.forEach((activity, index) => {
+    if (Activities.isPlannedActivity(activity)) {
+      if (activity.status !== 'completed' || !activity.completedAt || !timestamp(activity.completedAt)) return;
+      entries.push({
+        id: `planned:${activity.id}:${index}`,
+        sourceId: activity.id,
+        kind: 'activity', category: activity.category || 'Activity',
+        characterId: activity.characterId,
+        character: characterMap.get(activity.characterId) ?? null,
+        occurredAt: activity.completedAt,
+        title: `Completed ${activity.title}`,
+        detail: activity.notes || '',
+        durationMinutes: number(activity.estimatedMinutes),
+        goldDelta: 0,
+        relatedTab: 'activities'
+      });
+      return;
+    }
     const profit = number(activity.gold?.revenue) - number(activity.gold?.cost);
     const goldDelta = activity.kind === 'gold' ? profit : number(activity.gold?.delta);
     const title = activity.kind === 'session' ? 'Logged a play session'
@@ -222,7 +244,7 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
   const bounds = localWeekBounds(now);
   const rosterIds = new Set(activeCharacters(state).map(character => character.id));
   const selectedIds = scope === 'all' ? rosterIds : new Set(rosterIds.has(activeCharacterId) ? [activeCharacterId] : []);
-  const activities = list(state?.activities).filter(activity => selectedIds.has(activity.characterId) && inCurrentWeek(activity.occurredAt, bounds));
+  const activities = list(state?.activities).filter(activity => !Activities.isPlannedActivity(activity) && selectedIds.has(activity.characterId) && inCurrentWeek(activity.occurredAt, bounds));
   const sessions = activities.filter(activity => activity.kind === 'session');
   let goldEarned = 0;
   let goldSpent = 0;
@@ -240,6 +262,8 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
   }
   const completedGoals = list(state?.goals).filter(goal => selectedIds.has(goal.characterId) && isFinished(goal) && inCurrentWeek(goal.completedAt, bounds));
   completedGoals.forEach(goal => activeIds.add(goal.characterId));
+  const completedActivities = list(state?.activities).filter(activity => Activities.isPlannedActivity(activity) && selectedIds.has(activity.characterId) && activity.status === 'completed' && activity.completedAt && inCurrentWeek(activity.completedAt, bounds));
+  completedActivities.forEach(activity => activeIds.add(activity.characterId));
   const collectionEvents = list(state?.progressEvents).filter(event => selectedIds.has(event.entityId) && metricCollectionName(event.metric) && inCurrentWeek(event.recordedAt, bounds));
   collectionEvents.forEach(event => activeIds.add(event.entityId));
   return {
@@ -247,7 +271,7 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
     bounds,
     sessions: sessions.length,
     minutesPlayed: sessions.reduce((sum, activity) => sum + Math.max(0, number(activity.durationMinutes)), 0),
-    completed: completedGoals.length,
+    completed: completedGoals.length + completedActivities.length,
     goldEarned,
     goldSpent,
     netGold: goldEarned - goldSpent,
@@ -257,7 +281,8 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
 }
 
 function recommendationComparator(a, b) {
-  return a.statusRank - b.statusRank
+  return number(a.sourceRank) - number(b.sourceRank)
+    || a.statusRank - b.statusRank
     || b.priority - a.priority
     || b.recentAt - a.recentAt
     || a.activeRank - b.activeRank
@@ -275,7 +300,22 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
   const recentCutoff = timestamp(now) - RECENT_DAYS * DAY_MS;
   const unfinishedGoals = list(state?.goals).filter(goal => !isFinished(goal) && (goal.scope === 'account' || rosterIds.has(goal.characterId)));
   const highestPriority = unfinishedGoals.reduce((highest, goal) => Math.max(highest, number(goal.priority)), -Infinity);
-  const candidates = unfinishedGoals.map(goal => {
+  const candidates = Activities.selectPlannedActivities(state, { view: 'today', now }).filter(activity => !['completed', 'skipped'].includes(activity.effectiveStatus)).map(activity => {
+    const character = map.get(activity.characterId) ?? null;
+    const reason = activity.effectiveStatus === 'in_progress' ? 'Already in progress'
+      : number(activity.priority) >= 2 ? 'High-priority activity'
+      : activity.characterId === activeId ? 'Active character activity'
+      : 'Ready to work on';
+    return {
+      id: `activity:${activity.id}`, sourceType: 'activity', sourceId: activity.id,
+      title: activity.title, characterId: activity.characterId, character,
+      reason, category: activity.category || 'Activity', progress: null,
+      action: 'open-activity', actionLabel: 'Open activity', sourceRank: -1,
+      statusRank: statusRank(activity.effectiveStatus), priority: number(activity.priority), recentAt: timestamp(activity.updatedAt),
+      activeRank: activity.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
+    };
+  });
+  candidates.push(...unfinishedGoals.map(goal => {
     const updatedAt = goalUpdatedAt(goal);
     const character = map.get(goal.characterId) ?? null;
     let reason = 'Unfinished goal';
@@ -286,11 +326,11 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
       id: `goal:${goal.id}`, sourceType: 'goal', sourceId: goal.id,
       title: goal.title, characterId: goal.characterId, character,
       reason, category: goal.category || 'Goal', progress: goalProgress(goal),
-      action: 'open-goal', actionLabel: 'Open goal',
+      action: 'open-goal', actionLabel: 'Open goal', sourceRank: 0,
       statusRank: statusRank(goal.status), priority: number(goal.priority), recentAt: timestamp(updatedAt),
       activeRank: goal.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
     };
-  });
+  }));
 
   const latestProgressByMetric = new Map();
   list(state?.progressEvents).forEach(event => {
@@ -307,7 +347,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
       title: `${tracker.name}: ${number(tracker.target).toLocaleString()} milestone`, characterId: tracker.characterId, character,
       reason: ratio >= 0.8 ? 'Close to the next milestone' : 'Unfinished collection milestone', category: 'Collection',
       progress: { current: number(tracker.owned), target: number(tracker.target) },
-      action: 'open-collections', actionLabel: 'Update progress',
+      action: 'open-collections', actionLabel: 'Update progress', sourceRank: 1,
       statusRank: 1, priority: -1, recentAt: timestamp(event?.recordedAt), activeRank: tracker.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 1
     });
   }
@@ -320,7 +360,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `profile:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Complete ${character.name || 'character'}'s profile`, characterId: character.id, character,
         reason: `Missing ${item.missingFields.join(', ')}`, category: 'Character', progress: null,
-        action: 'edit-character', actionLabel: 'Edit character',
+        action: 'edit-character', actionLabel: 'Edit character', sourceRank: 2,
         statusRank: 1, priority: -2, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 2
       });
     } else if (item.attention === 'Needs attention') {
@@ -328,7 +368,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `attention:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Continue ${character.name}'s campaign`, characterId: character.id, character,
         reason: 'No recent activity', category: 'Character', progress: null,
-        action: 'switch-character', actionLabel: 'Select character',
+        action: 'switch-character', actionLabel: 'Select character', sourceRank: 2,
         statusRank: 1, priority: -3, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 2, typeRank: 2
       });
     } else if (item.attention === 'No current goals') {
@@ -336,7 +376,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `no-goals:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Choose ${character.name}'s next objective`, characterId: character.id, character,
         reason: 'No current goals', category: 'Planning', progress: null,
-        action: 'add-goal', actionLabel: 'Add goal',
+        action: 'add-goal', actionLabel: 'Add goal', sourceRank: 2,
         statusRank: 1, priority: -4, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 3
       });
     }
