@@ -228,6 +228,10 @@ const fixedCommands = Object.freeze([
   ['create-gold', 'Log gold', 'Creation', 'coins', 'log-gold', '', 'economy revenue costs'],
   ['create-collection', 'Update collection', 'Creation', 'gem', 'update-collection', '', 'mount pet appearance'],
   ['create-activity', 'Create activity', 'Creation', 'list-plus', 'create-activity', '', 'planned work task'],
+  ['session-plan', 'Plan a session', 'Session', 'calendar-clock', 'plan-session', '', 'generate play plan'],
+  ['session-save-current', 'Save current plan', 'Session', 'save', 'save-current-plan', '', 'planner draft'],
+  ['session-start-next', 'Start session', 'Session', 'play', 'start-next-session', '', 'ready saved plan'],
+  ['session-history', 'Open session history', 'Session', 'history', 'session-history', '', 'saved completed abandoned'],
   ['utility-export', 'Export backup', 'Utility', 'download', 'export', '', 'data safety'],
   ['utility-import', 'Import backup', 'Utility', 'upload', 'import', '', 'restore data'],
   ['utility-sidebar', 'Toggle sidebar', 'Utility', 'panel-left-close', 'toggle-sidebar', '', 'collapse navigation'],
@@ -251,6 +255,15 @@ export function buildCommandCatalog(state) {
   }
   for (const tracker of list(state?.collectionTrackers).filter(tracker => characterMap.has(tracker.characterId))) {
     items.push({ id: `collection:${tracker.id}`, label: `${tracker.name} collection`, category: 'Collection', icon: 'gem', action: 'open-collection', target: tracker.id, character: characterMap.get(tracker.characterId)?.name, keywords: `${tracker.owned} ${tracker.target}` });
+  }
+  const activeSession = list(state?.sessionPlans).find(plan => plan.status === 'in_progress') || list(state?.sessionPlans).find(plan => plan.status === 'paused');
+  if (activeSession) {
+    items.push({ id: `session-resume:${activeSession.id}`, label: activeSession.status === 'paused' ? 'Resume active session' : 'Open active session', category: 'Session', icon: 'play', action: activeSession.status === 'paused' ? 'resume-session' : 'open-session', target: activeSession.id, keywords: `${activeSession.title} ${activeSession.status}` });
+    if (activeSession.status === 'in_progress') items.push({ id: `session-pause:${activeSession.id}`, label: 'Pause session', category: 'Session', icon: 'pause', action: 'pause-session', target: activeSession.id, keywords: activeSession.title });
+    items.push({ id: `session-finish:${activeSession.id}`, label: 'Finish session', category: 'Session', icon: 'flag', action: 'finish-session', target: activeSession.id, keywords: activeSession.title });
+  }
+  for (const plan of list(state?.sessionPlans)) {
+    items.push({ id: `session:${plan.id}`, label: plan.title, category: 'Saved session', icon: plan.status === 'completed' ? 'circle-check-big' : 'calendar-clock', action: 'open-session', target: plan.id, keywords: `${plan.status} ${plan.plannedFor} ${list(plan.characterIds).map(id => characterMap.get(id)?.name || '').join(' ')}` });
   }
   return items;
 }

@@ -5,6 +5,7 @@
 
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
 const Activities = globalThis.AzerothActivities ?? await import('./activity-engine.mjs');
+const Sessions = globalThis.AzerothSessions ?? await import('./session-engine.mjs');
 
 const DAY_MS = 86_400_000;
 const RECENT_DAYS = 7;
@@ -300,7 +301,8 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
   const recentCutoff = timestamp(now) - RECENT_DAYS * DAY_MS;
   const unfinishedGoals = list(state?.goals).filter(goal => !isFinished(goal) && (goal.scope === 'account' || rosterIds.has(goal.characterId)));
   const highestPriority = unfinishedGoals.reduce((highest, goal) => Math.max(highest, number(goal.priority)), -Infinity);
-  const candidates = Activities.selectPlannedActivities(state, { view: 'today', now }).filter(activity => !['completed', 'skipped'].includes(activity.effectiveStatus)).map(activity => {
+  const candidates = list(state?.sessionPlans).map(plan => Sessions.sessionRecommendation(plan, state, { now })).filter(Boolean);
+  candidates.push(...Activities.selectPlannedActivities(state, { view: 'today', now }).filter(activity => !['completed', 'skipped'].includes(activity.effectiveStatus)).map(activity => {
     const character = map.get(activity.characterId) ?? null;
     const reason = activity.effectiveStatus === 'in_progress' ? 'Already in progress'
       : number(activity.priority) >= 2 ? 'High-priority activity'
@@ -310,11 +312,11 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
       id: `activity:${activity.id}`, sourceType: 'activity', sourceId: activity.id,
       title: activity.title, characterId: activity.characterId, character,
       reason, category: activity.category || 'Activity', progress: null,
-      action: 'open-activity', actionLabel: 'Open activity', sourceRank: -1,
+      action: 'open-activity', actionLabel: 'Open activity', sourceRank: 0,
       statusRank: statusRank(activity.effectiveStatus), priority: number(activity.priority), recentAt: timestamp(activity.updatedAt),
       activeRank: activity.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
     };
-  });
+  }));
   candidates.push(...unfinishedGoals.map(goal => {
     const updatedAt = goalUpdatedAt(goal);
     const character = map.get(goal.characterId) ?? null;
@@ -326,7 +328,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
       id: `goal:${goal.id}`, sourceType: 'goal', sourceId: goal.id,
       title: goal.title, characterId: goal.characterId, character,
       reason, category: goal.category || 'Goal', progress: goalProgress(goal),
-      action: 'open-goal', actionLabel: 'Open goal', sourceRank: 0,
+      action: 'open-goal', actionLabel: 'Open goal', sourceRank: goal.category === 'Current content' ? 2 : 1,
       statusRank: statusRank(goal.status), priority: number(goal.priority), recentAt: timestamp(updatedAt),
       activeRank: goal.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
     };
@@ -347,7 +349,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
       title: `${tracker.name}: ${number(tracker.target).toLocaleString()} milestone`, characterId: tracker.characterId, character,
       reason: ratio >= 0.8 ? 'Close to the next milestone' : 'Unfinished collection milestone', category: 'Collection',
       progress: { current: number(tracker.owned), target: number(tracker.target) },
-      action: 'open-collections', actionLabel: 'Update progress', sourceRank: 1,
+      action: 'open-collections', actionLabel: 'Update progress', sourceRank: 3,
       statusRank: 1, priority: -1, recentAt: timestamp(event?.recordedAt), activeRank: tracker.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 1
     });
   }
@@ -360,7 +362,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `profile:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Complete ${character.name || 'character'}'s profile`, characterId: character.id, character,
         reason: `Missing ${item.missingFields.join(', ')}`, category: 'Character', progress: null,
-        action: 'edit-character', actionLabel: 'Edit character', sourceRank: 2,
+        action: 'edit-character', actionLabel: 'Edit character', sourceRank: 4,
         statusRank: 1, priority: -2, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 2
       });
     } else if (item.attention === 'Needs attention') {
@@ -368,7 +370,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `attention:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Continue ${character.name}'s campaign`, characterId: character.id, character,
         reason: 'No recent activity', category: 'Character', progress: null,
-        action: 'switch-character', actionLabel: 'Select character', sourceRank: 2,
+        action: 'switch-character', actionLabel: 'Select character', sourceRank: 4,
         statusRank: 1, priority: -3, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 2, typeRank: 2
       });
     } else if (item.attention === 'No current goals') {
@@ -376,7 +378,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
         id: `no-goals:${character.id}`, sourceType: 'character', sourceId: character.id,
         title: `Choose ${character.name}'s next objective`, characterId: character.id, character,
         reason: 'No current goals', category: 'Planning', progress: null,
-        action: 'add-goal', actionLabel: 'Add goal', sourceRank: 2,
+        action: 'add-goal', actionLabel: 'Add goal', sourceRank: 4,
         statusRank: 1, priority: -4, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 3
       });
     }

@@ -1,5 +1,6 @@
 <div id="azeroth-command-center">
   <style>
+    #azeroth-command-center [hidden] { display: none !important; }
     #azeroth-command-center {
       color: var(--foreground);
       font-family: ui-sans-serif, system-ui, sans-serif;
@@ -1450,6 +1451,90 @@
       padding: 0.55rem 0;
       border-bottom: 1px solid var(--border);
     }
+    #azeroth-command-center .acc-active-session {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+      padding: 0.8rem 0.95rem;
+      border: 1px solid color-mix(in srgb, var(--acc-primary) 28%, var(--border));
+      border-radius: 7px;
+      background: linear-gradient(100deg, color-mix(in srgb, var(--acc-primary) 7%, var(--card)), var(--card));
+    }
+    #azeroth-command-center .acc-active-session[hidden] { display: none; }
+    #azeroth-command-center .acc-active-session-copy { display: grid; gap: 0.22rem; min-width: 0; }
+    #azeroth-command-center .acc-active-session-meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; color: var(--muted-foreground); font-size: 0.7rem; }
+    #azeroth-command-center .acc-session-history { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+    #azeroth-command-center .acc-session-history-list { border-top: 1px solid var(--border); }
+    #azeroth-command-center .acc-session-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(8rem, 0.75fr) auto auto;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 3.8rem;
+      padding: 0.65rem 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-session-row:hover { background: rgb(255 255 255 / 2.5%); }
+    #azeroth-command-center .acc-session-metrics { display: flex; gap: 0.7rem; color: var(--muted-foreground); font-size: 0.68rem; white-space: nowrap; }
+    #azeroth-command-center .acc-status-chip { text-transform: capitalize; }
+    #azeroth-command-center .acc-status-chip[data-status="in_progress"] { color: var(--acc-active); border-color: color-mix(in srgb, var(--acc-primary) 38%, var(--border)); }
+    #azeroth-command-center .acc-status-chip[data-status="paused"] { color: var(--acc-secondary); }
+    #azeroth-command-center #acc-plan-editor-dialog,
+    #azeroth-command-center #acc-session-runner-dialog,
+    #azeroth-command-center #acc-session-review-dialog { width: min(58rem, calc(100vw - 2rem)); }
+    #azeroth-command-center .acc-plan-editor-items,
+    #azeroth-command-center .acc-runner-items,
+    #azeroth-command-center .acc-review-items { display: grid; border-top: 1px solid var(--border); }
+    #azeroth-command-center .acc-plan-editor-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) 7rem auto;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-runner-header { display: grid; gap: 0.8rem; }
+    #azeroth-command-center .acc-runner-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--card);
+    }
+    #azeroth-command-center .acc-runner-metric { display: grid; gap: 0.15rem; padding: 0.65rem 0.75rem; border-right: 1px solid var(--border); }
+    #azeroth-command-center .acc-runner-metric:last-child { border-right: 0; }
+    #azeroth-command-center .acc-runner-metric span { color: var(--muted-foreground); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    #azeroth-command-center .acc-runner-metric strong { font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+    #azeroth-command-center .acc-runner-current {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.9rem 0;
+      padding: 0.9rem;
+      border: 1px solid color-mix(in srgb, var(--acc-primary) 32%, var(--border));
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--acc-primary) 6%, var(--card));
+    }
+    #azeroth-command-center .acc-runner-current-copy { display: grid; gap: 0.28rem; min-width: 0; }
+    #azeroth-command-center .acc-runner-controls { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    #azeroth-command-center .acc-runner-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.55rem 0.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-runner-item[data-current="true"] { background: color-mix(in srgb, var(--acc-primary) 5%, transparent); }
+    #azeroth-command-center .acc-runner-item[data-status="completed"] .acc-row-title { text-decoration: line-through; color: var(--muted-foreground); }
+    #azeroth-command-center .acc-runner-note { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.45rem; margin-top: 0.75rem; }
+    #azeroth-command-center .acc-review-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 0.75rem 0; background: var(--border); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+    #azeroth-command-center .acc-review-stat { display: grid; gap: 0.2rem; padding: 0.7rem; background: var(--card); }
+    #azeroth-command-center .acc-review-stat span { color: var(--muted-foreground); font-size: 0.62rem; }
+    #azeroth-command-center .acc-review-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
     @media (max-width: 1100px) {
       #azeroth-command-center .acc-activity-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #azeroth-command-center .acc-activity-filters .acc-filter-search { grid-column: 1 / -1; }
@@ -1473,6 +1558,17 @@
       #azeroth-command-center .acc-activity-estimate { grid-column: 3; grid-row: 2; justify-self: end; }
       #azeroth-command-center .acc-planner-presets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #azeroth-command-center .acc-command-footer { display: none; }
+      #azeroth-command-center .acc-active-session,
+      #azeroth-command-center .acc-session-row,
+      #azeroth-command-center .acc-plan-editor-row,
+      #azeroth-command-center .acc-runner-current { grid-template-columns: minmax(0, 1fr); }
+      #azeroth-command-center .acc-runner-metrics,
+      #azeroth-command-center .acc-review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-runner-metric:nth-child(2) { border-right: 0; }
+      #azeroth-command-center .acc-runner-metric:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+      #azeroth-command-center .acc-runner-controls .btn { flex: 1 1 8rem; }
+      #azeroth-command-center .acc-session-metrics { flex-wrap: wrap; white-space: normal; }
+      #azeroth-command-center .acc-runner-note { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 
@@ -1560,6 +1656,10 @@
       </section>
 
       <nav class="acc-quick-actions" aria-label="Quick actions">
+        <button class="btn" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
+        <button class="btn" type="button" data-command-action="open-session" id="acc-quick-resume" hidden><i data-lucide="play" aria-hidden="true"></i> Resume session</button>
+        <button class="btn" type="button" data-command-action="start-next-session" id="acc-quick-start"><i data-lucide="play" aria-hidden="true"></i> Start saved session</button>
+        <button class="btn" type="button" data-command-action="session-history"><i data-lucide="history" aria-hidden="true"></i> Session history</button>
         <button class="btn" type="button" data-command-action="log-session"><i data-lucide="timer" aria-hidden="true"></i> Log session</button>
         <button class="btn" type="button" data-command-action="add-goal"><i data-lucide="circle-plus" aria-hidden="true"></i> Add goal</button>
         <button class="btn" type="button" data-command-action="log-gold"><i data-lucide="coins" aria-hidden="true"></i> Log gold</button>
@@ -1569,6 +1669,11 @@
         <button class="btn" type="button" data-command-action="switch-character"><i data-lucide="users" aria-hidden="true"></i> Switch</button>
         <button class="btn" type="button" data-command-action="export"><i data-lucide="download" aria-hidden="true"></i> Export</button>
       </nav>
+
+      <section class="acc-active-session" id="acc-active-session" aria-labelledby="acc-active-session-title" hidden>
+        <div class="acc-active-session-copy"><span class="acc-eyebrow" id="acc-active-session-status">Active session</span><strong id="acc-active-session-title">Session</strong><span class="acc-active-session-meta" id="acc-active-session-meta"></span></div>
+        <button class="btn btn-primary" type="button" id="acc-open-active-session"><i data-lucide="play" aria-hidden="true"></i> Open session</button>
+      </section>
 
       <div class="acc-command-grid">
         <div class="acc-command-column">
@@ -1625,6 +1730,13 @@
         <label class="form-label"><span class="sr-only">Sort activities</span><select class="form-select" id="acc-activity-sort" aria-label="Sort activities"><option value="priority">Priority</option><option value="recent">Recently updated</option><option value="estimated">Estimated time</option><option value="alphabetical">Alphabetical</option></select></label>
       </div>
       <div class="acc-activity-list" id="acc-activity-list" aria-live="polite"></div>
+      <section class="acc-session-history" aria-labelledby="acc-session-history-heading">
+        <div class="acc-activity-head"><div><h2 id="acc-session-history-heading" style="margin:0">Session history</h2><span class="text-muted text-small" id="acc-session-count">0 saved sessions</span></div><button class="btn" type="button" id="acc-history-plan-session"><i data-lucide="calendar-plus" aria-hidden="true"></i> Plan new session</button></div>
+        <nav class="acc-view-tabs" aria-label="Session history views">
+          <button class="btn" type="button" data-session-view="active" aria-pressed="true">Active</button><button class="btn" type="button" data-session-view="upcoming" aria-pressed="false">Upcoming</button><button class="btn" type="button" data-session-view="completed" aria-pressed="false">Completed</button><button class="btn" type="button" data-session-view="abandoned" aria-pressed="false">Abandoned</button><button class="btn" type="button" data-session-view="all" aria-pressed="false">All sessions</button>
+        </nav>
+        <div class="acc-session-history-list" id="acc-session-history-list" aria-live="polite"></div>
+      </section>
     </section>
 
     <section class="acc-panel" id="acc-panel-collections" data-panel="collections" hidden>
@@ -1788,8 +1900,57 @@
     <div class="acc-inline"><label class="form-label" style="margin:0;flex:1">Available minutes<input class="form-control" id="acc-planner-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-generate-plan">Generate plan</button></div>
     <div class="acc-planner-summary" id="acc-planner-summary" hidden></div>
     <div class="acc-plan-list" id="acc-plan-list" aria-live="polite"></div>
-    <div class="acc-actions"><button class="btn" type="button" id="acc-regenerate-plan" hidden><i data-lucide="refresh-cw" aria-hidden="true"></i> Regenerate unlocked</button><button class="btn" type="button" data-close-dialog="acc-planner-dialog">Done</button></div>
+    <div class="acc-actions"><button class="btn" type="button" id="acc-regenerate-plan" hidden><i data-lucide="refresh-cw" aria-hidden="true"></i> Regenerate unlocked</button><button class="btn btn-primary" type="button" id="acc-save-plan" hidden><i data-lucide="save" aria-hidden="true"></i> Save plan</button><button class="btn" type="button" data-close-dialog="acc-planner-dialog">Done</button></div>
   </dialog>
+
+  <dialog id="acc-plan-editor-dialog" aria-labelledby="acc-plan-editor-title">
+    <form method="dialog" id="acc-plan-editor-form">
+      <div class="acc-dialog-head"><div><h2 id="acc-plan-editor-title">Edit saved plan</h2><span class="text-muted text-small">References existing activities without duplicating them.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-plan-editor-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="id">
+      <div class="acc-form-grid">
+        <label class="form-label wide">Session title<input class="form-control" name="title" maxlength="120" required></label>
+        <label class="form-label">Planned date<input class="form-control" name="plannedFor" type="date" required></label>
+        <label class="form-label">Status<select class="form-select" name="status"><option value="draft">Draft</option><option value="ready">Ready</option></select></label>
+        <label class="form-label wide">Notes<textarea class="form-control" name="notes" rows="2" maxlength="800"></textarea></label>
+      </div>
+      <div class="acc-section-head"><div><h3>Planned activities</h3><span class="text-muted text-small" id="acc-plan-editor-total"></span></div></div>
+      <div class="acc-plan-editor-items" id="acc-plan-editor-items"></div>
+      <div class="acc-inline"><select class="form-select" id="acc-plan-add-activity" aria-label="Add activity to saved plan"></select><button class="btn" type="button" id="acc-plan-add-item"><i data-lucide="plus" aria-hidden="true"></i> Add activity</button></div>
+      <div class="acc-actions"><button class="btn acc-btn-danger" type="button" id="acc-delete-plan">Delete draft</button><button class="btn" type="button" id="acc-duplicate-plan">Duplicate</button><span class="acc-actions"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn" type="button" id="acc-save-start-plan"><i data-lucide="play" aria-hidden="true"></i> Save & start</button></span></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-session-runner-dialog" aria-labelledby="acc-session-runner-title">
+    <div class="acc-runner-header">
+      <div class="acc-dialog-head"><div><span class="acc-eyebrow" id="acc-runner-status">Ready</span><h2 id="acc-session-runner-title">Saved session</h2><span class="text-muted text-small" id="acc-runner-character"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-runner-dialog" aria-label="Close runner"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <div class="acc-runner-metrics"><div class="acc-runner-metric"><span>Planned</span><strong id="acc-runner-planned">0m</strong></div><div class="acc-runner-metric"><span>Elapsed</span><strong id="acc-runner-elapsed">0m</strong></div><div class="acc-runner-metric"><span>Remaining</span><strong id="acc-runner-remaining">0m</strong></div><div class="acc-runner-metric"><span>Progress</span><strong id="acc-runner-progress">0/0</strong></div></div>
+    </div>
+    <section class="acc-runner-current" id="acc-runner-current"><div class="acc-runner-current-copy"><span class="acc-eyebrow">Current activity</span><strong id="acc-runner-current-title">Nothing selected</strong><span class="text-muted text-small" id="acc-runner-next"></span></div><button class="btn btn-primary" type="button" id="acc-complete-current">Complete current</button></section>
+    <div class="acc-runner-controls" id="acc-runner-controls"><button class="btn btn-primary" type="button" id="acc-runner-start">Start</button><button class="btn" type="button" id="acc-runner-pause">Pause</button><button class="btn" type="button" id="acc-runner-resume">Resume</button><button class="btn" type="button" id="acc-runner-previous">Previous</button><button class="btn" type="button" id="acc-runner-next-item">Next</button><button class="btn" type="button" id="acc-runner-skip">Skip current</button><button class="btn" type="button" id="acc-runner-add-unplanned">Add activity</button><button class="btn" type="button" id="acc-runner-finish"><i data-lucide="flag" aria-hidden="true"></i> Finish</button><button class="btn acc-btn-danger" type="button" id="acc-runner-abandon">Abandon</button><button class="btn" type="button" id="acc-runner-edit-results">Edit results</button></div>
+    <div class="acc-runner-note"><input class="form-control" id="acc-runner-note" maxlength="240" placeholder="Quick note…" aria-label="Quick session note"><button class="btn" type="button" id="acc-add-runner-note">Add note</button></div>
+    <div class="acc-section-head"><div><h3>Session activities</h3><span class="text-muted text-small">Select an unfinished item to make it current.</span></div></div>
+    <div class="acc-runner-items" id="acc-runner-items"></div>
+  </dialog>
+
+  <dialog id="acc-session-result-dialog" aria-labelledby="acc-session-result-title">
+    <form method="dialog" id="acc-session-result-form">
+      <div class="acc-dialog-head"><div><h2 id="acc-session-result-title">Record activity result</h2><span class="text-muted text-small" id="acc-session-result-subtitle"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-result-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="itemId">
+      <div class="acc-form-grid"><label class="form-label">Result<select class="form-select" name="status"><option value="completed">Completed</option><option value="partial">Partially completed</option><option value="skipped">Skipped</option></select></label><label class="form-label">Actual minutes<input class="form-control" name="actualMinutes" type="number" min="0" max="1440" value="0" required></label><label class="form-label">Gold earned<input class="form-control" name="goldEarned" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Gold spent<input class="form-control" name="goldSpent" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Progress metric<input class="form-control" name="progressMetric" maxlength="100" placeholder="level or collection:mounts:owned"></label><label class="form-label">Progress gained<input class="form-control" name="progressGained" type="number" step="0.01" value="0"></label><label class="form-label">Completion quantity<input class="form-control" name="completionQuantity" type="number" min="0" step="1"></label><label class="form-label">Underlying activity<select class="form-select" name="completionMode"><option value="run">Log this run only</option><option value="complete">Complete underlying activity</option></select></label><label class="form-label wide">Result notes<textarea class="form-control" name="resultNotes" rows="3" maxlength="600"></textarea></label></div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Save result</button><button class="btn" type="button" data-close-dialog="acc-session-result-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-session-review-dialog" aria-labelledby="acc-session-review-title">
+    <div class="acc-dialog-head"><div><h2 id="acc-session-review-title">Review session results</h2><span class="text-muted text-small">Correct individual results before final confirmation.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-review-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+    <div class="acc-review-grid" id="acc-session-review-summary"></div><div class="acc-review-items" id="acc-session-review-items"></div><div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-confirm-session-results">Confirm & finish session</button><button class="btn" type="button" data-close-dialog="acc-session-review-dialog">Continue session</button></div>
+  </dialog>
+
+  <dialog id="acc-add-unplanned-dialog" aria-labelledby="acc-add-unplanned-title"><div class="acc-dialog-head"><h2 id="acc-add-unplanned-title">Add an unplanned activity</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-add-unplanned-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><label class="form-label">Existing activity<select class="form-select" id="acc-unplanned-activity"></select></label><div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-confirm-unplanned">Add to session</button><button class="btn" type="button" data-close-dialog="acc-add-unplanned-dialog">Cancel</button></div></dialog>
+
+  <dialog id="acc-abandon-session-dialog" aria-labelledby="acc-abandon-session-title"><form method="dialog" id="acc-abandon-session-form"><div class="acc-dialog-head"><h2 id="acc-abandon-session-title">Abandon active session?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-abandon-session-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><p class="acc-delete-copy">The saved session and its activity results will remain in history, but no gold or progress will be applied.</p><div class="acc-actions"><button class="btn acc-btn-danger" type="submit">Abandon session</button><button class="btn" type="button" data-close-dialog="acc-abandon-session-dialog">Keep playing</button></div></form></dialog>
+
+  <dialog id="acc-delete-plan-dialog" aria-labelledby="acc-delete-plan-title"><form method="dialog" id="acc-delete-plan-form"><div class="acc-dialog-head"><h2 id="acc-delete-plan-title">Delete draft plan?</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-delete-plan-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><input type="hidden" name="id"><p class="acc-delete-copy">Only an unstarted draft or ready plan can be deleted. Underlying activities are never removed.</p><div class="acc-actions"><button class="btn acc-btn-danger" type="submit">Delete plan</button><button class="btn" type="button" data-close-dialog="acc-delete-plan-dialog">Keep plan</button></div></form></dialog>
 
   <dialog id="acc-command-dialog" aria-labelledby="acc-command-title" aria-modal="true">
     <h2 class="sr-only" id="acc-command-title">Command palette</h2>
@@ -1807,6 +1968,10 @@
       <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 3</kbd></div>
       <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 4</kbd></div>
       <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 5</kbd></div>
+      <div class="acc-shortcut-row"><span>Pause or resume runner</span><kbd>Space</kbd></div>
+      <div class="acc-shortcut-row"><span>Complete current activity</span><kbd>Enter</kbd></div>
+      <div class="acc-shortcut-row"><span>Skip current activity</span><kbd>S</kbd></div>
+      <div class="acc-shortcut-row"><span>Focus quick note</span><kbd>N</kbd></div>
       <div class="acc-shortcut-row"><span>Close dialog</span><kbd>Escape</kbd></div>
     </div>
   </dialog>
@@ -1844,6 +2009,7 @@
       const Core = globalThis.AzerothCore;
       const Selectors = globalThis.AzerothSelectors;
       const ActivityEngine = globalThis.AzerothActivities;
+      const SessionEngine = globalThis.AzerothSessions;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -1878,7 +2044,12 @@
       let activeTab = 'overview';
       let momentumScope = 'active';
       let activityView = 'today';
+      let sessionView = 'active';
       let plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+      let sessionEditorPlan = null;
+      let runnerPlanId = null;
+      let resultReturnsToReview = false;
+      let runnerTimer = null;
       let commandResults = [];
       let commandIndex = 0;
       let toastTimer = null;
@@ -1941,6 +2112,13 @@
         const h = Math.floor(m / 60);
         const rest = m % 60;
         return h ? `${h}h ${rest}m` : `${rest}m`;
+      }
+      function formatElapsed(milliseconds) {
+        const seconds = Math.max(0, Math.floor((Number(milliseconds) || 0) / 1000));
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const rest = seconds % 60;
+        return hours ? `${hours}:${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}` : `${minutes}:${String(rest).padStart(2, '0')}`;
       }
       function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
@@ -2033,6 +2211,7 @@
         quick.elements.location.value = c.location || '';
         renderCommandCenter(c);
         renderActivities();
+        renderSessionHistory();
         renderCollections(c);
         renderGold(c);
         renderJournal(c);
@@ -2059,11 +2238,27 @@
         root.querySelector('#acc-command-level').textContent = c.level;
         root.querySelector('#acc-command-gold').textContent = formatGold(c.gold);
         root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
+        renderActiveSession();
         renderNextUp();
         renderActiveGoals();
         renderMomentum();
         renderRoster();
         renderRecentActivity();
+      }
+      function renderActiveSession() {
+        const active = SessionEngine.selectActiveSession(state);
+        const section = root.querySelector('#acc-active-session');
+        const quickResume = root.querySelector('#acc-quick-resume');
+        section.hidden = !active;
+        quickResume.hidden = !active;
+        quickResume.dataset.sourceId = active?.id || '';
+        if (!active) return;
+        const current = active.items.find(item => item.id === active.currentItemId) || active.items.find(item => !['completed', 'skipped', 'partial'].includes(item.status));
+        const remaining = active.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status)).length;
+        root.querySelector('#acc-active-session-status').textContent = active.status === 'paused' ? 'Paused session' : 'Active session';
+        root.querySelector('#acc-active-session-title').textContent = current?.snapshot?.title || active.title;
+        root.querySelector('#acc-active-session-meta').innerHTML = `<span>${escapeHtml(active.title)}</span><span>·</span><span data-active-elapsed>${formatElapsed(SessionEngine.elapsedSessionMs(active))}</span><span>·</span><span>${remaining} remaining</span>`;
+        root.querySelector('#acc-open-active-session').dataset.sessionId = active.id;
       }
       function renderNextUp() {
         const target = root.querySelector('#acc-next-up');
@@ -2270,6 +2465,191 @@
           </article>`;
         }).join('');
       }
+      const sessionStatusLabels = { draft: 'Draft', ready: 'Ready', in_progress: 'In progress', paused: 'Paused', completed: 'Completed', abandoned: 'Abandoned' };
+      const sessionItemStatusLabels = { pending: 'Pending', current: 'Current', completed: 'Completed', skipped: 'Skipped', partial: 'Partially completed' };
+      function sessionPlan(id) { return (state.sessionPlans || []).find(plan => plan.id === id); }
+      function replaceSessionPlan(plan, { persist = true } = {}) {
+        state.sessionPlans ||= [];
+        const index = state.sessionPlans.findIndex(item => item.id === plan.id);
+        if (index >= 0) state.sessionPlans[index] = plan; else state.sessionPlans.push(plan);
+        if (persist) { saveState(); render(); }
+        return plan;
+      }
+      function renderSessionHistory() {
+        state.sessionPlans ||= [];
+        root.querySelectorAll('[data-session-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.sessionView === sessionView)));
+        const sessions = SessionEngine.filterSessionHistory(state, { view: sessionView, now: new Date() });
+        root.querySelector('#acc-session-count').textContent = `${sessions.length} saved session${sessions.length === 1 ? '' : 's'}`;
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        const target = root.querySelector('#acc-session-history-list');
+        if (!sessions.length) {
+          const copy = sessionView === 'active' ? 'No session is running or paused.' : sessionView === 'completed' ? 'Completed sessions will remain here as a durable campaign history.' : 'No saved sessions match this view.';
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn" type="button" data-session-action="plan">Plan a session</button></div></div>`;
+          return;
+        }
+        target.innerHTML = sessions.map(plan => {
+          const summary = SessionEngine.sessionSummary(plan);
+          const characters = plan.characterIds.map(id => characterMap.get(id)?.name || 'Former character').join(', ');
+          const actionLabel = plan.status === 'in_progress' ? 'Open' : plan.status === 'paused' ? 'Resume' : plan.status === 'completed' ? 'Review' : plan.status === 'abandoned' ? 'Review' : 'Edit';
+          const date = plan.startedAt || plan.plannedFor || plan.createdAt;
+          return `<article class="acc-session-row" data-session-id="${escapeHtml(plan.id)}"><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(plan.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characters || 'No character')}</span><span>·</span><span>${escapeHtml(formatLocalDateTime(date))}</span><span class="acc-chip acc-status-chip" data-status="${escapeHtml(plan.status)}">${escapeHtml(sessionStatusLabels[plan.status] || plan.status)}</span></span></div><span class="acc-session-metrics"><span>${formatMinutes(summary.plannedMinutes)} planned</span><span>${formatMinutes(summary.actualMinutes)} actual</span><span>${summary.completed}/${summary.planned} done</span>${summary.netGold ? `<span>${summary.netGold > 0 ? '+' : '−'}${formatGold(Math.abs(summary.netGold))}</span>` : ''}</span><button class="btn" type="button" data-session-action="open">${actionLabel}</button><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-session-action="duplicate" aria-label="Duplicate ${escapeHtml(plan.title)}"><i data-lucide="copy" aria-hidden="true"></i></button>${['draft', 'ready'].includes(plan.status) ? `<button class="btn btn-ghost" type="button" data-session-action="delete" aria-label="Delete ${escapeHtml(plan.title)}"><i data-lucide="trash-2" aria-hidden="true"></i></button>` : ''}${['in_progress', 'paused'].includes(plan.status) ? `<button class="btn btn-ghost" type="button" data-session-action="abandon" aria-label="Abandon ${escapeHtml(plan.title)}"><i data-lucide="circle-slash" aria-hidden="true"></i></button>` : ''}</span></article>`;
+        }).join('');
+      }
+      function openPlanner() {
+        plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+        root.querySelector('#acc-planner-minutes').value = 60;
+        renderPlanner();
+        root.querySelector('#acc-planner-dialog').showModal();
+      }
+      function openPlanEditor(plan) {
+        sessionEditorPlan = Core.clone(plan);
+        const form = root.querySelector('#acc-plan-editor-form');
+        form.elements.id.value = plan.id;
+        form.elements.title.value = plan.title;
+        form.elements.plannedFor.value = plan.plannedFor;
+        form.elements.status.value = ['draft', 'ready'].includes(plan.status) ? plan.status : 'draft';
+        form.elements.notes.value = plan.notes || '';
+        renderPlanEditor();
+        if (!root.querySelector('#acc-plan-editor-dialog').open) root.querySelector('#acc-plan-editor-dialog').showModal();
+      }
+      function renderPlanEditor() {
+        if (!sessionEditorPlan) return;
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        root.querySelector('#acc-plan-editor-total').textContent = `${formatMinutes(sessionEditorPlan.totalEstimatedMinutes)} · ${sessionEditorPlan.items.length} activities`;
+        root.querySelector('#acc-plan-editor-items').innerHTML = sessionEditorPlan.items.length ? sessionEditorPlan.items.map((item, index) => `<article class="acc-plan-editor-row" data-session-item-id="${escapeHtml(item.id)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.snapshot.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.characterId)?.name || 'Former character')}</span><span>·</span><span>${escapeHtml(item.snapshot.category)}</span>${!state.activities.some(activity => activity.id === item.activityId) ? '<span class="acc-chip">Source removed</span>' : ''}</span></div><label class="form-label"><span class="sr-only">Planned minutes for ${escapeHtml(item.snapshot.title)}</span><input class="form-control" type="number" min="1" max="1440" value="${Number(item.plannedMinutes)}" data-plan-item-minutes></label><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-plan-edit-action="lock" aria-pressed="${String(item.locked)}" aria-label="${item.locked ? 'Unlock' : 'Lock'} ${escapeHtml(item.snapshot.title)}"><i data-lucide="${item.locked ? 'lock-keyhole' : 'lock-keyhole-open'}" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-edit-action="up" ${index === 0 ? 'disabled' : ''} aria-label="Move up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-edit-action="down" ${index === sessionEditorPlan.items.length - 1 ? 'disabled' : ''} aria-label="Move down"><i data-lucide="chevron-down" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-edit-action="remove" aria-label="Remove ${escapeHtml(item.snapshot.title)}"><i data-lucide="x" aria-hidden="true"></i></button></span></article>`).join('') : '<div class="acc-empty">Add at least one existing activity before starting this session.</div>';
+        const existingIds = new Set(sessionEditorPlan.items.map(item => item.activityId));
+        const available = state.activities.filter(activity => ActivityEngine.isPlannedActivity(activity) && !existingIds.has(activity.id) && !['completed', 'skipped'].includes(ActivityEngine.effectiveActivityStatus(activity)));
+        root.querySelector('#acc-plan-add-activity').innerHTML = available.length ? available.map(activity => `<option value="${escapeHtml(activity.id)}">${escapeHtml(activity.title)} · ${escapeHtml(characterMap.get(activity.characterId)?.name || 'Character')}</option>`).join('') : '<option value="">No available activities</option>';
+        root.querySelector('#acc-plan-add-item').disabled = !available.length;
+        root.querySelector('#acc-delete-plan').hidden = !(state.sessionPlans || []).some(plan => plan.id === sessionEditorPlan.id) || !['draft', 'ready'].includes(sessionEditorPlan.status);
+        root.querySelector('#acc-save-start-plan').disabled = !sessionEditorPlan.items.length;
+        refreshIcons();
+      }
+      function savePlanEditor({ start = false } = {}) {
+        if (!sessionEditorPlan) return;
+        const form = root.querySelector('#acc-plan-editor-form');
+        try {
+          sessionEditorPlan = SessionEngine.updateSavedPlan(sessionEditorPlan, { title: form.elements.title.value, plannedFor: form.elements.plannedFor.value, status: form.elements.status.value, notes: form.elements.notes.value, items: sessionEditorPlan.items });
+          replaceSessionPlan(sessionEditorPlan);
+          root.querySelector('#acc-plan-editor-dialog').close();
+          showToast('Session plan saved.');
+          if (start) startSavedSession(sessionEditorPlan.id);
+        } catch (error) { showToast(error.message, { tone: 'warning' }); }
+      }
+      function startSavedSession(planId) {
+        const plan = sessionPlan(planId);
+        if (!plan) return;
+        try {
+          const running = SessionEngine.startSession(plan, state, { now: new Date() });
+          replaceSessionPlan(running);
+          openSessionRunner(planId);
+          showToast('Session started.');
+        } catch (error) { showToast(error.message, { tone: 'warning', duration: 8000 }); }
+      }
+      function openSessionRunner(planId) {
+        const plan = sessionPlan(planId);
+        if (!plan) return;
+        runnerPlanId = planId;
+        renderSessionRunner();
+        const dialog = root.querySelector('#acc-session-runner-dialog');
+        if (!dialog.open) dialog.showModal();
+        clearInterval(runnerTimer);
+        runnerTimer = setInterval(() => {
+          const current = sessionPlan(runnerPlanId);
+          if (!current || !root.querySelector('#acc-session-runner-dialog').open) return;
+          root.querySelector('#acc-runner-elapsed').textContent = formatElapsed(SessionEngine.elapsedSessionMs(current));
+          root.querySelectorAll('[data-active-elapsed]').forEach(node => { node.textContent = formatElapsed(SessionEngine.elapsedSessionMs(current)); });
+        }, 1000);
+      }
+      function renderSessionRunner() {
+        const plan = sessionPlan(runnerPlanId);
+        if (!plan) return;
+        const characterMap = new Map(state.characters.map(item => [item.id, item]));
+        const summary = SessionEngine.sessionSummary(plan);
+        const terminal = item => ['completed', 'skipped', 'partial'].includes(item.status);
+        const current = plan.items.find(item => item.id === plan.currentItemId) || plan.items.find(item => !terminal(item));
+        const currentIndex = current ? plan.items.findIndex(item => item.id === current.id) : -1;
+        const next = currentIndex >= 0 ? plan.items.slice(currentIndex + 1).find(item => !terminal(item)) : null;
+        root.querySelector('#acc-session-runner-title').textContent = plan.title;
+        root.querySelector('#acc-runner-status').textContent = sessionStatusLabels[plan.status] || plan.status;
+        root.querySelector('#acc-runner-character').textContent = plan.characterIds.map(id => characterMap.get(id)?.name || 'Former character').join(', ');
+        root.querySelector('#acc-runner-planned').textContent = formatMinutes(summary.plannedMinutes);
+        root.querySelector('#acc-runner-elapsed').textContent = formatElapsed(SessionEngine.elapsedSessionMs(plan));
+        root.querySelector('#acc-runner-remaining').textContent = formatMinutes(plan.items.filter(item => !terminal(item)).reduce((sum, item) => sum + Number(item.plannedMinutes || 0), 0));
+        root.querySelector('#acc-runner-progress').textContent = `${plan.items.filter(terminal).length}/${plan.items.length}`;
+        root.querySelector('#acc-runner-current-title').textContent = current?.snapshot?.title || 'No unfinished activity';
+        root.querySelector('#acc-runner-next').textContent = next ? `Next: ${next.snapshot.title}` : current ? 'Final planned activity' : 'All items reviewed';
+        const active = ['in_progress', 'paused'].includes(plan.status);
+        root.querySelector('#acc-runner-current').hidden = !active;
+        root.querySelector('#acc-runner-start').hidden = !['draft', 'ready'].includes(plan.status);
+        root.querySelector('#acc-runner-pause').hidden = plan.status !== 'in_progress';
+        root.querySelector('#acc-runner-resume').hidden = plan.status !== 'paused';
+        root.querySelector('#acc-runner-previous').hidden = !active;
+        root.querySelector('#acc-runner-next-item').hidden = !active;
+        root.querySelector('#acc-runner-skip').hidden = !active || !current;
+        root.querySelector('#acc-runner-add-unplanned').hidden = !active;
+        root.querySelector('#acc-runner-finish').hidden = !active;
+        root.querySelector('#acc-runner-abandon').hidden = !active;
+        root.querySelector('#acc-runner-edit-results').hidden = plan.status !== 'completed';
+        root.querySelector('#acc-complete-current').disabled = !current || !active;
+        root.querySelector('#acc-runner-note').disabled = !active;
+        root.querySelector('#acc-add-runner-note').disabled = !active;
+        root.querySelector('#acc-runner-items').innerHTML = plan.items.map((item, index) => `<article class="acc-runner-item" data-runner-item-id="${escapeHtml(item.id)}" data-current="${String(item.id === plan.currentItemId)}" data-status="${escapeHtml(item.status)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.snapshot.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.characterId)?.name || 'Former character')}</span><span>·</span><span>${escapeHtml(item.snapshot.category)}</span><span>·</span><span>${escapeHtml(sessionItemStatusLabels[item.status] || item.status)}</span>${item.unplanned ? '<span class="acc-chip">Unplanned</span>' : ''}${!state.activities.some(activity => activity.id === item.activityId) ? '<span class="acc-chip">Source removed</span>' : ''}</span></div><span class="acc-activity-actions"><span class="acc-activity-estimate">${formatMinutes(item.actualMinutes || item.plannedMinutes)}</span>${active && !terminal(item) ? '<button class="btn btn-ghost" type="button" data-runner-action="select">Select</button>' : ''}${terminal(item) ? '<button class="btn btn-ghost" type="button" data-runner-action="edit-result">Result</button>' : ''}</span></article>`).join('') || '<div class="acc-empty">This session has no activities.</div>';
+        refreshIcons();
+      }
+      function openSessionItemResult(itemId, { review = false } = {}) {
+        const plan = sessionPlan(runnerPlanId);
+        const item = plan?.items.find(value => value.id === itemId);
+        if (!item) return;
+        resultReturnsToReview = review;
+        const form = root.querySelector('#acc-session-result-form');
+        form.reset();
+        form.elements.itemId.value = item.id;
+        form.elements.status.value = ['completed', 'partial', 'skipped'].includes(item.status) ? item.status : 'completed';
+        form.elements.actualMinutes.value = item.actualMinutes || item.plannedMinutes;
+        form.elements.goldEarned.value = item.goldEarned || 0;
+        form.elements.goldSpent.value = item.goldSpent || 0;
+        form.elements.progressMetric.value = item.progressMetric || '';
+        form.elements.progressGained.value = item.progressGained || 0;
+        form.elements.completionQuantity.value = item.completionQuantity ?? '';
+        form.elements.completionMode.value = item.completeUnderlying ? 'complete' : 'run';
+        form.elements.resultNotes.value = item.resultNotes || '';
+        root.querySelector('#acc-session-result-subtitle').textContent = `${item.snapshot.title} · ${item.snapshot.repeatType.replace('_', '-')}`;
+        root.querySelector('#acc-session-result-dialog').showModal();
+      }
+      function renderSessionReview() {
+        const plan = sessionPlan(runnerPlanId);
+        if (!plan) return;
+        const summary = SessionEngine.sessionSummary(plan);
+        root.querySelector('#acc-session-review-title').textContent = plan.status === 'completed' ? 'Edit session results' : 'Review session results';
+        root.querySelector('#acc-confirm-session-results').textContent = plan.status === 'completed' ? 'Save corrected results' : 'Confirm & finish session';
+        root.querySelector('#acc-session-review-summary').innerHTML = [['Planned', formatMinutes(summary.plannedMinutes)], ['Actual', formatMinutes(summary.actualMinutes)], ['Completed', String(summary.completed)], ['Skipped', String(summary.skipped)], ['Partial', String(summary.partial)], ['Unfinished', String(summary.unfinished)], ['Gold earned', formatGold(summary.goldEarned)], ['Net gold', `${summary.netGold >= 0 ? '+' : '−'}${formatGold(Math.abs(summary.netGold))}`]].map(([label, value]) => `<div class="acc-review-stat"><span>${label}</span><strong>${value}</strong></div>`).join('');
+        root.querySelector('#acc-session-review-items').innerHTML = plan.items.map(item => `<article class="acc-review-row" data-review-item-id="${escapeHtml(item.id)}"><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.snapshot.title)}</span><span class="acc-row-meta"><span>${escapeHtml(sessionItemStatusLabels[item.status] || item.status)}</span><span>·</span><span>${formatMinutes(item.actualMinutes)} actual</span>${item.resultNotes ? `<span>·</span><span>${escapeHtml(item.resultNotes)}</span>` : ''}</span></div><span class="text-small text-muted">${item.goldEarned || item.goldSpent ? `${formatGold(item.goldEarned)} / ${formatGold(item.goldSpent)}` : ''}</span><button class="btn" type="button" data-review-action="edit">Edit result</button></article>`).join('');
+      }
+      function openSessionReview() {
+        renderSessionReview();
+        const dialog = root.querySelector('#acc-session-review-dialog');
+        if (!dialog.open) dialog.showModal();
+      }
+      function openSavedSession(planId, { start = false } = {}) {
+        const plan = sessionPlan(planId);
+        if (!plan) { showToast('That saved session is no longer available.', { tone: 'warning' }); return; }
+        if (start) { startSavedSession(planId); return; }
+        if (['draft', 'ready'].includes(plan.status)) openPlanEditor(plan);
+        else openSessionRunner(planId);
+      }
+      function openSessionHistory(view = 'all') {
+        sessionView = view;
+        activateTab('activities');
+        renderSessionHistory();
+        requestAnimationFrame(() => root.querySelector('#acc-session-history-heading')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      }
+      function startNextSavedSession() {
+        const todayKey = today();
+        const next = (state.sessionPlans || []).filter(plan => ['ready', 'draft'].includes(plan.status)).sort((a, b) => (a.status === 'ready' ? 0 : 1) - (b.status === 'ready' ? 0 : 1) || (a.plannedFor === todayKey ? 0 : 1) - (b.plannedFor === todayKey ? 0 : 1) || String(a.plannedFor).localeCompare(String(b.plannedFor)))[0];
+        if (!next) { openSessionHistory('upcoming'); showToast('No saved session is ready yet.'); return; }
+        startSavedSession(next.id);
+      }
       function openActivityDialog(activityId = null, defaults = {}) {
         const form = root.querySelector('#acc-activity-form');
         form.reset();
@@ -2312,6 +2692,7 @@
         const target = root.querySelector('#acc-plan-list');
         root.querySelectorAll('[data-planner-minutes]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.plannerMinutes) === Number(plannerState.budgetMinutes))));
         root.querySelector('#acc-regenerate-plan').hidden = !result;
+        root.querySelector('#acc-save-plan').hidden = !result || !result.items.length;
         if (!result) { summary.hidden = true; target.innerHTML = '<div class="acc-empty">Choose the time available, then generate a plan from your existing activities.</div>'; return; }
         summary.hidden = false;
         summary.innerHTML = `<span><strong>${formatMinutes(result.totalMinutes)}</strong> planned · ${result.items.length} activit${result.items.length === 1 ? 'y' : 'ies'}</span><span class="text-muted text-small">${result.characterIds.length} character${result.characterIds.length === 1 ? '' : 's'} · ${result.categories.map(escapeHtml).join(', ') || 'No categories'}</span>`;
@@ -2434,6 +2815,14 @@
         else if (item.action === 'log-gold') { activateTab('gold'); focusAfterNavigation('#acc-ledger-form [name="activity"]'); }
         else if (item.action === 'update-collection') { activateTab('collections'); focusAfterNavigation('[data-collection-owned]'); }
         else if (item.action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
+        else if (item.action === 'plan-session') openPlanner();
+        else if (item.action === 'save-current-plan') { if (plannerState.result?.items?.length) openPlanEditor(SessionEngine.createSavedPlan(plannerState.result, { status: 'draft' }, { id: uid('session-plan') })); else { openPlanner(); showToast('Generate a plan before saving it.'); } }
+        else if (item.action === 'start-next-session') startNextSavedSession();
+        else if (item.action === 'session-history') openSessionHistory('all');
+        else if (item.action === 'open-session') openSavedSession(item.target);
+        else if (item.action === 'pause-session') { const plan = sessionPlan(item.target); if (plan?.status === 'in_progress') replaceSessionPlan(SessionEngine.pauseSession(plan)); openSessionRunner(item.target); }
+        else if (item.action === 'resume-session') { const plan = sessionPlan(item.target); if (plan?.status === 'paused') replaceSessionPlan(SessionEngine.resumeSession(plan, state)); openSessionRunner(item.target); }
+        else if (item.action === 'finish-session') { openSessionRunner(item.target); openSessionReview(); }
         else if (item.action === 'open-activity') { const activity = state.activities.find(value => value.id === item.target); if (activity) selectCharacter(activity.characterId); activateTab('activities'); openActivityDialog(item.target); }
         else if (item.action === 'open-goal') { const goal = state.goals.find(value => value.id === item.target); if (goal) selectCharacter(goal.characterId); openGoalDialog(item.target); }
         else if (item.action === 'open-gold') { const entry = state.activities.find(value => value.id === item.target); if (entry) selectCharacter(entry.characterId); activateTab('gold'); focusAfterNavigation('#acc-ledger-body'); }
@@ -2451,6 +2840,11 @@
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
         else if (action === 'add-goal') openGoalDialog();
         else if (action === 'open-activity') { activateTab('activities'); openActivityDialog(sourceId); }
+        else if (action === 'plan-session') openPlanner();
+        else if (action === 'session-history') openSessionHistory('all');
+        else if (action === 'open-session') openSavedSession(sourceId || SessionEngine.selectActiveSession(state)?.id);
+        else if (action === 'start-session') openSavedSession(sourceId, { start: true });
+        else if (action === 'start-next-session') startNextSavedSession();
         else if (action === 'log-session') root.querySelector('#acc-session-dialog').showModal();
         else if (action === 'update-progress') root.querySelector('#acc-progress-dialog').showModal();
         else if (action === 'log-gold') { activateTab('gold'); requestAnimationFrame(() => root.querySelector('#acc-ledger-form [name="activity"]')?.focus()); }
@@ -2499,6 +2893,21 @@
       root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
       document.addEventListener('keydown', e => {
         if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); return; }
+        const runnerOpen = root.querySelector('#acc-session-runner-dialog').open;
+        const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+        if (runnerOpen && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          const plan = sessionPlan(runnerPlanId);
+          const current = plan?.items.find(item => item.id === plan.currentItemId);
+          if (e.code === 'Space' && ['in_progress', 'paused'].includes(plan?.status)) {
+            e.preventDefault();
+            try { replaceSessionPlan(plan.status === 'in_progress' ? SessionEngine.pauseSession(plan) : SessionEngine.resumeSession(plan, state)); renderSessionRunner(); }
+            catch (error) { showToast(error.message, { tone: 'warning' }); }
+            return;
+          }
+          if (e.key === 'Enter' && current && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); openSessionItemResult(current.id); return; }
+          if (e.key.toLowerCase() === 's' && current && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); replaceSessionPlan(SessionEngine.updateSessionItemResult(plan, current.id, { status: 'skipped' })); renderSessionRunner(); return; }
+          if (e.key.toLowerCase() === 'n' && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); root.querySelector('#acc-runner-note').focus(); return; }
+        }
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         const tabName = ({ '1': 'overview', '2': 'collections', '3': 'gold', '4': 'journal', '5': 'activities' })[e.key];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
@@ -2578,7 +2987,129 @@
         else if (action.dataset.activityAction === 'delete') { root.querySelector('#acc-delete-activity-form').elements.id.value = id; root.querySelector('#acc-delete-activity-name').textContent = activity.title; root.querySelector('#acc-delete-activity-dialog').showModal(); }
       });
       root.querySelector('#acc-delete-activity-form').addEventListener('submit', e => { e.preventDefault(); const id = e.currentTarget.elements.id.value; root.querySelector('#acc-delete-activity-dialog').close(); removeWithUndo(state.activities, id, 'Activity deleted.', (item, index) => state.activities.splice(index, 0, item)); });
-      root.querySelector('#acc-open-planner').addEventListener('click', () => { plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null }; root.querySelector('#acc-planner-minutes').value = 60; renderPlanner(); root.querySelector('#acc-planner-dialog').showModal(); });
+      root.querySelector('#acc-open-planner').addEventListener('click', openPlanner);
+      root.querySelector('#acc-history-plan-session').addEventListener('click', openPlanner);
+      root.querySelector('#acc-open-active-session').addEventListener('click', e => openSavedSession(e.currentTarget.dataset.sessionId));
+      root.querySelectorAll('[data-session-view]').forEach(button => button.addEventListener('click', () => { sessionView = button.dataset.sessionView; renderSessionHistory(); refreshIcons(); }));
+      root.querySelector('#acc-session-history-list').addEventListener('click', e => {
+        const button = e.target.closest('[data-session-action]');
+        if (!button) return;
+        const plan = sessionPlan(button.closest('[data-session-id]')?.dataset.sessionId);
+        if (button.dataset.sessionAction === 'plan') { openPlanner(); return; }
+        if (!plan) return;
+        if (button.dataset.sessionAction === 'open') openSavedSession(plan.id);
+        else if (button.dataset.sessionAction === 'duplicate') {
+          const copy = SessionEngine.duplicateSavedPlan(plan, { id: uid('session-plan') });
+          replaceSessionPlan(copy); openPlanEditor(copy); showToast('Session plan duplicated.');
+        } else if (button.dataset.sessionAction === 'delete') {
+          root.querySelector('#acc-delete-plan-form').elements.id.value = plan.id;
+          root.querySelector('#acc-delete-plan-dialog').showModal();
+        } else if (button.dataset.sessionAction === 'abandon') {
+          runnerPlanId = plan.id; root.querySelector('#acc-abandon-session-dialog').showModal();
+        }
+      });
+      root.querySelector('#acc-save-plan').addEventListener('click', () => {
+        if (!plannerState.result?.items?.length) return;
+        const plan = SessionEngine.createSavedPlan(plannerState.result, { title: `Campaign session · ${today()}`, plannedFor: today(), status: 'draft' }, { id: uid('session-plan') });
+        root.querySelector('#acc-planner-dialog').close(); openPlanEditor(plan);
+      });
+      root.querySelector('#acc-plan-editor-form').addEventListener('submit', e => { e.preventDefault(); savePlanEditor(); });
+      root.querySelector('#acc-save-start-plan').addEventListener('click', () => savePlanEditor({ start: true }));
+      root.querySelector('#acc-plan-editor-items').addEventListener('click', e => {
+        const button = e.target.closest('[data-plan-edit-action]');
+        const row = button?.closest('[data-session-item-id]');
+        if (!button || !row || !sessionEditorPlan) return;
+        const id = row.dataset.sessionItemId;
+        const index = sessionEditorPlan.items.findIndex(item => item.id === id);
+        if (button.dataset.planEditAction === 'lock') sessionEditorPlan = SessionEngine.updateSessionItemPlan(sessionEditorPlan, id, { locked: !sessionEditorPlan.items[index].locked });
+        else if (button.dataset.planEditAction === 'remove') sessionEditorPlan = SessionEngine.removeSessionItem(sessionEditorPlan, id);
+        else if (button.dataset.planEditAction === 'up' || button.dataset.planEditAction === 'down') sessionEditorPlan = SessionEngine.reorderSessionItems(sessionEditorPlan, index, index + (button.dataset.planEditAction === 'up' ? -1 : 1));
+        renderPlanEditor();
+      });
+      root.querySelector('#acc-plan-editor-items').addEventListener('change', e => {
+        if (!e.target.matches('[data-plan-item-minutes]') || !sessionEditorPlan) return;
+        const id = e.target.closest('[data-session-item-id]')?.dataset.sessionItemId;
+        sessionEditorPlan = SessionEngine.updateSessionItemPlan(sessionEditorPlan, id, { plannedMinutes: Number(e.target.value) }); renderPlanEditor();
+      });
+      root.querySelector('#acc-plan-add-item').addEventListener('click', () => {
+        const activity = state.activities.find(item => item.id === root.querySelector('#acc-plan-add-activity').value && ActivityEngine.isPlannedActivity(item));
+        if (!activity || !sessionEditorPlan) return;
+        sessionEditorPlan = SessionEngine.addActivityToPlan(sessionEditorPlan, activity); renderPlanEditor();
+      });
+      root.querySelector('#acc-duplicate-plan').addEventListener('click', () => {
+        if (!sessionEditorPlan) return;
+        const copy = SessionEngine.duplicateSavedPlan(sessionEditorPlan, { id: uid('session-plan') });
+        replaceSessionPlan(copy); openPlanEditor(copy); showToast('Session plan duplicated.');
+      });
+      root.querySelector('#acc-delete-plan').addEventListener('click', () => {
+        if (!sessionEditorPlan) return;
+        root.querySelector('#acc-delete-plan-form').elements.id.value = sessionEditorPlan.id; root.querySelector('#acc-delete-plan-dialog').showModal();
+      });
+      root.querySelector('#acc-delete-plan-form').addEventListener('submit', e => {
+        e.preventDefault(); const id = e.currentTarget.elements.id.value; const plan = sessionPlan(id);
+        if (!plan || !['draft', 'ready'].includes(plan.status)) { showToast('Only an unstarted plan can be deleted.', { tone: 'warning' }); return; }
+        state.sessionPlans = state.sessionPlans.filter(item => item.id !== id); saveState(); render();
+        root.querySelector('#acc-delete-plan-dialog').close();
+        if (root.querySelector('#acc-plan-editor-dialog').open && sessionEditorPlan?.id === id) root.querySelector('#acc-plan-editor-dialog').close();
+        sessionEditorPlan = null; showToast('Draft plan deleted. Underlying activities were kept.');
+      });
+      root.querySelector('#acc-runner-start').addEventListener('click', () => startSavedSession(runnerPlanId));
+      root.querySelector('#acc-runner-pause').addEventListener('click', () => { const plan = sessionPlan(runnerPlanId); if (plan?.status === 'in_progress') replaceSessionPlan(SessionEngine.pauseSession(plan)); renderSessionRunner(); });
+      root.querySelector('#acc-runner-resume').addEventListener('click', () => { const plan = sessionPlan(runnerPlanId); if (!plan) return; try { replaceSessionPlan(SessionEngine.resumeSession(plan, state)); renderSessionRunner(); } catch (error) { showToast(error.message, { tone: 'warning' }); } });
+      root.querySelector('#acc-complete-current').addEventListener('click', () => { const plan = sessionPlan(runnerPlanId); const current = plan?.items.find(item => item.id === plan.currentItemId); if (current) openSessionItemResult(current.id); });
+      root.querySelector('#acc-runner-skip').addEventListener('click', () => { const plan = sessionPlan(runnerPlanId); const current = plan?.items.find(item => item.id === plan.currentItemId); if (current) { replaceSessionPlan(SessionEngine.updateSessionItemResult(plan, current.id, { status: 'skipped' })); renderSessionRunner(); } });
+      const moveRunnerSelection = direction => {
+        const plan = sessionPlan(runnerPlanId); if (!plan) return;
+        const available = plan.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status));
+        const currentIndex = available.findIndex(item => item.id === plan.currentItemId);
+        const target = available[currentIndex + direction];
+        if (target) { replaceSessionPlan(SessionEngine.setCurrentSessionItem(plan, target.id)); renderSessionRunner(); }
+      };
+      root.querySelector('#acc-runner-previous').addEventListener('click', () => moveRunnerSelection(-1));
+      root.querySelector('#acc-runner-next-item').addEventListener('click', () => moveRunnerSelection(1));
+      root.querySelector('#acc-runner-add-unplanned').addEventListener('click', () => {
+        const plan = sessionPlan(runnerPlanId); const existing = new Set(plan?.items.map(item => item.activityId));
+        const available = state.activities.filter(item => ActivityEngine.isPlannedActivity(item) && !existing.has(item.id));
+        const select = root.querySelector('#acc-unplanned-activity'); select.innerHTML = available.length ? available.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join('') : '<option value="">No other activities available</option>';
+        root.querySelector('#acc-confirm-unplanned').disabled = !available.length; root.querySelector('#acc-add-unplanned-dialog').showModal();
+      });
+      root.querySelector('#acc-confirm-unplanned').addEventListener('click', () => {
+        const plan = sessionPlan(runnerPlanId); const activity = state.activities.find(item => item.id === root.querySelector('#acc-unplanned-activity').value);
+        if (!plan || !activity) return; replaceSessionPlan(SessionEngine.addUnplannedActivity(plan, activity)); root.querySelector('#acc-add-unplanned-dialog').close(); renderSessionRunner();
+      });
+      root.querySelector('#acc-add-runner-note').addEventListener('click', () => {
+        const input = root.querySelector('#acc-runner-note'); const plan = sessionPlan(runnerPlanId); if (!plan || !input.value.trim()) return;
+        replaceSessionPlan(SessionEngine.appendSessionNote(plan, input.value)); input.value = ''; renderSessionRunner(); showToast('Session note added.');
+      });
+      root.querySelector('#acc-runner-items').addEventListener('click', e => {
+        const button = e.target.closest('[data-runner-action]'); const id = button?.closest('[data-runner-item-id]')?.dataset.runnerItemId; const plan = sessionPlan(runnerPlanId);
+        if (!button || !id || !plan) return;
+        if (button.dataset.runnerAction === 'select') { replaceSessionPlan(SessionEngine.setCurrentSessionItem(plan, id)); renderSessionRunner(); }
+        else if (button.dataset.runnerAction === 'edit-result') openSessionItemResult(id, { review: plan.status === 'completed' });
+      });
+      root.querySelector('#acc-runner-finish').addEventListener('click', openSessionReview);
+      root.querySelector('#acc-runner-edit-results').addEventListener('click', openSessionReview);
+      root.querySelector('#acc-runner-abandon').addEventListener('click', () => root.querySelector('#acc-abandon-session-dialog').showModal());
+      root.querySelector('#acc-abandon-session-form').addEventListener('submit', e => {
+        e.preventDefault(); const plan = sessionPlan(runnerPlanId); if (!plan) return;
+        replaceSessionPlan(SessionEngine.abandonSession(plan)); root.querySelector('#acc-abandon-session-dialog').close(); root.querySelector('#acc-session-runner-dialog').close(); showToast('Session abandoned and kept in history. No results were applied.');
+      });
+      root.querySelector('#acc-session-result-form').addEventListener('submit', e => {
+        e.preventDefault(); const plan = sessionPlan(runnerPlanId); if (!plan) return;
+        const form = e.currentTarget; const result = { status: form.elements.status.value, actualMinutes: Number(form.elements.actualMinutes.value), goldEarned: Number(form.elements.goldEarned.value), goldSpent: Number(form.elements.goldSpent.value), progressMetric: form.elements.progressMetric.value.trim(), progressGained: Number(form.elements.progressGained.value), completionQuantity: form.elements.completionQuantity.value === '' ? null : Number(form.elements.completionQuantity.value), completeUnderlying: form.elements.completionMode.value === 'complete', resultNotes: form.elements.resultNotes.value.trim() };
+        replaceSessionPlan(SessionEngine.updateSessionItemResult(plan, form.elements.itemId.value, result, { advance: plan.status !== 'completed' })); root.querySelector('#acc-session-result-dialog').close();
+        if (resultReturnsToReview) { renderSessionReview(); } else renderSessionRunner();
+      });
+      root.querySelector('#acc-session-review-items').addEventListener('click', e => { const button = e.target.closest('[data-review-action="edit"]'); const id = button?.closest('[data-review-item-id]')?.dataset.reviewItemId; if (id) openSessionItemResult(id, { review: true }); });
+      root.querySelector('#acc-confirm-session-results').addEventListener('click', () => {
+        const plan = sessionPlan(runnerPlanId); if (!plan) return;
+        try {
+          if (plan.status === 'completed') { const reconciled = SessionEngine.reconcileSessionResults(state, plan); state = reconciled.state; const index = state.sessionPlans.findIndex(item => item.id === plan.id); state.sessionPlans[index] = reconciled.plan; }
+          else state = SessionEngine.finalizeSession(state, plan.id);
+          saveState(); render(); renderSessionRunner(); root.querySelector('#acc-session-review-dialog').close(); showToast(plan.status === 'completed' ? 'Corrected results saved without duplicate records.' : 'Session completed and results applied.');
+        } catch (error) { showToast(error.message, { tone: 'warning', duration: 8000 }); }
+      });
+      root.querySelector('#acc-session-runner-dialog').addEventListener('close', () => { clearInterval(runnerTimer); runnerTimer = null; });
       root.querySelectorAll('[data-planner-minutes]').forEach(button => button.addEventListener('click', () => { plannerState.budgetMinutes = Number(button.dataset.plannerMinutes); root.querySelector('#acc-planner-minutes').value = plannerState.budgetMinutes; renderPlanner(); }));
       root.querySelector('#acc-generate-plan').addEventListener('click', () => generatePlanner({ reset: true }));
       root.querySelector('#acc-regenerate-plan').addEventListener('click', () => generatePlanner());
@@ -2655,6 +3186,12 @@
         action();
       });
       boot();
+      setInterval(() => {
+        if (!state) return;
+        const active = SessionEngine.selectActiveSession(state);
+        if (!active) return;
+        root.querySelectorAll('[data-active-elapsed]').forEach(node => { node.textContent = formatElapsed(SessionEngine.elapsedSessionMs(active)); });
+      }, 1000);
     })();
   </script>
 </div>

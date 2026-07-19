@@ -28,7 +28,7 @@ const KNOWN_GOAL_FIELDS = new Set([
 const KNOWN_SESSION_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'minutes', 'durationMinutes', 'goldDelta', 'note', 'title', 'legacy', 'extensions']);
 const KNOWN_LEDGER_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'activity', 'minutes', 'revenue', 'cost', 'notes', 'legacy', 'extensions']);
 const KNOWN_COLLECTION_FIELDS = new Set(['id', 'owned', 'target', 'baseline', 'legacy', 'extensions']);
-const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'legacy', 'extensions']);
+const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'sessionPlans', 'legacy', 'extensions']);
 
 export function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -200,6 +200,41 @@ function validateCollectionTracker(tracker, index, errors) {
   for (const field of ['owned', 'target', 'baseline']) if (!isFiniteNumber(tracker[field], { min: 0 })) addError(errors, `${path}.${field}`, 'must be a non-negative number');
 }
 
+function validateSessionPlan(plan, index, errors) {
+  const path = `sessionPlans[${index}]`;
+  if (!isPlainObject(plan)) { addError(errors, path, 'must be an object'); return; }
+  if (typeof plan.id !== 'string' || !plan.id) addError(errors, `${path}.id`, 'must be a non-empty string');
+  if (typeof plan.title !== 'string' || !plan.title.trim()) addError(errors, `${path}.title`, 'must be a non-empty string');
+  if (!['draft', 'ready', 'in_progress', 'paused', 'completed', 'abandoned'].includes(plan.status)) addError(errors, `${path}.status`, 'has an unknown status');
+  if (!Array.isArray(plan.characterIds) || plan.characterIds.some(id => typeof id !== 'string' || !id)) addError(errors, `${path}.characterIds`, 'must be an array of character ids');
+  if (!Array.isArray(plan.items)) addError(errors, `${path}.items`, 'must be an array');
+  else plan.items.forEach((item, itemIndex) => {
+    const itemPath = `${path}.items[${itemIndex}]`;
+    if (!isPlainObject(item)) { addError(errors, itemPath, 'must be an object'); return; }
+    if (typeof item.id !== 'string' || !item.id) addError(errors, `${itemPath}.id`, 'must be a non-empty string');
+    if (item.activityId !== null && item.activityId !== undefined && typeof item.activityId !== 'string') addError(errors, `${itemPath}.activityId`, 'must be null or a string');
+    if (typeof item.characterId !== 'string' || !item.characterId) addError(errors, `${itemPath}.characterId`, 'must identify a character');
+    if (!isPlainObject(item.snapshot) || typeof item.snapshot.title !== 'string' || typeof item.snapshot.category !== 'string' || typeof item.snapshot.characterId !== 'string' || typeof item.snapshot.repeatType !== 'string') addError(errors, `${itemPath}.snapshot`, 'must preserve title, category, character, and repeat type');
+    if (!['pending', 'current', 'completed', 'skipped', 'partial'].includes(item.status)) addError(errors, `${itemPath}.status`, 'has an unknown status');
+    if (!isFiniteNumber(item.order, { min: 0 })) addError(errors, `${itemPath}.order`, 'must be non-negative');
+    if (typeof item.locked !== 'boolean') addError(errors, `${itemPath}.locked`, 'must be boolean');
+    for (const field of ['plannedMinutes']) if (!isFiniteNumber(item[field], { min: 1 })) addError(errors, `${itemPath}.${field}`, 'must be positive');
+    for (const field of ['actualMinutes', 'goldEarned', 'goldSpent']) if (!isFiniteNumber(item[field], { min: 0 })) addError(errors, `${itemPath}.${field}`, 'must be non-negative');
+    if (!isFiniteNumber(item.progressGained)) addError(errors, `${itemPath}.progressGained`, 'must be numeric');
+    if (typeof item.resultNotes !== 'string' || typeof item.progressMetric !== 'string') addError(errors, itemPath, 'result notes and progress metric must be strings');
+    if (typeof item.completeUnderlying !== 'boolean' || typeof item.unplanned !== 'boolean') addError(errors, itemPath, 'completion and unplanned flags must be boolean');
+    for (const field of ['startedAt', 'completedAt']) if (item[field] !== null && item[field] !== undefined && !validDateValue(item[field])) addError(errors, `${itemPath}.${field}`, 'must be null or a timestamp');
+  });
+  if (!isFiniteNumber(plan.totalEstimatedMinutes, { min: 0 })) addError(errors, `${path}.totalEstimatedMinutes`, 'must be non-negative');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(plan.plannedFor || ''))) addError(errors, `${path}.plannedFor`, 'must be a local date');
+  for (const field of ['createdAt', 'updatedAt']) if (!validDateValue(plan[field])) addError(errors, `${path}.${field}`, 'must be a timestamp');
+  for (const field of ['startedAt', 'completedAt', 'endedAt', 'activeStartedAt', 'pausedAt']) if (plan[field] !== null && plan[field] !== undefined && !validDateValue(plan[field])) addError(errors, `${path}.${field}`, 'must be null or a timestamp');
+  if (!isFiniteNumber(plan.accumulatedMs, { min: 0 })) addError(errors, `${path}.accumulatedMs`, 'must be non-negative');
+  if (plan.currentItemId !== null && plan.currentItemId !== undefined && typeof plan.currentItemId !== 'string') addError(errors, `${path}.currentItemId`, 'must be null or a string');
+  if (typeof plan.notes !== 'string') addError(errors, `${path}.notes`, 'must be a string');
+  if (plan.reconciliation !== null && plan.reconciliation !== undefined && !isPlainObject(plan.reconciliation)) addError(errors, `${path}.reconciliation`, 'must be null or an object');
+}
+
 export function validateV2State(input) {
   const errors = [];
   if (!isPlainObject(input)) return { ok: false, errors: ['state: must be an object'] };
@@ -216,6 +251,9 @@ export function validateV2State(input) {
   else input.progressEvents.forEach((event, index) => validateProgressEvent(event, index, errors));
   if (!Array.isArray(input.collectionTrackers)) addError(errors, 'collectionTrackers', 'must be an array');
   else input.collectionTrackers.forEach((tracker, index) => validateCollectionTracker(tracker, index, errors));
+  if (input.sessionPlans !== undefined && !Array.isArray(input.sessionPlans)) addError(errors, 'sessionPlans', 'must be an array when present');
+  else (input.sessionPlans || []).forEach((plan, index) => validateSessionPlan(plan, index, errors));
+  if ((input.sessionPlans || []).filter(plan => plan?.status === 'in_progress').length > 1) addError(errors, 'sessionPlans', 'cannot contain more than one running session');
   if (!isPlainObject(input.migration)) addError(errors, 'migration', 'must be an object');
   else {
     if (!Number.isInteger(input.migration.sourceVersion)) addError(errors, 'migration.sourceVersion', 'must be an integer');
@@ -400,6 +438,7 @@ export function migrateV1ToV2(input, { now = new Date() } = {}) {
     activities,
     progressEvents,
     collectionTrackers,
+    sessionPlans: [],
     migration: { sourceVersion: 1, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue, warnings },
     ...(Object.keys(rawLegacy).length ? { legacy: clone(rawLegacy) } : {})
   };
@@ -409,7 +448,9 @@ export function migrateV1ToV2(input, { now = new Date() } = {}) {
 }
 
 export function normalizeV2State(input) {
-  return clone(input);
+  const normalized = clone(input);
+  if (normalized.sessionPlans === undefined) normalized.sessionPlans = [];
+  return normalized;
 }
 
 export function migrateState(input, { now = new Date() } = {}) {
@@ -450,6 +491,7 @@ export function createStarterState({ now = new Date() } = {}) {
       { id: deterministicId('progress-level', [characterId, 'starter']), entityType: 'character', entityId: characterId, metric: 'level', value: 1, recordedAt: date, source: 'starter' }
     ],
     collectionTrackers,
+    sessionPlans: [],
     migration: { sourceVersion: V2_SCHEMA_VERSION, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue }
   };
 }

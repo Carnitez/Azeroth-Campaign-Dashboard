@@ -4,11 +4,12 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
-const [baseCss, dashboard, core, activities, selectors] = await Promise.all([
+const [baseCss, dashboard, core, activities, sessions, selectors] = await Promise.all([
   readFile(resolve(root, 'src/base.css'), 'utf8'),
   readFile(resolve(root, 'src/dashboard.html'), 'utf8'),
   readFile(resolve(root, 'src/core.mjs'), 'utf8'),
   readFile(resolve(root, 'src/activity-engine.mjs'), 'utf8'),
+  readFile(resolve(root, 'src/session-engine.mjs'), 'utf8'),
   readFile(resolve(root, 'src/selectors.mjs'), 'utf8'),
 ]);
 
@@ -32,6 +33,9 @@ ${core}
 </script>
 <script type="module">
 ${activities}
+</script>
+<script type="module">
+${sessions}
 </script>
 <script type="module">
 ${selectors}
