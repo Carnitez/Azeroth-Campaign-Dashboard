@@ -1610,8 +1610,12 @@
       #azeroth-command-center .acc-agenda-toolbar { align-items: stretch; flex-direction: column; }
       #azeroth-command-center .acc-agenda-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       #azeroth-command-center .acc-agenda-row { grid-template-columns: auto minmax(0, 1fr); }
-      #azeroth-command-center .acc-agenda-when { grid-column: 2; justify-items: start; white-space: normal; }
-      #azeroth-command-center .acc-agenda-actions { grid-column: 1 / -1; padding-left: 2.1rem; flex-wrap: wrap; }
+      #azeroth-command-center .acc-agenda-row > .acc-activity-mark,
+      #azeroth-command-center .acc-agenda-row > .form-check { grid-column: 1; grid-row: 1 / span 2; }
+      #azeroth-command-center .acc-agenda-row > .acc-row-copy { grid-column: 2; grid-row: 1; }
+      #azeroth-command-center .acc-agenda-when { grid-column: 2; grid-row: 2; min-width: 0; justify-items: start; white-space: normal; }
+      #azeroth-command-center .acc-agenda-when > span { max-width: 100%; overflow-wrap: anywhere; }
+      #azeroth-command-center .acc-agenda-actions { grid-column: 1 / -1; grid-row: 3; padding-left: 2.1rem; flex-wrap: wrap; }
       #azeroth-command-center .acc-agenda-actions .btn { min-height: 2.5rem; }
       #azeroth-command-center .acc-upcoming-day { grid-template-columns: minmax(0, 1fr); }
       #azeroth-command-center .acc-upcoming-date { padding-bottom: 0.2rem; }
