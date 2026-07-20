@@ -4,13 +4,14 @@
  */
 
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
+const Schedule = globalThis.AzerothSchedule ?? await import('./schedule-engine.mjs');
 
 export const ACTIVITY_CATEGORIES = Object.freeze([
   'Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts',
   'Transmog', 'Achievements', 'Events', 'Custom'
 ]);
 export const ACTIVITY_STATUSES = Object.freeze(['todo', 'in_progress', 'completed', 'skipped']);
-export const ACTIVITY_REPEAT_TYPES = Object.freeze(['one_time', 'daily', 'weekly', 'manual']);
+export const ACTIVITY_REPEAT_TYPES = Object.freeze(['one_time', 'daily', 'weekly', 'weekdays', 'interval', 'manual']);
 export const ACTIVITY_PRIORITIES = Object.freeze([0, 1, 2, 3]);
 
 const DAY_MS = 86_400_000;
@@ -31,7 +32,7 @@ export function createPlannedActivity(input, { id = Core.createId('activity-plan
   const status = ACTIVITY_STATUSES.includes(input?.status) ? input.status : 'todo';
   const repeatType = ACTIVITY_REPEAT_TYPES.includes(input?.repeatType) ? input.repeatType : 'one_time';
   const category = ACTIVITY_CATEGORIES.includes(input?.category) ? input.category : 'Custom';
-  return {
+  const activity = {
     id,
     kind: 'planned',
     title: String(input?.title ?? '').trim(),
@@ -47,8 +48,15 @@ export function createPlannedActivity(input, { id = Core.createId('activity-plan
     scheduledFor: /^\d{4}-\d{2}-\d{2}$/.test(String(input?.scheduledFor ?? '')) ? String(input.scheduledFor) : null,
     createdAt: nowIso,
     updatedAt: nowIso,
-    completedAt: status === 'completed' ? nowIso : null
+    completedAt: status === 'completed' ? nowIso : null,
+    ...(input?.manualResetAt ? { manualResetAt: input.manualResetAt } : {})
   };
+  if (Core.isPlainObject(input?.schedule)) {
+    const schedule = Schedule.normalizeSchedule({ ...activity, schedule: input.schedule });
+    delete schedule.legacyUnscheduled;
+    activity.schedule = schedule;
+  }
+  return activity;
 }
 
 export function updatePlannedActivity(activity, changes, { now = new Date() } = {}) {
@@ -90,12 +98,17 @@ export function effectiveActivityStatus(activity, now = new Date()) {
   if (!isPlannedActivity(activity)) return activity?.status ?? 'completed';
   if (activity.status !== 'completed') return activity.status;
   if (!activity.completedAt) return 'todo';
-  if (activity.repeatType === 'daily' && Core.localDateKey(activity.completedAt) !== Core.localDateKey(now)) return 'todo';
-  if (activity.repeatType === 'weekly' && timestamp(activity.completedAt) < localWeekStart(now).getTime()) return 'todo';
+  const schedule = Schedule.normalizeSchedule(activity);
+  if (['daily', 'weekdays'].includes(schedule.type) && Core.localDateKey(activity.completedAt) !== Core.localDateKey(now)) return 'todo';
+  if (['weekly'].includes(schedule.type) && timestamp(activity.completedAt) < localWeekStart(now).getTime()) return 'todo';
+  if (schedule.type === 'interval' && Schedule.occurrenceKeyForDate(activity, Core.localDateKey(activity.completedAt)) !== Schedule.occurrenceKeyForDate(activity, Core.localDateKey(now))) return 'todo';
   return 'completed';
 }
 
 function compareActivities(a, b, sort) {
+  if (sort === 'next_available') return timestamp(a.availability?.nextAvailable || a.availability?.dueAt || a.availability?.expectedDate) - timestamp(b.availability?.nextAvailable || b.availability?.dueAt || b.availability?.expectedDate) || String(a.title).localeCompare(String(b.title));
+  if (sort === 'due') return timestamp(a.availability?.dueAt || a.availability?.nextAvailable) - timestamp(b.availability?.dueAt || b.availability?.nextAvailable) || number(b.priority) - number(a.priority);
+  if (sort === 'recently_completed') return timestamp(b.availability?.lastCompletedAt) - timestamp(a.availability?.lastCompletedAt) || String(a.title).localeCompare(String(b.title));
   if (sort === 'recent') return timestamp(b.updatedAt) - timestamp(a.updatedAt) || String(a.id).localeCompare(String(b.id));
   if (sort === 'estimated') return number(a.estimatedMinutes, Infinity) - number(b.estimatedMinutes, Infinity) || String(a.title).localeCompare(String(b.title));
   if (sort === 'alphabetical') return String(a.title).localeCompare(String(b.title)) || String(a.id).localeCompare(String(b.id));
@@ -113,11 +126,19 @@ export function selectPlannedActivities(state, filters = {}) {
   const tagFilters = normalizeTags(filters.tags).map(normalizeText);
   return list(state?.activities)
     .filter(activity => isPlannedActivity(activity) && rosterIds.has(activity.characterId))
-    .map(activity => ({ ...activity, effectiveStatus: effectiveActivityStatus(activity, now) }))
+    .map(activity => {
+      const availability = Schedule.activityAvailability(activity, state, { now });
+      const effectiveStatus = availability.state === 'completed_period' ? (availability.result === 'skipped' ? 'skipped' : 'completed') : activity.status === 'completed' && !['one_time', 'manual'].includes(availability.schedule.type) ? 'todo' : effectiveActivityStatus(activity, now);
+      return { ...activity, effectiveStatus, availability };
+    })
     .filter(activity => {
-      if (filters.view === 'today' && (['completed', 'skipped'].includes(activity.effectiveStatus) || (activity.scheduledFor && activity.scheduledFor > today))) return false;
-      if (filters.view === 'upcoming' && (!activity.scheduledFor || activity.scheduledFor <= today || ['completed', 'skipped'].includes(activity.effectiveStatus))) return false;
+      if (['today', 'available'].includes(filters.view) && (!['available_now', 'due_today', 'due_later_today', 'manual_available'].includes(activity.availability.state) || ['completed', 'skipped'].includes(activity.effectiveStatus))) return false;
+      if (filters.view === 'upcoming' && !['upcoming', 'not_started'].includes(activity.availability.state)) return false;
       if (filters.view === 'completed' && activity.effectiveStatus !== 'completed') return false;
+      if (filters.view === 'completed_today' && !(activity.availability.state === 'completed_period' && Core.localDateKey(activity.availability.lastCompletedAt) === today)) return false;
+      if (filters.view === 'missed' && activity.availability.state !== 'missed') return false;
+      if (filters.view === 'unscheduled' && !activity.availability.schedule?.legacyUnscheduled) return false;
+      if (filters.view === 'paused' && activity.availability.state !== 'paused') return false;
       if (filters.characterId && activity.characterId !== filters.characterId) return false;
       if (filters.category && activity.category !== filters.category) return false;
       if (filters.priority !== undefined && filters.priority !== '' && number(activity.priority) !== number(filters.priority)) return false;
@@ -132,8 +153,10 @@ export function selectPlannedActivities(state, filters = {}) {
     .sort((a, b) => compareActivities(a, b, filters.sort || 'priority'));
 }
 
-function plannerComparator(activeCharacterId, limitedTime) {
-  return (a, b) => (a.effectiveStatus === 'in_progress' ? 0 : 1) - (b.effectiveStatus === 'in_progress' ? 0 : 1)
+function plannerComparator(activeCharacterId, limitedTime, selectedIds = new Set()) {
+  return (a, b) => (selectedIds.has(a.id) ? 0 : 1) - (selectedIds.has(b.id) ? 0 : 1)
+    || (a.effectiveStatus === 'in_progress' ? 0 : 1) - (b.effectiveStatus === 'in_progress' ? 0 : 1)
+    || (['due_today', 'due_later_today'].includes(a.availability?.state) ? 0 : 1) - (['due_today', 'due_later_today'].includes(b.availability?.state) ? 0 : 1)
     || number(b.priority) - number(a.priority)
     || (a.characterId === activeCharacterId ? 0 : 1) - (b.characterId === activeCharacterId ? 0 : 1)
     || (limitedTime ? number(a.estimatedMinutes) - number(b.estimatedMinutes) : 0)
@@ -155,6 +178,8 @@ export function planSession(state, options = {}) {
   const budgetMinutes = Math.max(1, Math.round(number(options.budgetMinutes, 30)));
   const cap = budgetMinutes + 5;
   const lockedIds = new Set(list(options.lockedIds));
+  const selectedIds = new Set(list(options.selectedIds));
+  for (const id of selectedIds) lockedIds.add(id);
   const excludedIds = new Set(list(options.excludedIds));
   const order = list(options.currentOrder);
   const orderIndex = new Map(order.map((id, index) => [id, index]));
@@ -163,7 +188,7 @@ export function planSession(state, options = {}) {
   const locked = eligible.filter(activity => lockedIds.has(activity.id))
     .sort((a, b) => (orderIndex.get(a.id) ?? Infinity) - (orderIndex.get(b.id) ?? Infinity));
   const unlocked = eligible.filter(activity => !lockedIds.has(activity.id))
-    .sort(plannerComparator(options.activeCharacterId ?? state?.activeCharacterId, budgetMinutes <= 60));
+    .sort(plannerComparator(options.activeCharacterId ?? state?.activeCharacterId, budgetMinutes <= 60, selectedIds));
   const selected = [];
   let totalMinutes = 0;
   for (const activity of [...locked, ...unlocked]) {
@@ -213,6 +238,10 @@ export function fuzzyScore(query, value) {
 
 const fixedCommands = Object.freeze([
   ['nav-home', 'Go Home', 'Navigation', 'home', 'navigate', 'overview', 'command center dashboard'],
+  ['nav-agenda', 'Open Daily Agenda', 'Navigation', 'calendar-days', 'navigate', 'agenda', 'today available activities'],
+  ['agenda-available', 'Show available activities', 'Agenda', 'circle-play', 'agenda-view', 'available', 'today ready now'],
+  ['agenda-overdue', 'Show overdue activities', 'Agenda', 'history', 'agenda-view', 'missed', 'missed needs attention'],
+  ['agenda-upcoming', 'Show upcoming week', 'Agenda', 'calendar-range', 'agenda-view', 'upcoming', 'next seven days'],
   ['nav-campaign', 'Open Campaign', 'Navigation', 'map', 'navigate-focus', 'campaign', 'campaign next up'],
   ['nav-activities', 'Open Activities', 'Navigation', 'list-checks', 'navigate', 'activities', 'tasks planner'],
   ['nav-characters', 'Open Characters', 'Navigation', 'users', 'focus-characters', '', 'roster switch character'],
@@ -250,7 +279,20 @@ export function buildCommandCatalog(state) {
   }
   for (const activity of list(state?.activities).filter(activity => characterMap.has(activity.characterId))) {
     const character = characterMap.get(activity.characterId);
-    if (isPlannedActivity(activity)) items.push({ id: `activity:${activity.id}`, label: activity.title, category: 'Activity', icon: 'list-checks', action: 'open-activity', target: activity.id, character: character?.name, keywords: `${activity.category} ${activity.status} ${list(activity.tags).join(' ')}` });
+    if (isPlannedActivity(activity)) {
+      items.push({ id: `activity:${activity.id}`, label: activity.title, category: 'Activity', icon: 'list-checks', action: 'open-activity', target: activity.id, character: character?.name, keywords: `${activity.category} ${activity.status} ${list(activity.tags).join(' ')}`, rankBias: 12 });
+      const availability = Schedule.activityAvailability(activity, state, { now: new Date() });
+      if (['available_now', 'due_today', 'due_later_today', 'manual_available'].includes(availability.state)) {
+        items.push({ id: `activity-complete:${activity.id}`, label: `Complete ${activity.title}`, category: 'Agenda', icon: 'circle-check-big', action: 'complete-activity', target: activity.id, character: character?.name, keywords: 'mark done available today' });
+        items.push({ id: `activity-session:${activity.id}`, label: `Add ${activity.title} to session`, category: 'Agenda', icon: 'list-plus', action: 'add-activity-session', target: activity.id, character: character?.name, keywords: 'plan draft' });
+        items.push({ id: `activity-snooze:${activity.id}`, label: `Snooze ${activity.title}`, category: 'Agenda', icon: 'clock-3', action: 'snooze-activity', target: activity.id, character: character?.name, keywords: 'later tomorrow' });
+        items.push({ id: `activity-skip:${activity.id}`, label: `Skip ${activity.title}`, category: 'Agenda', icon: 'skip-forward', action: 'skip-activity', target: activity.id, character: character?.name, keywords: 'this occurrence' });
+      }
+      if (!availability.schedule?.legacyUnscheduled) {
+        items.push({ id: `activity-schedule:${activity.id}`, label: `Edit schedule for ${activity.title}`, category: 'Agenda', icon: 'calendar-cog', action: 'edit-activity-schedule', target: activity.id, character: character?.name, keywords: 'recurrence repeat' });
+        items.push({ id: `activity-${availability.state === 'paused' ? 'resume' : 'pause'}:${activity.id}`, label: `${availability.state === 'paused' ? 'Resume' : 'Pause'} schedule for ${activity.title}`, category: 'Agenda', icon: availability.state === 'paused' ? 'play' : 'pause', action: availability.state === 'paused' ? 'resume-activity-schedule' : 'pause-activity-schedule', target: activity.id, character: character?.name, keywords: 'recurrence schedule' });
+      }
+    }
     else if (activity.kind === 'gold') items.push({ id: `gold:${activity.id}`, label: activity.title || 'Gold activity', category: 'Gold', icon: 'coins', action: 'open-gold', target: activity.id, character: character?.name, keywords: activity.notes || '' });
   }
   for (const tracker of list(state?.collectionTrackers).filter(tracker => characterMap.has(tracker.characterId))) {
@@ -285,7 +327,7 @@ export function searchCommands(items, query = '', { history = {}, limit = 12 } =
   return list(items).map(item => {
     const labelScore = fuzzyScore(needle, item.label);
     const contextScore = fuzzyScore(needle, `${item.category} ${item.character || ''} ${item.keywords || ''}`) - 15;
-    return { ...item, score: Math.max(labelScore, contextScore) + Math.min(12, commandUsage(history, item.id) * 1.5), matchedText: item.label };
+    return { ...item, score: Math.max(labelScore, contextScore) + number(item.rankBias) + Math.min(12, commandUsage(history, item.id) * 1.5), matchedText: item.label };
   }).filter(item => Number.isFinite(item.score)).sort((a, b) => b.score - a.score
     || (recentRank.get(a.id) ?? Infinity) - (recentRank.get(b.id) ?? Infinity)
     || String(a.label).localeCompare(String(b.label))).slice(0, limit);

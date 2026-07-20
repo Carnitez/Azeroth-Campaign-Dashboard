@@ -6,6 +6,7 @@
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
 const Activities = globalThis.AzerothActivities ?? await import('./activity-engine.mjs');
 const Sessions = globalThis.AzerothSessions ?? await import('./session-engine.mjs');
+const Schedule = globalThis.AzerothSchedule ?? await import('./schedule-engine.mjs');
 
 const DAY_MS = 86_400_000;
 const RECENT_DAYS = 7;
@@ -181,6 +182,19 @@ export function selectRecentActivity(state, { limit = 10 } = {}) {
     });
   });
 
+  list(state?.activityOccurrences).forEach((record, index) => {
+    if (!visibleIds.has(record.characterId) || record.undoneAt || !['completed', 'skipped'].includes(record.status) || !timestamp(record.completedAt || record.skippedAt || record.recordedAt)) return;
+    const activity = activities.find(item => item.id === record.activityId);
+    if (!activity) return;
+    entries.push({
+      id: `occurrence:${record.id}:${index}`, sourceId: activity.id, kind: 'activity', category: activity.category || 'Activity',
+      characterId: record.characterId, character: characterMap.get(record.characterId) ?? null,
+      occurredAt: record.completedAt || record.skippedAt || record.recordedAt,
+      title: `${record.status === 'completed' ? 'Completed' : 'Skipped'} ${activity.title}`,
+      detail: record.notes || record.reason || '', durationMinutes: 0, goldDelta: 0, relatedTab: 'agenda'
+    });
+  });
+
   list(state?.progressEvents).forEach((event, index) => {
     if (!visibleIds.has(event.entityId) || ['starter', 'legacy-current-observation'].includes(event.source)) return;
     if (event.sourceActivityId && activityIds.has(event.sourceActivityId)) return;
@@ -265,6 +279,19 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
   completedGoals.forEach(goal => activeIds.add(goal.characterId));
   const completedActivities = list(state?.activities).filter(activity => Activities.isPlannedActivity(activity) && selectedIds.has(activity.characterId) && activity.status === 'completed' && activity.completedAt && inCurrentWeek(activity.completedAt, bounds));
   completedActivities.forEach(activity => activeIds.add(activity.characterId));
+  const completedOccurrences = list(state?.activityOccurrences).filter(record => !record.undoneAt && record.status === 'completed' && selectedIds.has(record.characterId) && inCurrentWeek(record.completedAt || record.recordedAt, bounds));
+  completedOccurrences.forEach(record => activeIds.add(record.characterId));
+  const completionKeys = new Set();
+  completedActivities.forEach(activity => completionKeys.add(`${activity.id}:${Schedule.occurrenceKeyForDate(activity, Core.localDateKey(activity.completedAt))}`));
+  completedOccurrences.forEach(record => completionKeys.add(`${record.activityId}:${record.occurrenceKey}`));
+  list(state?.sessionPlans).filter(plan => plan.status === 'completed' && inCurrentWeek(plan.completedAt || plan.endedAt, bounds)).forEach(plan => {
+    list(plan.items).filter(item => item.status === 'completed' && selectedIds.has(item.characterId)).forEach(item => {
+      const activity = list(state?.activities).find(candidate => candidate.id === item.activityId);
+      const occurredAt = item.completedAt || plan.completedAt || plan.endedAt;
+      completionKeys.add(activity ? `${activity.id}:${Schedule.occurrenceKeyForDate(activity, Core.localDateKey(occurredAt))}` : `session:${plan.id}:${item.id}`);
+      activeIds.add(item.characterId);
+    });
+  });
   const collectionEvents = list(state?.progressEvents).filter(event => selectedIds.has(event.entityId) && metricCollectionName(event.metric) && inCurrentWeek(event.recordedAt, bounds));
   collectionEvents.forEach(event => activeIds.add(event.entityId));
   return {
@@ -272,7 +299,7 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
     bounds,
     sessions: sessions.length,
     minutesPlayed: sessions.reduce((sum, activity) => sum + Math.max(0, number(activity.durationMinutes)), 0),
-    completed: completedGoals.length + completedActivities.length,
+    completed: completedGoals.length + completionKeys.size,
     goldEarned,
     goldSpent,
     netGold: goldEarned - goldSpent,
@@ -311,7 +338,7 @@ export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
     return {
       id: `activity:${activity.id}`, sourceType: 'activity', sourceId: activity.id,
       title: activity.title, characterId: activity.characterId, character,
-      reason, category: activity.category || 'Activity', progress: null,
+      reason: activity.availability.state === 'due_today' ? 'Due today' : reason, category: activity.category || 'Activity', progress: null,
       action: 'open-activity', actionLabel: 'Open activity', sourceRank: 0,
       statusRank: statusRank(activity.effectiveStatus), priority: number(activity.priority), recentAt: timestamp(activity.updatedAt),
       activeRank: activity.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0

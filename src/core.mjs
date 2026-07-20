@@ -13,7 +13,7 @@ export const V2_SCHEMA_VERSION = 2;
 export const COLLECTION_NAMES = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
 export const PLANNED_ACTIVITY_CATEGORIES = ['Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Transmog', 'Achievements', 'Events', 'Custom'];
 export const PLANNED_ACTIVITY_STATUSES = ['todo', 'in_progress', 'completed', 'skipped'];
-export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'manual'];
+export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'weekdays', 'interval', 'manual'];
 
 const KNOWN_CHARACTER_FIELDS = new Set([
   'id', 'name', 'realm', 'region', 'faction', 'race', 'raceId', 'className', 'classId', 'spec',
@@ -28,7 +28,7 @@ const KNOWN_GOAL_FIELDS = new Set([
 const KNOWN_SESSION_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'minutes', 'durationMinutes', 'goldDelta', 'note', 'title', 'legacy', 'extensions']);
 const KNOWN_LEDGER_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'activity', 'minutes', 'revenue', 'cost', 'notes', 'legacy', 'extensions']);
 const KNOWN_COLLECTION_FIELDS = new Set(['id', 'owned', 'target', 'baseline', 'legacy', 'extensions']);
-const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'sessionPlans', 'legacy', 'extensions']);
+const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'sessionPlans', 'activityOccurrences', 'legacy', 'extensions']);
 
 export function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -160,6 +160,22 @@ function validateActivity(activity, index, errors) {
     if (!validDateValue(activity.updatedAt)) addError(errors, `${path}.updatedAt`, 'must be a valid date or timestamp');
     if (activity.completedAt !== null && activity.completedAt !== undefined && !validDateValue(activity.completedAt)) addError(errors, `${path}.completedAt`, 'must be null or a valid date');
     if (activity.scheduledFor !== null && activity.scheduledFor !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(activity.scheduledFor)) addError(errors, `${path}.scheduledFor`, 'must be null or a local date');
+    if (activity.schedule !== undefined) {
+      const schedulePath = `${path}.schedule`;
+      if (!isPlainObject(activity.schedule)) addError(errors, schedulePath, 'must be an object');
+      else {
+        if (!['one_time', 'daily', 'weekly', 'weekdays', 'interval', 'manual'].includes(activity.schedule.type)) addError(errors, `${schedulePath}.type`, 'has an unknown schedule type');
+        for (const field of ['startDate', 'endDate', 'pausedUntil']) if (activity.schedule[field] !== null && activity.schedule[field] !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(activity.schedule[field])) addError(errors, `${schedulePath}.${field}`, 'must be null or a local date');
+        if (activity.schedule.dueTime !== null && activity.schedule.dueTime !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(activity.schedule.dueTime)) addError(errors, `${schedulePath}.dueTime`, 'must be null or a local time');
+        if (!Array.isArray(activity.schedule.weekdays) || activity.schedule.weekdays.some(day => !Number.isInteger(day) || day < 0 || day > 6)) addError(errors, `${schedulePath}.weekdays`, 'must contain local weekday numbers from 0 to 6');
+        if (!isFiniteNumber(activity.schedule.intervalValue, { min: 1 })) addError(errors, `${schedulePath}.intervalValue`, 'must be positive');
+        if (!['days', 'weeks'].includes(activity.schedule.intervalUnit)) addError(errors, `${schedulePath}.intervalUnit`, 'must be days or weeks');
+        if (activity.schedule.timezoneMode !== 'local') addError(errors, `${schedulePath}.timezoneMode`, 'must be local');
+        if (!isFiniteNumber(activity.schedule.graceMinutes, { min: 0 })) addError(errors, `${schedulePath}.graceMinutes`, 'must be non-negative');
+        if (typeof activity.schedule.paused !== 'boolean') addError(errors, `${schedulePath}.paused`, 'must be boolean');
+      }
+    }
+    if (activity.manualResetAt !== undefined && !validDateValue(activity.manualResetAt)) addError(errors, `${path}.manualResetAt`, 'must be a timestamp');
   } else {
     if (!validDateValue(activity.occurredAt)) addError(errors, `${path}.occurredAt`, 'must be a valid date or timestamp');
     if (!isFiniteNumber(activity.durationMinutes, { min: 0 })) addError(errors, `${path}.durationMinutes`, 'must be a non-negative number');
@@ -171,6 +187,17 @@ function validateActivity(activity, index, errors) {
       if (typeof activity.gold.affectsBalance !== 'boolean') addError(errors, `${path}.gold.affectsBalance`, 'must be boolean');
     }
   }
+}
+
+function validateActivityOccurrence(record, index, errors) {
+  const path = `activityOccurrences[${index}]`;
+  if (!isPlainObject(record)) { addError(errors, path, 'must be an object'); return; }
+  for (const field of ['id', 'activityId', 'characterId', 'occurrenceKey']) if (typeof record[field] !== 'string' || !record[field]) addError(errors, `${path}.${field}`, 'must be a non-empty string');
+  if (!['completed', 'skipped', 'snoozed', 'reset'].includes(record.status)) addError(errors, `${path}.status`, 'has an unknown occurrence status');
+  if (!validDateValue(record.recordedAt)) addError(errors, `${path}.recordedAt`, 'must be a timestamp');
+  for (const field of ['expectedAt', 'completedAt', 'skippedAt', 'snoozedAt', 'snoozedUntil', 'undoneAt']) if (record[field] !== null && record[field] !== undefined && !validDateValue(record[field])) addError(errors, `${path}.${field}`, 'must be null or a timestamp');
+  if (record.notes !== undefined && typeof record.notes !== 'string') addError(errors, `${path}.notes`, 'must be a string');
+  if (record.reason !== undefined && typeof record.reason !== 'string') addError(errors, `${path}.reason`, 'must be a string');
 }
 
 function validateProgressEvent(event, index, errors) {
@@ -254,6 +281,8 @@ export function validateV2State(input) {
   if (input.sessionPlans !== undefined && !Array.isArray(input.sessionPlans)) addError(errors, 'sessionPlans', 'must be an array when present');
   else (input.sessionPlans || []).forEach((plan, index) => validateSessionPlan(plan, index, errors));
   if ((input.sessionPlans || []).filter(plan => plan?.status === 'in_progress').length > 1) addError(errors, 'sessionPlans', 'cannot contain more than one running session');
+  if (input.activityOccurrences !== undefined && !Array.isArray(input.activityOccurrences)) addError(errors, 'activityOccurrences', 'must be an array when present');
+  else (input.activityOccurrences || []).forEach((record, index) => validateActivityOccurrence(record, index, errors));
   if (!isPlainObject(input.migration)) addError(errors, 'migration', 'must be an object');
   else {
     if (!Number.isInteger(input.migration.sourceVersion)) addError(errors, 'migration.sourceVersion', 'must be an integer');
@@ -439,6 +468,7 @@ export function migrateV1ToV2(input, { now = new Date() } = {}) {
     progressEvents,
     collectionTrackers,
     sessionPlans: [],
+    activityOccurrences: [],
     migration: { sourceVersion: 1, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue, warnings },
     ...(Object.keys(rawLegacy).length ? { legacy: clone(rawLegacy) } : {})
   };
@@ -450,6 +480,7 @@ export function migrateV1ToV2(input, { now = new Date() } = {}) {
 export function normalizeV2State(input) {
   const normalized = clone(input);
   if (normalized.sessionPlans === undefined) normalized.sessionPlans = [];
+  if (normalized.activityOccurrences === undefined) normalized.activityOccurrences = [];
   return normalized;
 }
 
@@ -492,6 +523,7 @@ export function createStarterState({ now = new Date() } = {}) {
     ],
     collectionTrackers,
     sessionPlans: [],
+    activityOccurrences: [],
     migration: { sourceVersion: V2_SCHEMA_VERSION, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue }
   };
 }

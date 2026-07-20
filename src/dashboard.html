@@ -1534,15 +1534,54 @@
     #azeroth-command-center .acc-review-stat { display: grid; gap: 0.2rem; padding: 0.7rem; background: var(--card); }
     #azeroth-command-center .acc-review-stat span { color: var(--muted-foreground); font-size: 0.62rem; }
     #azeroth-command-center .acc-review-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+    #azeroth-command-center .acc-today-summary {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; align-items: stretch;
+      margin: 0 0 1rem; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; background: var(--card);
+    }
+    #azeroth-command-center .acc-today-stat { display: grid; gap: 0.2rem; padding: 0.7rem 0.8rem; border-right: 1px solid var(--border); min-width: 0; }
+    #azeroth-command-center .acc-today-stat span { color: var(--muted-foreground); font-size: 0.65rem; }
+    #azeroth-command-center .acc-today-stat strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #azeroth-command-center .acc-today-summary > .btn { margin: auto 0.7rem; }
+    #azeroth-command-center .acc-agenda-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 0.75rem; margin-bottom: 0.75rem; }
+    #azeroth-command-center .acc-agenda-filters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.45rem; padding: 0.65rem; border-block: 1px solid var(--border); background: color-mix(in srgb, var(--card) 75%, transparent); }
+    #azeroth-command-center .acc-agenda-selection { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+    #azeroth-command-center .acc-agenda-selection .form-control { width: 6rem; }
+    #azeroth-command-center .acc-agenda-section { margin-top: 1rem; }
+    #azeroth-command-center .acc-agenda-section > header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+    #azeroth-command-center .acc-agenda-section h2,
+    #azeroth-command-center .acc-agenda-group h3 { margin: 0; font-size: 0.82rem; }
+    #azeroth-command-center .acc-agenda-group { margin-top: 0.65rem; }
+    #azeroth-command-center .acc-agenda-group > header { display: flex; align-items: center; gap: 0.45rem; color: var(--muted-foreground); padding: 0.25rem 0.35rem; }
+    #azeroth-command-center .acc-agenda-list { display: grid; }
+    #azeroth-command-center .acc-agenda-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 0.65rem; min-width: 0; padding: 0.55rem 0.35rem; border-bottom: 1px solid var(--border); }
+    #azeroth-command-center .acc-agenda-row:hover { background: color-mix(in srgb, var(--acc-primary) 4%, transparent); }
+    #azeroth-command-center .acc-agenda-row[data-state="missed"] { box-shadow: inset 2px 0 color-mix(in srgb, var(--destructive) 45%, transparent); }
+    #azeroth-command-center .acc-agenda-row[data-state="completed_period"] { opacity: 0.72; }
+    #azeroth-command-center .acc-agenda-when { display: grid; justify-items: end; gap: 0.1rem; color: var(--muted-foreground); font-size: 0.67rem; white-space: nowrap; }
+    #azeroth-command-center .acc-agenda-actions { display: flex; align-items: center; gap: 0.3rem; }
+    #azeroth-command-center .acc-agenda-actions .btn { padding-inline: 0.55rem; }
+    #azeroth-command-center .acc-upcoming-day { display: grid; grid-template-columns: 8rem minmax(0, 1fr); border-bottom: 1px solid var(--border); }
+    #azeroth-command-center .acc-upcoming-date { padding: 0.65rem 0.35rem; color: var(--muted-foreground); font-size: 0.72rem; }
+    #azeroth-command-center .acc-active-session.acc-agenda-active { margin: 0 0 0.75rem; }
+    #azeroth-command-center .acc-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.3rem; }
+    #azeroth-command-center .acc-weekday { display: grid; place-items: center; min-height: 2.4rem; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; }
+    #azeroth-command-center .acc-weekday:has(input:checked) { border-color: var(--acc-primary); background: color-mix(in srgb, var(--acc-primary) 10%, transparent); color: var(--foreground); }
+    #azeroth-command-center .acc-weekday input { position: absolute; opacity: 0; }
+    #azeroth-command-center .acc-schedule-preview { padding: 0.7rem; border: 1px solid var(--border); border-radius: 6px; color: var(--muted-foreground); background: color-mix(in srgb, var(--acc-primary) 4%, var(--card)); }
+    #azeroth-command-center .acc-history-row { display: grid; grid-template-columns: 9rem minmax(0, 1fr) auto; gap: 0.65rem; align-items: center; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
     @media (max-width: 1100px) {
       #azeroth-command-center .acc-activity-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #azeroth-command-center .acc-activity-filters .acc-filter-search { grid-column: 1 / -1; }
+      #azeroth-command-center .acc-agenda-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-today-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-today-summary > :nth-child(2) { border-right: 0; }
+      #azeroth-command-center .acc-today-summary > .btn { margin: 0.55rem; }
     }
     @media (max-width: 860px) {
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed { grid-template-columns: 1fr; }
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-character-card .acc-identity, .acc-character-select, .acc-tabs span) { display: initial; }
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar { padding: 0.75rem; }
-      #azeroth-command-center .acc-tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     }
     @media (max-width: 620px) {
       #azeroth-command-center .acc-command-trigger { min-width: 2rem; }
@@ -1568,6 +1607,17 @@
       #azeroth-command-center .acc-runner-controls .btn { flex: 1 1 8rem; }
       #azeroth-command-center .acc-session-metrics { flex-wrap: wrap; white-space: normal; }
       #azeroth-command-center .acc-runner-note { grid-template-columns: minmax(0, 1fr); }
+      #azeroth-command-center .acc-agenda-toolbar { align-items: stretch; flex-direction: column; }
+      #azeroth-command-center .acc-agenda-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-agenda-row { grid-template-columns: auto minmax(0, 1fr); }
+      #azeroth-command-center .acc-agenda-when { grid-column: 2; justify-items: start; white-space: normal; }
+      #azeroth-command-center .acc-agenda-actions { grid-column: 1 / -1; padding-left: 2.1rem; flex-wrap: wrap; }
+      #azeroth-command-center .acc-agenda-actions .btn { min-height: 2.5rem; }
+      #azeroth-command-center .acc-upcoming-day { grid-template-columns: minmax(0, 1fr); }
+      #azeroth-command-center .acc-upcoming-date { padding-bottom: 0.2rem; }
+      #azeroth-command-center .acc-history-row { grid-template-columns: minmax(0, 1fr); }
+      #azeroth-command-center dialog { max-height: calc(100dvh - 1rem); max-width: calc(100vw - 1rem); overflow: auto; }
+      #azeroth-command-center :is(.acc-panel, .acc-page-header, .acc-tabs) .btn { min-height: 2.5rem; }
     }
   </style>
 
@@ -1606,6 +1656,7 @@
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
         <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Command Center</span><kbd>Alt 1</kbd></button>
+        <button class="btn" type="button" data-tab="agenda" aria-pressed="false" aria-keyshortcuts="Alt+6"><i data-lucide="calendar-days" aria-hidden="true"></i><span>Daily Agenda</span><kbd>Alt 6</kbd></button>
         <button class="btn" type="button" data-tab="activities" aria-pressed="false" aria-keyshortcuts="Alt+5"><i data-lucide="list-checks" aria-hidden="true"></i><span>Activities</span><kbd>Alt 5</kbd></button>
         <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 2</kbd></button>
         <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 3</kbd></button>
@@ -1674,6 +1725,14 @@
         <button class="btn btn-primary" type="button" id="acc-open-active-session"><i data-lucide="play" aria-hidden="true"></i> Open session</button>
       </section>
 
+      <section class="acc-today-summary" id="acc-today-summary" aria-label="Today at a glance">
+        <div class="acc-today-stat"><span>Available</span><strong id="acc-today-available">0</strong></div>
+        <div class="acc-today-stat"><span>Completed today</span><strong id="acc-today-completed">0</strong></div>
+        <div class="acc-today-stat"><span>Available work</span><strong id="acc-today-minutes">0m</strong></div>
+        <div class="acc-today-stat"><span>Best next action</span><strong id="acc-today-priority">Nothing queued</strong></div>
+        <button class="btn" type="button" data-command-action="agenda"><i data-lucide="arrow-right" aria-hidden="true"></i> Open agenda</button>
+      </section>
+
       <div class="acc-command-grid">
         <div class="acc-command-column">
           <section class="acc-command-section" aria-labelledby="acc-next-up-heading">
@@ -1705,6 +1764,27 @@
       </section>
     </section>
 
+    <section class="acc-panel" id="acc-panel-agenda" data-panel="agenda" hidden>
+      <div class="acc-agenda-toolbar">
+        <div><h2 style="margin:0">Daily Agenda</h2><span class="text-muted text-small" id="acc-agenda-subtitle">Today’s actionable campaign work.</span></div>
+        <div class="acc-activity-toolbar"><button class="btn" type="button" id="acc-agenda-create"><i data-lucide="plus" aria-hidden="true"></i> Add activity</button><button class="btn btn-primary" type="button" id="acc-agenda-plan"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan by time</button></div>
+      </div>
+      <section class="acc-active-session acc-agenda-active" id="acc-agenda-active-session" hidden><div class="acc-active-session-copy"><span class="acc-eyebrow" id="acc-agenda-active-status">Active session</span><strong id="acc-agenda-active-title">Session</strong><span class="acc-active-session-meta" id="acc-agenda-active-meta"></span></div><button class="btn btn-primary" type="button" id="acc-agenda-resume">Open session</button></section>
+      <div class="acc-agenda-filters" aria-label="Agenda filters">
+        <label class="form-label">Scope<select class="form-select" id="acc-agenda-scope"><option value="active">Active character</option><option value="all">All characters</option></select></label>
+        <label class="form-label">Character<select class="form-select" id="acc-agenda-character"><option value="">Any character</option></select></label>
+        <label class="form-label">Category<select class="form-select" id="acc-agenda-category"><option value="">Any category</option></select></label>
+        <label class="form-label">Priority<select class="form-select" id="acc-agenda-priority"><option value="">Any priority</option><option value="3">Critical</option><option value="2">High</option><option value="1">Normal</option><option value="0">Low</option></select></label>
+        <label class="form-label">Schedule<select class="form-select" id="acc-agenda-schedule"><option value="">Any schedule</option><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekdays">Selected weekdays</option><option value="interval">Interval</option><option value="manual">Manual</option></select></label>
+        <label class="form-label">State<select class="form-select" id="acc-agenda-state"><option value="">Any state</option><option value="available">Available</option><option value="completed">Completed</option><option value="missed">Missed</option><option value="upcoming">Upcoming</option><option value="paused">Paused</option></select></label>
+      </div>
+      <div class="acc-agenda-selection"><strong id="acc-agenda-selected">0 selected · 0m</strong><label class="form-label acc-inline" style="margin:0"><span>Available time</span><input class="form-control" id="acc-agenda-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-agenda-selected-plan" disabled>Create selected plan</button><button class="btn" type="button" id="acc-agenda-add-draft" disabled>Add to draft</button><button class="btn" type="button" id="acc-agenda-time-plan">Generate from today</button></div>
+      <section class="acc-agenda-section" aria-labelledby="acc-agenda-today-heading"><header><div><h2 id="acc-agenda-today-heading">Today</h2><span class="text-muted text-small">Available, due, optional, and completed work.</span></div></header><div id="acc-agenda-today"></div></section>
+      <section class="acc-agenda-section" aria-labelledby="acc-agenda-attention-heading"><header><div><h2 id="acc-agenda-attention-heading">Needs attention</h2><span class="text-muted text-small">Missed work and ready plans whose date has passed.</span></div></header><div class="acc-agenda-list" id="acc-agenda-attention"></div></section>
+      <section class="acc-agenda-section" aria-labelledby="acc-agenda-upcoming-heading"><header><div><h2 id="acc-agenda-upcoming-heading">Upcoming</h2><span class="text-muted text-small">Scheduled work across the next seven local days.</span></div></header><div id="acc-agenda-upcoming"></div></section>
+      <section class="acc-agenda-section" aria-labelledby="acc-agenda-recent-heading"><header><div><h2 id="acc-agenda-recent-heading">Recently completed</h2><span class="text-muted text-small">Recurring and one-time runs from canonical history.</span></div></header><div class="acc-agenda-list" id="acc-agenda-completed"></div></section>
+    </section>
+
     <section class="acc-panel" id="acc-panel-activities" data-panel="activities" hidden>
       <div class="acc-activity-head">
         <div><h2 style="margin:0">Activities</h2><span class="text-muted text-small" id="acc-activity-count">0 activities</span></div>
@@ -1714,9 +1794,12 @@
         </div>
       </div>
       <nav class="acc-view-tabs" aria-label="Activity views">
-        <button class="btn" type="button" data-activity-view="today" aria-pressed="true">Today</button>
+        <button class="btn" type="button" data-activity-view="today" aria-pressed="true">Available today</button>
         <button class="btn" type="button" data-activity-view="upcoming" aria-pressed="false">Upcoming</button>
-        <button class="btn" type="button" data-activity-view="completed" aria-pressed="false">Completed</button>
+        <button class="btn" type="button" data-activity-view="completed_today" aria-pressed="false">Completed today</button>
+        <button class="btn" type="button" data-activity-view="missed" aria-pressed="false">Missed</button>
+        <button class="btn" type="button" data-activity-view="paused" aria-pressed="false">Paused</button>
+        <button class="btn" type="button" data-activity-view="unscheduled" aria-pressed="false">Unscheduled</button>
         <button class="btn" type="button" data-activity-view="all" aria-pressed="false">All activities</button>
       </nav>
       <div class="acc-activity-filters" aria-label="Activity filters">
@@ -1726,7 +1809,7 @@
         <label class="form-label"><span class="sr-only">Filter by priority</span><select class="form-select" id="acc-activity-priority-filter" aria-label="Filter by priority"><option value="">All priorities</option><option value="3">Critical</option><option value="2">High</option><option value="1">Normal</option><option value="0">Low</option></select></label>
         <label class="form-label"><span class="sr-only">Filter by status</span><select class="form-select" id="acc-activity-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
         <label class="form-label"><span class="sr-only">Filter by tags</span><input class="form-control" id="acc-activity-tags-filter" placeholder="Tags"></label>
-        <label class="form-label"><span class="sr-only">Sort activities</span><select class="form-select" id="acc-activity-sort" aria-label="Sort activities"><option value="priority">Priority</option><option value="recent">Recently updated</option><option value="estimated">Estimated time</option><option value="alphabetical">Alphabetical</option></select></label>
+        <label class="form-label"><span class="sr-only">Sort activities</span><select class="form-select" id="acc-activity-sort" aria-label="Sort activities"><option value="next_available">Next available</option><option value="due">Due time</option><option value="priority">Priority</option><option value="estimated">Estimated time</option><option value="recently_completed">Recently completed</option><option value="recent">Recently updated</option><option value="alphabetical">Alphabetical</option></select></label>
       </div>
       <div class="acc-activity-list" id="acc-activity-list" aria-live="polite"></div>
       <section class="acc-session-history" aria-labelledby="acc-session-history-heading">
@@ -1873,7 +1956,7 @@
         <label class="form-label">Priority<select class="form-select" name="priority"><option value="0">Low</option><option value="1" selected>Normal</option><option value="2">High</option><option value="3">Critical</option></select></label>
         <label class="form-label">Status<select class="form-select" name="status"><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
         <label class="form-label">Estimated minutes<input class="form-control" name="estimatedMinutes" type="number" min="1" max="1440" value="30" required></label>
-        <label class="form-label">Repeat<select class="form-select" name="repeatType"><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="manual">Manual</option></select></label>
+        <label class="form-label">Repeat<select class="form-select" name="repeatType"><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekdays">Selected weekdays</option><option value="interval">Interval</option><option value="manual">Manual</option></select></label>
         <label class="form-label">Scheduled date<input class="form-control" name="scheduledFor" type="date"></label>
         <label class="form-label">Tags<input class="form-control" name="tags" maxlength="160" placeholder="campaign, solo, weekly"></label>
         <label class="form-label wide">Notes<textarea class="form-control" name="notes" rows="3" maxlength="400"></textarea></label>
@@ -1881,6 +1964,34 @@
       <div class="acc-actions"><button class="btn btn-primary" type="submit" id="acc-activity-submit">Create activity</button><button class="btn" type="button" data-close-dialog="acc-activity-dialog">Cancel</button></div>
     </form>
   </dialog>
+
+  <dialog id="acc-schedule-dialog" aria-labelledby="acc-schedule-title">
+    <form method="dialog" id="acc-schedule-form">
+      <div class="acc-dialog-head"><div><h2 id="acc-schedule-title">Edit schedule</h2><span class="text-muted text-small">Availability is calculated locally from this reusable rule.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-schedule-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+      <input type="hidden" name="activityId">
+      <div class="acc-form-grid">
+        <label class="form-label">Schedule type<select class="form-select" name="type"><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekdays">Selected weekdays</option><option value="interval">Every N days or weeks</option><option value="manual">Manual reset</option></select></label>
+        <label class="form-label">Start date<input class="form-control" name="startDate" type="date"></label>
+        <label class="form-label">Due time<input class="form-control" name="dueTime" type="time"></label>
+        <label class="form-label">End date<input class="form-control" name="endDate" type="date"></label>
+        <label class="form-label" data-schedule-interval>Every<input class="form-control" name="intervalValue" type="number" min="1" max="365" value="1"></label>
+        <label class="form-label" data-schedule-interval>Interval unit<select class="form-select" name="intervalUnit"><option value="days">Days</option><option value="weeks">Weeks</option></select></label>
+        <label class="form-label">Estimated minutes<input class="form-control" name="estimatedMinutes" type="number" min="1" max="1440"></label>
+        <label class="form-label">Priority<select class="form-select" name="priority"><option value="0">Low</option><option value="1">Normal</option><option value="2">High</option><option value="3">Critical</option></select></label>
+        <label class="form-label">Pause until<input class="form-control" name="pausedUntil" type="date"></label>
+        <div class="form-label wide" data-schedule-weekdays><span>Weekdays</span><div class="acc-weekdays"><label class="acc-weekday"><input type="checkbox" name="weekday" value="0"><span>Sun</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="1"><span>Mon</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="2"><span>Tue</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="3"><span>Wed</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="4"><span>Thu</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="5"><span>Fri</span></label><label class="acc-weekday"><input type="checkbox" name="weekday" value="6"><span>Sat</span></label></div></div>
+        <label class="form-check wide"><input class="form-check-input" type="checkbox" name="paused"><span>Pause indefinitely</span></label>
+      </div>
+      <div class="acc-schedule-preview" id="acc-schedule-preview">Available manually</div><div class="text-destructive text-small" id="acc-schedule-error" role="alert"></div>
+      <div class="acc-actions"><button class="btn btn-primary" type="submit">Save schedule</button><button class="btn" type="button" data-close-dialog="acc-schedule-dialog">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="acc-snooze-dialog" aria-labelledby="acc-snooze-title"><form method="dialog" id="acc-snooze-form"><div class="acc-dialog-head"><div><h2 id="acc-snooze-title">Snooze this occurrence</h2><span class="text-muted text-small" id="acc-snooze-activity"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-snooze-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><input type="hidden" name="activityId"><div class="acc-form-grid"><label class="form-label">Snooze until<select class="form-select" name="preset"><option value="later">Later today</option><option value="tomorrow">Tomorrow</option><option value="custom">Choose date and time</option></select></label><label class="form-label" data-snooze-custom hidden>Date and time<input class="form-control" name="customAt" type="datetime-local"></label><label class="form-label wide">Note<input class="form-control" name="notes" maxlength="240" placeholder="Optional reason"></label></div><div class="text-destructive text-small" id="acc-snooze-error" role="alert"></div><div class="acc-actions"><button class="btn btn-primary" type="submit">Snooze occurrence</button><button class="btn" type="button" data-close-dialog="acc-snooze-dialog">Cancel</button></div></form></dialog>
+
+  <dialog id="acc-skip-dialog" aria-labelledby="acc-skip-title"><form method="dialog" id="acc-skip-form"><div class="acc-dialog-head"><div><h2 id="acc-skip-title">Skip this occurrence?</h2><span class="text-muted text-small" id="acc-skip-activity"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-skip-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><input type="hidden" name="activityId"><p class="acc-delete-copy">Only the current occurrence will be skipped. Future occurrences and the underlying activity stay intact.</p><label class="form-label">Reason<input class="form-control" name="reason" maxlength="240" placeholder="Optional"></label><div class="acc-actions"><button class="btn btn-primary" type="submit">Skip occurrence</button><button class="btn" type="button" data-close-dialog="acc-skip-dialog">Cancel</button></div></form></dialog>
+
+  <dialog id="acc-run-history-dialog" aria-labelledby="acc-run-history-title"><div class="acc-dialog-head"><div><h2 id="acc-run-history-title">Run history</h2><span class="text-muted text-small" id="acc-run-history-subtitle"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-run-history-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><div id="acc-run-history-list"></div></dialog>
 
   <dialog id="acc-delete-activity-dialog" aria-labelledby="acc-delete-activity-title">
     <form method="dialog" id="acc-delete-activity-form">
@@ -1967,6 +2078,7 @@
       <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 3</kbd></div>
       <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 4</kbd></div>
       <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 5</kbd></div>
+      <div class="acc-shortcut-row"><span>Daily Agenda</span><kbd>Alt 6</kbd></div>
       <div class="acc-shortcut-row"><span>Pause or resume runner</span><kbd>Space</kbd></div>
       <div class="acc-shortcut-row"><span>Complete current activity</span><kbd>Enter</kbd></div>
       <div class="acc-shortcut-row"><span>Skip current activity</span><kbd>S</kbd></div>
@@ -2009,6 +2121,7 @@
       const Selectors = globalThis.AzerothSelectors;
       const ActivityEngine = globalThis.AzerothActivities;
       const SessionEngine = globalThis.AzerothSessions;
+      const Schedule = globalThis.AzerothSchedule;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -2033,6 +2146,7 @@
       });
       const pageMeta = Object.freeze({
         overview: { title: 'Command Center', description: 'Decide what to do next from real campaign progress.' },
+        agenda: { title: 'Daily Agenda', description: 'See what is available, due, missed, and coming next.' },
         activities: { title: 'Activities', description: 'Plan and complete the work that moves your campaign forward.' },
         collections: { title: 'Collections', description: 'Track account gains and keep the next milestone in reach.' },
         gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
@@ -2043,6 +2157,7 @@
       let activeTab = 'overview';
       let momentumScope = 'active';
       let activityView = 'today';
+      let agendaSelected = new Set();
       let sessionView = 'active';
       let plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
       let sessionEditorPlan = null;
@@ -2209,6 +2324,7 @@
         quick.elements.gold.value = c.gold;
         quick.elements.location.value = c.location || '';
         renderCommandCenter(c);
+        renderAgenda();
         renderActivities();
         renderSessionHistory();
         renderCollections(c);
@@ -2238,11 +2354,19 @@
         root.querySelector('#acc-command-gold').textContent = formatGold(c.gold);
         root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
         renderActiveSession();
+        renderTodaySummary();
         renderNextUp();
         renderActiveGoals();
         renderMomentum();
         renderRoster();
         renderRecentActivity();
+      }
+      function renderTodaySummary() {
+        const summary = Schedule.commandCenterTodaySummary(state, { now: new Date(), characterId: state.activeCharacterId });
+        root.querySelector('#acc-today-available').textContent = String(summary.availableCount);
+        root.querySelector('#acc-today-completed').textContent = String(summary.completedCount);
+        root.querySelector('#acc-today-minutes').textContent = formatMinutes(summary.estimatedMinutes);
+        root.querySelector('#acc-today-priority').textContent = summary.highestPriority?.activity?.title || summary.nextScheduled?.activity?.title || 'Nothing queued';
       }
       function renderActiveSession() {
         const active = SessionEngine.selectActiveSession(state);
@@ -2403,9 +2527,84 @@
         target.innerHTML = [...sessions].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(s => `
           <article class="acc-entry"><time class="text-muted">${escapeHtml(Core.localDateKey(s.occurredAt) || s.occurredAt)}</time><div class="acc-entry-body"><strong>${formatMinutes(s.durationMinutes)}</strong> · ${Number(s.gold?.delta) >= 0 ? '+' : ''}${formatGold(s.gold?.delta)}<div>${escapeHtml(s.notes || 'No notes')}</div></div><button class="btn btn-ghost" type="button" data-session-delete="${escapeHtml(s.id)}" aria-label="Delete journal entry"><i data-lucide="x" aria-hidden="true"></i></button></article>`).join('');
       }
+      const agendaGroupLabels = { inProgress: 'In progress', dueNow: 'Due now', availableToday: 'Available today', optional: 'Optional', completedToday: 'Completed today' };
+      const availabilityLabels = { available_now: 'Available now', due_today: 'Due now', due_later_today: 'Due later today', upcoming: 'Upcoming', completed_period: 'Completed for this period', missed: 'Missed', paused: 'Paused', not_started: 'Not started', expired: 'Expired', manual_available: 'Manually available' };
+      function formatLocalDate(value, options = {}) {
+        const date = Core.localDateTime(value);
+        return date ? new Intl.DateTimeFormat(undefined, { weekday: options.weekday || 'short', month: 'short', day: 'numeric', ...(options.time ? { hour: '2-digit', minute: '2-digit' } : {}) }).format(date) : 'Unscheduled';
+      }
+      function currentAgendaFilters() {
+        const scope = root.querySelector('#acc-agenda-scope').value || state.preferences?.agendaScope || 'active';
+        const characterId = root.querySelector('#acc-agenda-character').value;
+        return { scope: characterId || scope, characterId, category: root.querySelector('#acc-agenda-category').value, priority: root.querySelector('#acc-agenda-priority').value, scheduleType: root.querySelector('#acc-agenda-schedule').value, completionState: root.querySelector('#acc-agenda-state').value, now: new Date() };
+      }
+      function renderAgendaOptions() {
+        const scope = root.querySelector('#acc-agenda-scope');
+        scope.value = ['active', 'all'].includes(state.preferences?.agendaScope) ? state.preferences.agendaScope : 'active';
+        const characterFilter = root.querySelector('#acc-agenda-character');
+        const selectedCharacter = characterFilter.value;
+        characterFilter.innerHTML = `<option value="">Any character</option>${rosterCharacters().map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}`;
+        characterFilter.value = rosterCharacters().some(item => item.id === selectedCharacter) ? selectedCharacter : '';
+        const category = root.querySelector('#acc-agenda-category');
+        const selectedCategory = category.value;
+        category.innerHTML = `<option value="">Any category</option>${ActivityEngine.ACTIVITY_CATEGORIES.map(value => `<option>${escapeHtml(value)}</option>`).join('')}`;
+        category.value = ActivityEngine.ACTIVITY_CATEGORIES.includes(selectedCategory) ? selectedCategory : '';
+      }
+      function agendaRowMarkup(row, { selectable = true, upcomingDate = '' } = {}) {
+        const activity = row.activity;
+        const availability = row.availability || Schedule.activityAvailability(activity, state, { now: new Date() });
+        const owner = state.characters.find(item => item.id === activity.characterId);
+        const available = ['available_now', 'due_today', 'due_later_today', 'manual_available'].includes(availability.state);
+        const selected = agendaSelected.has(activity.id);
+        const scheduleText = Schedule.scheduleDescription(activity);
+        const due = availability.dueAt ? formatLocalDate(availability.dueAt, { time: true }) : upcomingDate ? formatLocalDate(upcomingDate) : availability.nextAvailable ? formatLocalDate(availability.nextAvailable, { time: String(availability.nextAvailable).includes('T') }) : scheduleText;
+        const otherCharacter = activity.characterId !== state.activeCharacterId;
+        return `<article class="acc-agenda-row" data-agenda-id="${escapeHtml(activity.id)}" data-state="${escapeHtml(availability.state)}">
+          ${selectable && available ? `<label class="form-check"><input class="form-check-input" type="checkbox" data-agenda-select ${selected ? 'checked' : ''} aria-label="Select ${escapeHtml(activity.title)}"></label>` : '<span class="acc-activity-mark" aria-hidden="true"><i data-lucide="circle-dot" aria-hidden="true"></i></span>'}
+          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Former character')}${otherCharacter ? ' · other character' : ''}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(availabilityLabels[availability.state] || availability.state)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span></span></div>
+          <span class="acc-agenda-when"><strong>${formatMinutes(activity.estimatedMinutes)}</strong><span>${escapeHtml(due)}</span></span>
+          <span class="acc-agenda-actions">${available ? `<button class="btn btn-primary" type="button" data-agenda-action="start">Start</button><button class="btn" type="button" data-agenda-action="complete">Complete</button>` : ''}<details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover">${available ? '<button class="btn btn-ghost" type="button" data-agenda-action="add-draft">Add to draft</button><button class="btn btn-ghost" type="button" data-agenda-action="new-plan">Create plan</button><button class="btn btn-ghost" type="button" data-agenda-action="log-run">Log a run</button><button class="btn btn-ghost" type="button" data-agenda-action="snooze">Snooze</button><button class="btn btn-ghost" type="button" data-agenda-action="skip">Skip occurrence</button>' : ''}<button class="btn btn-ghost" type="button" data-agenda-action="schedule">Edit schedule</button><button class="btn btn-ghost" type="button" data-agenda-action="history">Run history</button><button class="btn btn-ghost" type="button" data-agenda-action="open">Open activity</button>${otherCharacter ? '<button class="btn btn-ghost" type="button" data-agenda-action="switch">Switch character</button>' : ''}${availability.schedule?.type === 'manual' && availability.state === 'completed_period' ? '<button class="btn btn-ghost" type="button" data-agenda-action="reset-manual">Reset manual activity</button>' : ''}${availability.record?.id ? `<button class="btn btn-ghost" type="button" data-agenda-action="undo-occurrence" data-occurrence-id="${escapeHtml(availability.record.id)}">Undo occurrence</button>` : ''}</div></details></span>
+        </article>`;
+      }
+      function renderAgenda() {
+        renderAgendaOptions();
+        const filters = currentAgendaFilters();
+        const agenda = Schedule.selectAgenda(state, filters);
+        const activeIds = new Set(agenda.rows.map(row => row.activity.id));
+        agendaSelected = new Set([...agendaSelected].filter(id => activeIds.has(id)));
+        root.querySelector('#acc-agenda-subtitle').textContent = `${formatLocalDate(new Date(), { weekday: 'long' })} · ${agenda.rows.length} scheduled activit${agenda.rows.length === 1 ? 'y' : 'ies'} in scope`;
+        const active = SessionEngine.selectActiveSession(state);
+        const activeSection = root.querySelector('#acc-agenda-active-session');
+        activeSection.hidden = !active;
+        if (active) {
+          const current = active.items.find(item => item.id === active.currentItemId) || active.items.find(item => !['completed', 'skipped', 'partial'].includes(item.status));
+          root.querySelector('#acc-agenda-active-status').textContent = active.status === 'paused' ? 'Paused session' : 'Active session';
+          root.querySelector('#acc-agenda-active-title').textContent = current?.snapshot?.title || active.title;
+          root.querySelector('#acc-agenda-active-meta').textContent = `${formatElapsed(SessionEngine.elapsedSessionMs(active))} · ${active.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status)).length} remaining`;
+          root.querySelector('#acc-agenda-resume').dataset.sessionId = active.id;
+        }
+        const todayTarget = root.querySelector('#acc-agenda-today');
+        const groups = ['inProgress', 'dueNow', 'availableToday', 'optional', 'completedToday'].map(key => [key, agenda.groups[key]]).filter(([, rows]) => rows.length);
+        todayTarget.innerHTML = groups.length ? groups.map(([key, rows]) => `<section class="acc-agenda-group"><header><h3>${agendaGroupLabels[key]}</h3><span>${rows.length}</span></header><div class="acc-agenda-list">${rows.map(row => agendaRowMarkup(row, { selectable: key !== 'completedToday' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No activities match today’s filters.</div>';
+        const overduePlans = (state.sessionPlans || []).filter(plan => plan.status === 'ready' && plan.plannedFor && plan.plannedFor < today()).map(plan => `<article class="acc-agenda-row"><span class="acc-activity-mark"><i data-lucide="calendar-x" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(plan.title)}</span><span class="acc-row-meta">Ready session · planned for ${escapeHtml(plan.plannedFor)}</span></div><span class="acc-agenda-when"><strong>${formatMinutes(plan.totalEstimatedMinutes)}</strong></span><span class="acc-agenda-actions"><button class="btn" type="button" data-session-open="${escapeHtml(plan.id)}">Open plan</button></span></article>`);
+        root.querySelector('#acc-agenda-attention').innerHTML = [...agenda.groups.needsAttention.map(row => agendaRowMarkup(row, { selectable: false })), ...overduePlans].join('') || '<div class="acc-empty">Nothing needs attention.</div>';
+        const upcomingByDate = new Map();
+        for (const item of agenda.groups.upcoming) { if (!upcomingByDate.has(item.date)) upcomingByDate.set(item.date, []); upcomingByDate.get(item.date).push(item); }
+        root.querySelector('#acc-agenda-upcoming').innerHTML = upcomingByDate.size ? [...upcomingByDate].map(([date, rows]) => `<section class="acc-upcoming-day"><time class="acc-upcoming-date" datetime="${date}">${escapeHtml(formatLocalDate(date, { weekday: 'long' }))}</time><div class="acc-agenda-list">${rows.map(item => agendaRowMarkup(item, { selectable: false, upcomingDate: date })).join('')}</div></section>`).join('') : '<div class="acc-empty">No scheduled work in the next seven days.</div>';
+        const recentRuns = state.activities.filter(ActivityEngine.isPlannedActivity).flatMap(activity => Schedule.selectRunHistory(state, activity.id).map(run => ({ activity, run }))).filter(item => ['completed', 'partial'].includes(item.run.status)).sort((a, b) => String(b.run.occurredAt).localeCompare(String(a.run.occurredAt))).slice(0, 8);
+        root.querySelector('#acc-agenda-completed').innerHTML = recentRuns.length ? recentRuns.map(({ activity, run }) => agendaRowMarkup({ activity, availability: { ...Schedule.activityAvailability(activity, state), state: 'completed_period', lastCompletedAt: run.occurredAt } }, { selectable: false })).join('') : '<div class="acc-empty">Completed runs will appear here.</div>';
+        renderAgendaSelection();
+      }
+      function renderAgendaSelection() {
+        const selected = state.activities.filter(activity => agendaSelected.has(activity.id));
+        const minutes = selected.reduce((sum, activity) => sum + Number(activity.estimatedMinutes || 0), 0);
+        root.querySelector('#acc-agenda-selected').textContent = `${selected.length} selected · ${formatMinutes(minutes)}`;
+        root.querySelector('#acc-agenda-selected-plan').disabled = !selected.length;
+        root.querySelector('#acc-agenda-add-draft').disabled = !selected.length;
+      }
       const activityStatusLabels = { todo: 'Todo', in_progress: 'In progress', completed: 'Completed', skipped: 'Skipped' };
       const activityPriorityLabels = ['Low', 'Normal', 'High', 'Critical'];
-      const activityRepeatLabels = { one_time: 'One-time', daily: 'Daily', weekly: 'Weekly', manual: 'Manual' };
+      const activityRepeatLabels = { one_time: 'One-time', daily: 'Daily', weekly: 'Weekly', weekdays: 'Selected days', interval: 'Interval', manual: 'Manual' };
       function renderActivityOptions() {
         const roster = rosterCharacters();
         const filter = root.querySelector('#acc-activity-character-filter');
@@ -2455,12 +2654,15 @@
           const completed = activity.effectiveStatus === 'completed';
           const skipped = activity.effectiveStatus === 'skipped';
           const completeLabel = completed || skipped ? 'Undo' : 'Complete';
-          const tags = activity.tags.slice(0, 3).map(tag => `<span class="acc-chip">${escapeHtml(tag)}</span>`).join('');
+          const tags = (activity.tags || []).slice(0, 3).map(tag => `<span class="acc-chip">${escapeHtml(tag)}</span>`).join('');
+          const scheduleText = Schedule.scheduleDescription(activity);
+          const nextValue = Schedule.nextAvailability(activity, state, { now: new Date() });
+          const lastValue = activity.availability.lastCompletedAt;
           return `<article class="acc-activity-row" data-activity-id="${escapeHtml(activity.id)}" data-status="${escapeHtml(activity.effectiveStatus)}">
             <button class="btn btn-ghost acc-activity-check" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}" aria-label="${completeLabel} ${escapeHtml(activity.title)}"><i data-lucide="${completed ? 'circle-check-big' : skipped ? 'rotate-ccw' : 'circle'}" aria-hidden="true"></i></button>
             <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Character')}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(activityStatusLabels[activity.effectiveStatus] || activity.effectiveStatus)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span>${activity.repeatType !== 'one_time' ? `<span class="acc-chip">${escapeHtml(activityRepeatLabels[activity.repeatType])}</span>` : ''}${tags}</span>${activity.description ? `<span class="text-small text-muted">${escapeHtml(activity.description)}</span>` : ''}</div>
-            <span class="acc-activity-estimate">${formatMinutes(activity.estimatedMinutes)}</span>
-            <span class="acc-activity-actions"><button class="btn" type="button" data-activity-action="edit">Open</button><details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover"><button class="btn btn-ghost" type="button" data-activity-action="edit">Edit</button><button class="btn btn-ghost" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}">${completeLabel}</button><button class="btn btn-ghost" type="button" data-activity-action="duplicate">Duplicate</button><button class="btn btn-ghost acc-btn-danger" type="button" data-activity-action="delete">Delete</button></div></details></span>
+            <span class="acc-activity-estimate" title="${escapeHtml(scheduleText)}${lastValue ? ` · Last ${escapeHtml(formatLocalDate(lastValue, { time: true }))}` : ''}">${formatMinutes(activity.estimatedMinutes)}${nextValue ? `<small class="text-muted"> · ${escapeHtml(formatLocalDate(nextValue, { time: String(nextValue).includes('T') }))}</small>` : ''}</span>
+            <span class="acc-activity-actions"><button class="btn" type="button" data-activity-action="edit">Open</button><details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover"><button class="btn btn-ghost" type="button" data-activity-action="edit">Edit</button><button class="btn btn-ghost" type="button" data-activity-action="schedule">Edit schedule</button><button class="btn btn-ghost" type="button" data-activity-action="history">Run history</button><button class="btn btn-ghost" type="button" data-activity-action="${activity.availability.state === 'paused' ? 'resume-schedule' : 'pause-schedule'}">${activity.availability.state === 'paused' ? 'Resume schedule' : 'Pause schedule'}</button><button class="btn btn-ghost" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}">${completeLabel}</button><button class="btn btn-ghost" type="button" data-activity-action="duplicate">Duplicate</button><button class="btn btn-ghost acc-btn-danger" type="button" data-activity-action="delete">Delete</button></div></details></span>
           </article>`;
         }).join('');
       }
@@ -2656,7 +2858,7 @@
         const activity = activityId ? state.activities.find(item => item.id === activityId && ActivityEngine.isPlannedActivity(item)) : null;
         root.querySelector('#acc-activity-dialog-title').textContent = activity ? 'Edit activity' : 'Create activity';
         root.querySelector('#acc-activity-submit').textContent = activity ? 'Save activity' : 'Create activity';
-        const values = activity || { characterId: state.activeCharacterId, category: 'Campaign', priority: 1, status: 'todo', estimatedMinutes: 30, repeatType: 'one_time', tags: [], scheduledFor: '', ...defaults };
+        const values = activity ? { ...activity, repeatType: activity.schedule?.type || activity.repeatType } : { characterId: state.activeCharacterId, category: 'Campaign', priority: 1, status: 'todo', estimatedMinutes: 30, repeatType: 'one_time', tags: [], scheduledFor: '', ...defaults };
         for (const [key, value] of Object.entries(values)) {
           if (!form.elements[key]) continue;
           form.elements[key].value = key === 'tags' ? (Array.isArray(value) ? value.join(', ') : value || '') : value ?? '';
@@ -2677,6 +2879,68 @@
         const previous = replaceActivity(activityId, activity => ActivityEngine.setPlannedActivityStatus(activity, status));
         if (!previous) return;
         showToast(status === 'completed' ? 'Activity completed.' : 'Activity reopened.', { actionLabel: 'Undo', onAction: () => { const index = state.activities.findIndex(item => item.id === activityId); if (index >= 0) state.activities[index] = previous; saveState(); render(); showToast('Activity restored.'); } });
+      }
+      function activityById(activityId) { return state.activities.find(item => item.id === activityId && ActivityEngine.isPlannedActivity(item)); }
+      function completeAgendaActivity(activityId) {
+        const activity = activityById(activityId); if (!activity) return;
+        try {
+          const result = Schedule.completeCurrentOccurrence(activity, state, {}, { now: new Date() });
+          if (result.duplicate) { showToast('This occurrence is already complete.'); return; }
+          state = result.state; saveState(); render();
+          showToast('Occurrence completed.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Completion undone.'); } });
+        } catch (error) { showToast(error.message, { tone: 'warning' }); }
+      }
+      function undoCurrentOccurrence(activityId) {
+        const activity = activityById(activityId); if (!activity) return;
+        const availability = Schedule.activityAvailability(activity, state, { now: new Date() });
+        const record = [...(state.activityOccurrences || [])].reverse().find(item => item.activityId === activityId && item.occurrenceKey === availability.occurrenceKey && !item.undoneAt);
+        if (!record) { showToast('This result belongs to a saved session and can be corrected from session history.', { tone: 'warning' }); return; }
+        state = Schedule.undoOccurrence(state, record.id); saveState(); render(); showToast('Occurrence restored.');
+      }
+      function generatedPlanFor(activityIds, budgetMinutes = Infinity) { return Schedule.agendaToSessionPlan(state, activityIds, { budgetMinutes, now: new Date() }); }
+      function createAgendaPlan(activityIds, { start = false, open = true } = {}) {
+        const generated = generatedPlanFor(activityIds);
+        if (!generated.items.length) { showToast('No selected activity is currently available.', { tone: 'warning' }); return null; }
+        const plan = SessionEngine.createSavedPlan(generated, { status: 'ready', title: `Today’s campaign · ${today()}` }, { id: uid('session-plan') });
+        state.sessionPlans ||= []; state.sessionPlans.push(plan); agendaSelected.clear(); saveState(); render();
+        if (start) startSavedSession(plan.id); else if (open) openPlanEditor(plan);
+        return plan;
+      }
+      function addActivitiesToDraft(activityIds) {
+        const candidates = state.activities.filter(activity => activityIds.includes(activity.id));
+        let plan = (state.sessionPlans || []).filter(item => ['draft', 'ready'].includes(item.status)).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
+        if (!plan) { createAgendaPlan(activityIds); return; }
+        const existing = new Set(plan.items.map(item => item.activityId));
+        for (const activity of candidates) if (!existing.has(activity.id)) plan = SessionEngine.addActivityToPlan(plan, activity);
+        agendaSelected.clear(); replaceSessionPlan(plan); openPlanEditor(plan); showToast('Activities added to the latest editable plan.');
+      }
+      function startAgendaActivity(activityId) { createAgendaPlan([activityId], { start: true, open: false }); }
+      function openScheduleDialog(activityId) {
+        const activity = activityById(activityId); if (!activity) return;
+        const schedule = Schedule.normalizeSchedule(activity); const form = root.querySelector('#acc-schedule-form'); form.reset();
+        form.elements.activityId.value = activity.id; form.elements.type.value = schedule.type; form.elements.startDate.value = schedule.startDate || ''; form.elements.dueTime.value = schedule.dueTime || ''; form.elements.endDate.value = schedule.endDate || ''; form.elements.intervalValue.value = schedule.intervalValue || 1; form.elements.intervalUnit.value = schedule.intervalUnit || 'days'; form.elements.estimatedMinutes.value = activity.estimatedMinutes; form.elements.priority.value = activity.priority; form.elements.paused.checked = Boolean(schedule.paused); form.elements.pausedUntil.value = schedule.pausedUntil || '';
+        [...form.querySelectorAll('[name="weekday"]')].forEach(input => { input.checked = (schedule.weekdays || []).includes(Number(input.value)); });
+        root.querySelector('#acc-schedule-title').textContent = `Schedule · ${activity.title}`; renderSchedulePreview(); root.querySelector('#acc-schedule-dialog').showModal();
+      }
+      function scheduleInputFromForm() {
+        const form = root.querySelector('#acc-schedule-form');
+        return { type: form.elements.type.value, startDate: form.elements.startDate.value || null, dueTime: form.elements.dueTime.value || null, weekdays: [...form.querySelectorAll('[name="weekday"]:checked')].map(input => Number(input.value)), intervalValue: Number(form.elements.intervalValue.value || 1), intervalUnit: form.elements.intervalUnit.value, endDate: form.elements.endDate.value || null, timezoneMode: 'local', graceMinutes: 0, paused: form.elements.paused.checked, pausedUntil: form.elements.pausedUntil.value || null };
+      }
+      function renderSchedulePreview() {
+        const schedule = scheduleInputFromForm(); const validation = Schedule.validateSchedule(schedule); const form = root.querySelector('#acc-schedule-form');
+        form.querySelector('[data-schedule-weekdays]').hidden = !['weekly', 'weekdays'].includes(schedule.type);
+        form.querySelectorAll('[data-schedule-interval]').forEach(node => node.hidden = schedule.type !== 'interval');
+        root.querySelector('#acc-schedule-preview').textContent = Schedule.scheduleDescription({ schedule });
+        root.querySelector('#acc-schedule-error').textContent = validation.ok ? '' : validation.errors.join(' ');
+        form.querySelector('[type="submit"]').disabled = !validation.ok;
+      }
+      function openSnoozeDialog(activityId) { const activity = activityById(activityId); if (!activity) return; const form = root.querySelector('#acc-snooze-form'); form.reset(); form.elements.activityId.value = activityId; root.querySelector('#acc-snooze-activity').textContent = activity.title; root.querySelector('#acc-snooze-error').textContent = ''; root.querySelector('[data-snooze-custom]').hidden = true; root.querySelector('#acc-snooze-dialog').showModal(); }
+      function openSkipDialog(activityId) { const activity = activityById(activityId); if (!activity) return; const form = root.querySelector('#acc-skip-form'); form.reset(); form.elements.activityId.value = activityId; root.querySelector('#acc-skip-activity').textContent = activity.title; root.querySelector('#acc-skip-dialog').showModal(); }
+      function openRunHistory(activityId) {
+        const activity = activityById(activityId); if (!activity) return; const history = Schedule.selectRunHistory(state, activityId);
+        root.querySelector('#acc-run-history-title').textContent = `Run history · ${activity.title}`; root.querySelector('#acc-run-history-subtitle').textContent = `${history.length} recorded result${history.length === 1 ? '' : 's'}`;
+        root.querySelector('#acc-run-history-list').innerHTML = history.length ? history.map(run => `<article class="acc-history-row" data-history-id="${escapeHtml(run.id)}"><time datetime="${escapeHtml(run.occurredAt)}">${escapeHtml(formatLocalDateTime(run.occurredAt))}</time><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(run.status)}</span><span class="acc-row-meta"><span>${escapeHtml(run.character?.name || 'Character')}</span><span>·</span><span>${formatMinutes(run.actualMinutes)}</span><span>·</span><span>${run.goldEarned ? `+${formatGold(run.goldEarned)}` : 'No gold earned'}</span>${run.notes ? `<span>·</span><span>${escapeHtml(run.notes)}</span>` : ''}</span></div><span class="acc-agenda-actions">${run.sourceSessionId ? `<button class="btn" type="button" data-history-session="${escapeHtml(run.sourceSessionId)}">Open session</button>` : !run.undoneAt ? `<button class="btn" type="button" data-history-undo="${escapeHtml(run.id)}">Undo</button>` : ''}</span></article>`).join('') : '<div class="acc-empty">No runs have been recorded yet.</div>';
+        root.querySelector('#acc-run-history-dialog').showModal(); refreshIcons();
       }
       function generatePlanner({ reset = false } = {}) {
         if (reset) plannerState = { ...plannerState, lockedIds: new Set(), excludedIds: new Set(), order: [] };
@@ -2799,6 +3063,7 @@
         saveState();
         root.querySelector('#acc-command-dialog').close();
         if (item.action === 'navigate') activateTab(item.target, true);
+        else if (item.action === 'agenda-view') { activateTab('agenda'); root.querySelector('#acc-agenda-state').value = item.target === 'upcoming' ? 'upcoming' : item.target; renderAgenda(); focusAfterNavigation('#acc-agenda-today-heading'); }
         else if (item.action === 'navigate-focus') {
           if (item.target === 'campaign') { activateTab('overview'); focusAfterNavigation('#acc-next-up-heading'); }
           else if (item.target === 'analytics') { activateTab('overview'); focusAfterNavigation('#acc-momentum-scope'); }
@@ -2823,6 +3088,13 @@
         else if (item.action === 'resume-session') { const plan = sessionPlan(item.target); if (plan?.status === 'paused') replaceSessionPlan(SessionEngine.resumeSession(plan, state)); openSessionRunner(item.target); }
         else if (item.action === 'finish-session') { openSessionRunner(item.target); openSessionReview(); }
         else if (item.action === 'open-activity') { const activity = state.activities.find(value => value.id === item.target); if (activity) selectCharacter(activity.characterId); activateTab('activities'); openActivityDialog(item.target); }
+        else if (item.action === 'complete-activity') completeAgendaActivity(item.target);
+        else if (item.action === 'add-activity-session') addActivitiesToDraft([item.target]);
+        else if (item.action === 'snooze-activity') openSnoozeDialog(item.target);
+        else if (item.action === 'skip-activity') openSkipDialog(item.target);
+        else if (item.action === 'edit-activity-schedule') openScheduleDialog(item.target);
+        else if (item.action === 'pause-activity-schedule') { replaceActivity(item.target, activity => Schedule.pauseSchedule(activity)); showToast('Schedule paused.'); }
+        else if (item.action === 'resume-activity-schedule') { replaceActivity(item.target, activity => Schedule.resumeSchedule(activity)); showToast('Schedule resumed.'); }
         else if (item.action === 'open-goal') { const goal = state.goals.find(value => value.id === item.target); if (goal) selectCharacter(goal.characterId); openGoalDialog(item.target); }
         else if (item.action === 'open-gold') { const entry = state.activities.find(value => value.id === item.target); if (entry) selectCharacter(entry.characterId); activateTab('gold'); focusAfterNavigation('#acc-ledger-body'); }
         else if (item.action === 'open-collection') { const tracker = state.collectionTrackers.find(value => value.id === item.target); if (tracker) selectCharacter(tracker.characterId); activateTab('collections'); focusAfterNavigation(`[data-collection="${CSS.escape(tracker?.name || '')}"]`); }
@@ -2834,6 +3106,7 @@
       function performCommandAction(action, characterId = '', sourceId = '') {
         if (characterId && characterId !== state.activeCharacterId) selectCharacter(characterId);
         if (action === 'open-goal') openGoalDialog(sourceId);
+        else if (action === 'agenda') activateTab('agenda');
         else if (action === 'open-collections' || action === 'collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
         else if (action === 'edit-character') openCharacterDialog(true);
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
@@ -2908,7 +3181,7 @@
           if (e.key.toLowerCase() === 'n' && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); root.querySelector('#acc-runner-note').focus(); return; }
         }
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-        const tabName = ({ '1': 'overview', '2': 'collections', '3': 'gold', '4': 'journal', '5': 'activities' })[e.key];
+        const tabName = ({ '1': 'overview', '2': 'collections', '3': 'gold', '4': 'journal', '5': 'activities', '6': 'agenda' })[e.key];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
@@ -2959,6 +3232,65 @@
         root.querySelector('#acc-goal-dialog').close();
         removeWithUndo(state.goals, id, 'Goal removed.', (item, index) => state.goals.splice(index, 0, item));
       });
+      ['acc-agenda-scope', 'acc-agenda-character', 'acc-agenda-category', 'acc-agenda-priority', 'acc-agenda-schedule', 'acc-agenda-state'].forEach(id => root.querySelector(`#${id}`).addEventListener('change', event => {
+        if (id === 'acc-agenda-scope') { state.preferences = { ...state.preferences, agendaScope: event.target.value }; saveState(); }
+        renderAgenda(); refreshIcons();
+      }));
+      root.querySelector('#acc-agenda-create').addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
+      root.querySelector('#acc-agenda-plan').addEventListener('click', openPlanner);
+      root.querySelector('#acc-agenda-resume').addEventListener('click', event => openSavedSession(event.currentTarget.dataset.sessionId));
+      root.querySelector('#acc-agenda-selected-plan').addEventListener('click', () => createAgendaPlan([...agendaSelected]));
+      root.querySelector('#acc-agenda-add-draft').addEventListener('click', () => addActivitiesToDraft([...agendaSelected]));
+      root.querySelector('#acc-agenda-time-plan').addEventListener('click', () => {
+        const budget = Math.max(1, Number(root.querySelector('#acc-agenda-minutes').value) || 60); openPlanner(); root.querySelector('#acc-planner-minutes').value = budget; plannerState.budgetMinutes = budget; generatePlanner();
+      });
+      root.querySelector('#acc-panel-agenda').addEventListener('change', event => {
+        if (!event.target.matches('[data-agenda-select]')) return; const row = event.target.closest('[data-agenda-id]'); if (!row) return;
+        if (event.target.checked) agendaSelected.add(row.dataset.agendaId); else agendaSelected.delete(row.dataset.agendaId); renderAgendaSelection();
+      });
+      root.querySelector('#acc-panel-agenda').addEventListener('click', event => {
+        const planButton = event.target.closest('[data-session-open]'); if (planButton) { openSavedSession(planButton.dataset.sessionOpen); return; }
+        const action = event.target.closest('[data-agenda-action]'); if (!action) return; const row = action.closest('[data-agenda-id]'); const id = row?.dataset.agendaId; const activity = activityById(id); if (!activity) return;
+        const name = action.dataset.agendaAction;
+        if (name === 'start' || name === 'log-run') startAgendaActivity(id);
+        else if (name === 'complete') completeAgendaActivity(id);
+        else if (name === 'add-draft') addActivitiesToDraft([id]);
+        else if (name === 'new-plan') createAgendaPlan([id]);
+        else if (name === 'snooze') openSnoozeDialog(id);
+        else if (name === 'skip') openSkipDialog(id);
+        else if (name === 'schedule') openScheduleDialog(id);
+        else if (name === 'history') openRunHistory(id);
+        else if (name === 'open') { activateTab('activities'); openActivityDialog(id); }
+        else if (name === 'switch') selectCharacter(activity.characterId);
+        else if (name === 'reset-manual') { replaceActivity(id, item => Schedule.resetManualSchedule(item)); showToast('Manual activity is available again.'); }
+        else if (name === 'undo-occurrence') { state = Schedule.undoOccurrence(state, action.dataset.occurrenceId); saveState(); render(); showToast('Occurrence restored.'); }
+      });
+      root.querySelector('#acc-schedule-form').addEventListener('input', renderSchedulePreview);
+      root.querySelector('#acc-schedule-form').addEventListener('change', renderSchedulePreview);
+      root.querySelector('#acc-schedule-form').addEventListener('submit', event => {
+        event.preventDefault(); const form = event.currentTarget; const schedule = scheduleInputFromForm(); const validation = Schedule.validateSchedule(schedule);
+        if (!validation.ok) { root.querySelector('#acc-schedule-error').textContent = validation.errors.join(' '); return; }
+        replaceActivity(form.elements.activityId.value, activity => ActivityEngine.updatePlannedActivity(activity, { schedule, repeatType: schedule.type, scheduledFor: schedule.startDate, estimatedMinutes: Number(form.elements.estimatedMinutes.value), priority: Number(form.elements.priority.value) }));
+        root.querySelector('#acc-schedule-dialog').close(); showToast('Schedule saved. Historical runs were not changed.');
+      });
+      root.querySelector('#acc-snooze-form').elements.preset.addEventListener('change', event => { root.querySelector('[data-snooze-custom]').hidden = event.target.value !== 'custom'; });
+      root.querySelector('#acc-snooze-form').addEventListener('submit', event => {
+        event.preventDefault(); const form = event.currentTarget; const activity = activityById(form.elements.activityId.value); if (!activity) return; const now = new Date(); let until;
+        if (form.elements.preset.value === 'later') until = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+        else if (form.elements.preset.value === 'tomorrow') { until = Schedule.addLocalDays(now, 1); until.setHours(9, 0, 0, 0); }
+        else until = form.elements.customAt.value ? new Date(form.elements.customAt.value) : null;
+        try { const result = Schedule.snoozeCurrentOccurrence(activity, state, until, { notes: form.elements.notes.value }, { now }); state = result.state; saveState(); root.querySelector('#acc-snooze-dialog').close(); render(); showToast('Occurrence snoozed.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Snooze removed.'); } }); }
+        catch (error) { root.querySelector('#acc-snooze-error').textContent = error.message; }
+      });
+      root.querySelector('#acc-skip-form').addEventListener('submit', event => {
+        event.preventDefault(); const form = event.currentTarget; const activity = activityById(form.elements.activityId.value); if (!activity) return;
+        try { const result = Schedule.skipCurrentOccurrence(activity, state, { reason: form.elements.reason.value }, { now: new Date() }); state = result.state; saveState(); root.querySelector('#acc-skip-dialog').close(); render(); showToast('Occurrence skipped.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Skip undone.'); } }); }
+        catch (error) { showToast(error.message, { tone: 'warning' }); }
+      });
+      root.querySelector('#acc-run-history-list').addEventListener('click', event => {
+        const session = event.target.closest('[data-history-session]'); if (session) { root.querySelector('#acc-run-history-dialog').close(); openSavedSession(session.dataset.historySession); return; }
+        const undo = event.target.closest('[data-history-undo]'); if (!undo) return; state = Schedule.undoOccurrence(state, undo.dataset.historyUndo); saveState(); root.querySelector('#acc-run-history-dialog').close(); render(); showToast('Occurrence restored.');
+      });
       root.querySelector('#acc-create-activity').addEventListener('click', () => openActivityDialog());
       root.querySelectorAll('[data-activity-view]').forEach(button => button.addEventListener('click', () => { activityView = button.dataset.activityView; renderActivities(); refreshIcons(); }));
       ['acc-activity-character-filter', 'acc-activity-category-filter', 'acc-activity-priority-filter', 'acc-activity-status-filter', 'acc-activity-sort'].forEach(id => root.querySelector(`#${id}`).addEventListener('change', () => { renderActivities(); refreshIcons(); }));
@@ -2966,8 +3298,11 @@
       root.querySelector('#acc-activity-form').addEventListener('submit', e => {
         e.preventDefault();
         const form = e.currentTarget, data = new FormData(form), id = data.get('id');
-        const input = { title: data.get('title'), description: data.get('description'), characterId: data.get('characterId'), category: data.get('category'), priority: Number(data.get('priority')), status: data.get('status'), estimatedMinutes: Number(data.get('estimatedMinutes')), repeatType: data.get('repeatType'), scheduledFor: data.get('scheduledFor') || null, tags: data.get('tags'), notes: data.get('notes') };
         const index = state.activities.findIndex(item => item.id === id && ActivityEngine.isPlannedActivity(item));
+        const existing = index >= 0 ? state.activities[index] : null; const repeatType = data.get('repeatType'); const scheduledFor = data.get('scheduledFor') || null;
+        let schedule = existing?.schedule ? { ...Schedule.normalizeSchedule(existing), type: repeatType } : null;
+        if (!schedule && (repeatType !== 'one_time' || scheduledFor)) schedule = { type: repeatType, startDate: scheduledFor || today(), dueTime: null, weekdays: ['weekly', 'weekdays'].includes(repeatType) ? [new Date().getDay()] : [], intervalValue: 1, intervalUnit: 'days', endDate: null, timezoneMode: 'local', graceMinutes: 0, paused: false, pausedUntil: null };
+        const input = { title: data.get('title'), description: data.get('description'), characterId: data.get('characterId'), category: data.get('category'), priority: Number(data.get('priority')), status: data.get('status'), estimatedMinutes: Number(data.get('estimatedMinutes')), repeatType, scheduledFor, tags: data.get('tags'), notes: data.get('notes'), ...(schedule ? { schedule } : {}) };
         if (index >= 0) state.activities[index] = ActivityEngine.updatePlannedActivity(state.activities[index], input);
         else state.activities.push(ActivityEngine.createPlannedActivity(input, { id: uid('activity-plan') }));
         saveState(); form.reset(); root.querySelector('#acc-activity-dialog').close(); render(); showToast(index >= 0 ? 'Activity updated.' : 'Activity created.');
@@ -2980,8 +3315,12 @@
         const activity = state.activities.find(item => item.id === id && ActivityEngine.isPlannedActivity(item));
         if (!activity) return;
         if (action.dataset.activityAction === 'edit') openActivityDialog(id);
-        else if (action.dataset.activityAction === 'complete') setActivityStatus(id, 'completed');
-        else if (action.dataset.activityAction === 'undo') setActivityStatus(id, 'todo');
+        else if (action.dataset.activityAction === 'complete') completeAgendaActivity(id);
+        else if (action.dataset.activityAction === 'undo') undoCurrentOccurrence(id);
+        else if (action.dataset.activityAction === 'schedule') openScheduleDialog(id);
+        else if (action.dataset.activityAction === 'history') openRunHistory(id);
+        else if (action.dataset.activityAction === 'pause-schedule') { replaceActivity(id, item => Schedule.pauseSchedule(item)); showToast('Schedule paused.'); }
+        else if (action.dataset.activityAction === 'resume-schedule') { replaceActivity(id, item => Schedule.resumeSchedule(item)); showToast('Schedule resumed.'); }
         else if (action.dataset.activityAction === 'duplicate') { state.activities.push(ActivityEngine.duplicatePlannedActivity(activity, { id: uid('activity-plan') })); saveState(); render(); showToast('Activity duplicated.'); }
         else if (action.dataset.activityAction === 'delete') { root.querySelector('#acc-delete-activity-form').elements.id.value = id; root.querySelector('#acc-delete-activity-name').textContent = activity.title; root.querySelector('#acc-delete-activity-dialog').showModal(); }
       });

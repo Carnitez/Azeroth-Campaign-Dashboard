@@ -22,6 +22,8 @@ A local-first World of Warcraft campaign tracker for completionists and gold mak
 - Saved session plans with editable order, timing, activity snapshots, notes, duplication, and safe draft deletion
 - A focused session runner with pause/resume timing, per-activity results, review, linked gold and progress, and durable history
 - A global command palette that searches live campaign records and runs existing dashboard actions
+- A Daily Agenda with active/all-character scope, calm attention states, seven-day projection, multi-select session building, and time-limited planning
+- Anchor-based one-time, daily, weekly, selected-weekday, interval, and manual schedules with local-time due states, pause, snooze, skip, and reusable run history
 
 Carnitez-Silvermoon EU is included as the initial campaign character. All data is stored in the browser with `localStorage`; no account or login is required.
 
@@ -29,7 +31,7 @@ Carnitez-Silvermoon EU is included as the initial campaign character. All data i
 
 The dashboard uses a compact campaign-management shell with a persistent desktop sidebar and a responsive mobile navigation layout. The Command Center derives its recommendations and weekly summaries from canonical v2 campaign data without storing a second copy. The active character's class selects the accent, progress, focus, surface, motif, and icon tokens; Night Elf characters add a restrained moonlit influence. Theme selection is derived from existing character fields, so older saved campaigns remain compatible.
 
-Use `Ctrl+K` or `Cmd+K` to open the command palette. Use `Alt+1` through `Alt+5` to move between Command Center, Collections, Gold, Journal, and Activities from the keyboard. While the session runner is open, `Space` pauses or resumes, `Enter` opens the current result form, `S` skips the current item, and `N` focuses the quick note field.
+Use `Ctrl+K` or `Cmd+K` to open the command palette. Use `Alt+1` through `Alt+6` to move between Command Center, Collections, Gold, Journal, Activities, and Daily Agenda from the keyboard. While the session runner is open, `Space` pauses or resumes, `Enter` opens the current result form, `S` skips the current item, and `N` focuses the quick note field.
 
 ## Run locally
 
@@ -53,4 +55,4 @@ Progress stays in the browser that recorded it. Export a JSON backup before clea
 
 ## Data safety
 
-The dashboard stores validated schema-v2 state under `azeroth-command-center-v2`. Existing `azeroth-command-center-v1` data is never changed or removed; it is migrated into v2 on first load and the exact original string is kept once under `azeroth-command-center-v1-recovery`. Saved sessions are an optional v2 collection, so existing v2 campaigns continue loading unchanged. Malformed or future-version data opens an explicit recovery view instead of being replaced with starter data. Character removal archives the character from the active roster while retaining its goals, activities, progress events, collection trackers, and session history. Use `npm test` to run the migration, validation, persistence, session, selector, gold, and local-date tests.
+The dashboard stores validated schema-v2 state under `azeroth-command-center-v2`. Existing `azeroth-command-center-v1` data is never changed or removed; it is migrated into v2 on first load and the exact original string is kept once under `azeroth-command-center-v1-recovery`. Saved sessions and occurrence history are optional v2 collections, so existing v2 campaigns continue loading unchanged. Agenda availability is always derived and is never written as duplicated state. Malformed or future-version data opens an explicit recovery view instead of being replaced with starter data. Character removal archives the character from the active roster while retaining its goals, activities, progress events, collection trackers, and session history. Use `npm test` to run the migration, validation, persistence, scheduling, session, selector, gold, and local-date tests.
