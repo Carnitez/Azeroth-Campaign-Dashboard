@@ -413,10 +413,20 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    #azeroth-command-center .acc-character-select {
+    #azeroth-command-center .acc-character-controls {
       grid-column: 1 / -1;
+      display: flex;
+      gap: 0.35rem;
+    }
+    #azeroth-command-center .acc-character-select {
+      flex: 1;
       min-height: 2rem;
       font-size: 0.75rem;
+    }
+    #azeroth-command-center .acc-add-character-btn {
+      flex: none;
+      min-height: 2rem;
+      padding: 0 0.5rem;
     }
     #azeroth-command-center .acc-tabs {
       display: grid;
@@ -1260,7 +1270,7 @@
     #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar {
       padding-inline: 0.55rem;
     }
-    #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-brand span:last-child, .acc-character-card .acc-identity, .acc-character-select, .acc-tabs span, .acc-tabs kbd, .acc-sidebar-footer span:last-child) {
+    #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-brand span:last-child, .acc-character-card .acc-identity, .acc-character-controls, .acc-tabs span, .acc-tabs kbd, .acc-sidebar-footer span:last-child) {
       display: none;
     }
     #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-brand, .acc-character-card, .acc-tabs .btn, .acc-sidebar-footer) {
@@ -1605,7 +1615,7 @@
     }
     @media (max-width: 860px) {
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed { grid-template-columns: 1fr; }
-      #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-character-card .acc-identity, .acc-character-select, .acc-tabs span) { display: initial; }
+      #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-character-card .acc-identity, .acc-character-controls, .acc-tabs span) { display: flex; }
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar { padding: 0.75rem; }
       #azeroth-command-center .acc-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     }
@@ -1681,8 +1691,11 @@
           <span class="acc-name" id="acc-character-name">Carnitez</span>
           <span class="text-muted" id="acc-character-meta">Night Elf Druid · Silvermoon EU</span>
         </div>
-        <label class="sr-only" for="acc-character-select">Character</label>
-        <select class="form-select acc-character-select" id="acc-character-select" aria-label="Character"></select>
+        <div class="acc-character-controls">
+          <label class="sr-only" for="acc-character-select">Character</label>
+          <select class="form-select acc-character-select" id="acc-character-select" aria-label="Character"></select>
+          <button class="btn btn-ghost acc-add-character-btn" type="button" id="acc-add-character" aria-label="Add character"><i data-lucide="user-plus" aria-hidden="true"></i></button>
+        </div>
       </div>
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
@@ -1709,8 +1722,6 @@
         </div>
         <div class="acc-toolbar">
           <button class="btn acc-command-trigger" type="button" id="acc-open-command" aria-label="Open command palette" aria-keyshortcuts="Control+K Meta+K"><span><i data-lucide="search" aria-hidden="true"></i> Search commands</span><kbd>Ctrl K</kbd></button>
-          <button class="btn" type="button" id="acc-edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
-          <button class="btn btn-primary" type="button" id="acc-add-character"><i data-lucide="user-plus" aria-hidden="true"></i> Add character</button>
         </div>
       </header>
 
@@ -1745,7 +1756,7 @@
       </section>
 
       <nav class="acc-quick-actions" aria-label="Quick actions">
-        <button class="btn" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
+        <button class="btn btn-primary" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
         <button class="btn" type="button" data-command-action="open-session" id="acc-quick-resume" hidden><i data-lucide="play" aria-hidden="true"></i> Resume session</button>
         <button class="btn" type="button" data-command-action="start-next-session" id="acc-quick-start"><i data-lucide="play" aria-hidden="true"></i> Start saved session</button>
         <button class="btn" type="button" data-command-action="session-history"><i data-lucide="history" aria-hidden="true"></i> Session history</button>
@@ -1833,7 +1844,7 @@
           <button class="btn btn-primary" type="button" id="acc-create-activity"><i data-lucide="plus" aria-hidden="true"></i> Create activity</button>
         </div>
       </div>
-      <nav class="acc-view-tabs" aria-label="Activity views">
+      <nav class="acc-view-tabs" id="acc-activity-view-tabs" aria-label="Activity views">
         <button class="btn" type="button" data-activity-view="today" aria-pressed="true">Available today</button>
         <button class="btn" type="button" data-activity-view="upcoming" aria-pressed="false">Upcoming</button>
         <button class="btn" type="button" data-activity-view="completed_today" aria-pressed="false">Completed today</button>
@@ -2451,6 +2462,7 @@
         section.hidden = !active;
         quickResume.hidden = !active;
         quickResume.dataset.sourceId = active?.id || '';
+        root.querySelector('#acc-quick-start').hidden = !(state.sessionPlans || []).length;
         if (!active) return;
         const current = active.items.find(item => item.id === active.currentItemId) || active.items.find(item => !['completed', 'skipped', 'partial'].includes(item.status));
         const remaining = active.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status)).length;
@@ -2662,6 +2674,20 @@
       }
       function renderAgenda() {
         renderAgendaOptions();
+        const hasAnyActivity = state.activities.some(ActivityEngine.isPlannedActivity);
+        root.querySelector('.acc-agenda-filters').hidden = !hasAnyActivity;
+        root.querySelector('.acc-agenda-selection').hidden = !hasAnyActivity;
+        if (!hasAnyActivity) {
+          root.querySelector('#acc-agenda-subtitle').textContent = 'No activities yet.';
+          root.querySelector('#acc-agenda-active-session').hidden = true;
+          root.querySelector('#acc-agenda-today').innerHTML = '<div class="acc-empty">Create your first activity to start building the Daily Agenda.<div class="acc-actions"><button class="btn" type="button" id="acc-agenda-empty-create">Create activity</button></div></div>';
+          root.querySelector('#acc-agenda-empty-create')?.addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
+          root.querySelector('#acc-agenda-attention').innerHTML = '';
+          root.querySelector('#acc-agenda-upcoming').innerHTML = '';
+          root.querySelector('#acc-agenda-completed').innerHTML = '';
+          renderAgendaSelection();
+          return;
+        }
         const filters = currentAgendaFilters();
         const agenda = Schedule.selectAgenda(state, filters);
         const sortMode = root.querySelector('#acc-agenda-sort').value;
@@ -2736,6 +2762,9 @@
       function renderActivities() {
         renderActivityOptions();
         root.querySelectorAll('[data-activity-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.activityView === activityView)));
+        const hasAnyActivity = state.activities.some(ActivityEngine.isPlannedActivity);
+        root.querySelector('#acc-activity-view-tabs').hidden = !hasAnyActivity;
+        root.querySelector('.acc-activity-filters').hidden = !hasAnyActivity;
         const activities = ActivityEngine.selectPlannedActivities(state, currentActivityFilters());
         root.querySelector('#acc-activity-count').textContent = `${activities.length} activit${activities.length === 1 ? 'y' : 'ies'}`;
         const characterMap = new Map(state.characters.map(item => [item.id, item]));
@@ -3367,7 +3396,6 @@
         saveState(); renderOnboarding();
       });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
-      root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
       root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));
       root.querySelector('#acc-character-form').elements.faction.addEventListener('change', e => refreshCharacterFormRace(e.currentTarget.form, ''));
       root.querySelector('#acc-character-form').elements.className.addEventListener('change', e => refreshCharacterFormSpec(e.currentTarget.form, ''));
