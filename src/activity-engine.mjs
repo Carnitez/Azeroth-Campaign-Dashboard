@@ -207,7 +207,7 @@ export function fuzzyScore(query, value) {
 }
 
 const fixedCommands = Object.freeze([
-  ['nav-home', 'Go Home', 'Navigation', 'home', 'navigate', 'overview', 'command center dashboard'],
+  ['nav-home', 'Go Home', 'Navigation', 'house', 'navigate', 'overview', 'command center dashboard'],
   ['nav-agenda', 'Open Daily Agenda', 'Navigation', 'calendar-days', 'navigate', 'agenda', 'today available activities'],
   ['agenda-available', 'Show available activities', 'Agenda', 'circle-play', 'agenda-view', 'available', 'today ready now'],
   ['agenda-overdue', 'Show overdue activities', 'Agenda', 'history', 'agenda-view', 'missed', 'missed needs attention'],

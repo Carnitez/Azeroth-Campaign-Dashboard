@@ -17,6 +17,8 @@ if (!html.includes("'night-elf'")) failures.push('Night Elf theme influence is m
 if (!html.includes('AzerothSelectors')) failures.push('Command Center selectors are missing.');
 if (!html.includes('acc-next-up')) failures.push('Command Center recommendations are missing.');
 if (!html.includes('acc-momentum')) failures.push('Weekly momentum is missing.');
+if (/unpkg\.com|cdn\.|<script[^>]+\bsrc=/i.test(html)) failures.push('A runtime CDN or externally-sourced script tag was found.');
+if (!html.includes('id="lucide-sprite"') || !/<symbol id="lucide-/.test(html)) failures.push('Inline Lucide icon sprite is missing.');
 
 const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)].map(match => ({ attrs: match[1], source: match[2] }));
 for (const [index, script] of inlineScripts.entries()) {

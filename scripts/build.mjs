@@ -15,6 +15,38 @@ const [baseCss, dashboard, core, schedule, recommendations, activities, sessions
   readFile(resolve(root, 'src/selectors.mjs'), 'utf8'),
 ]);
 
+// Every icon name referenced anywhere via data-lucide (including dynamic/ternary
+// branches in dashboard.html) or via an `icon:` field surfaced through the command
+// palette catalog in activity-engine.mjs. There is no static analysis that can find
+// these automatically across template-literal expressions and data objects, so this
+// list is maintained by hand — add a name here whenever a new data-lucide value is
+// introduced anywhere in src/.
+const ICON_NAMES = [
+  'arrow-right', 'book-open', 'calendar-clock', 'calendar-cog', 'calendar-days', 'calendar-plus',
+  'calendar-range', 'calendar-x', 'chart-no-axes-combined', 'check', 'chevron-down', 'chevron-up',
+  'circle', 'circle-check', 'circle-check-big', 'circle-dot', 'circle-dot-dashed', 'circle-play',
+  'circle-plus', 'circle-slash', 'clock-3', 'coins', 'copy', 'download', 'ellipsis', 'flag', 'gem',
+  'history', 'house', 'keyboard', 'layout-dashboard', 'list-checks', 'list-plus', 'lock-keyhole',
+  'lock-keyhole-open', 'map', 'map-pin', 'notebook-pen', 'panel-left-close', 'pause', 'pencil',
+  'play', 'plus', 'refresh-cw', 'rotate-ccw', 'save', 'search', 'settings', 'skip-forward',
+  'sparkles', 'target', 'timer', 'trash-2', 'trending-up', 'upload', 'user-plus', 'user-round',
+  'users', 'x'
+];
+
+function attrsToString(attrs) {
+  return Object.entries(attrs).map(([key, value]) => `${key}="${value}"`).join(' ');
+}
+
+function iconNodeToSymbol(name, [, attrs, children]) {
+  const inner = children.map(([tag, childAttrs]) => `<${tag} ${attrsToString(childAttrs)}/>`).join('');
+  return `<symbol id="lucide-${name}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</symbol>`;
+}
+
+const iconModules = await Promise.all(ICON_NAMES.map(name => import(`lucide/dist/esm/icons/${name}.js`)));
+const sprite = `<svg id="lucide-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">${
+  iconModules.map((module, index) => iconNodeToSymbol(ICON_NAMES[index], module.default)).join('')
+}</svg>`;
+
 const document = `<!doctype html>
 <html lang="en">
 <head>
@@ -30,6 +62,7 @@ body { box-sizing: border-box; min-width: 320px; background: #0c0f0d; color: var
   </style>
 </head>
 <body>
+${sprite}
 <script type="module">
 ${core}
 </script>
@@ -49,12 +82,6 @@ ${sessions}
 ${selectors}
 </script>
 ${dashboard}
-<script id="lucide-library" src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-<script>
-document.getElementById('lucide-library')?.addEventListener('load', () => {
-  globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
-}, { once: true });
-</script>
 </body>
 </html>
 `;

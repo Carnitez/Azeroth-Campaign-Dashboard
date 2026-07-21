@@ -2370,7 +2370,21 @@
         return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
       }
       function refreshIcons() {
-        if (window.lucide?.createIcons) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        document.querySelectorAll('i[data-lucide]').forEach(el => {
+          const name = el.dataset.lucide;
+          if (!document.getElementById(`lucide-${name}`)) return;
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('data-lucide', name);
+          svg.setAttribute('width', '16');
+          svg.setAttribute('height', '16');
+          svg.setAttribute('viewBox', '0 0 24 24');
+          if (el.hasAttribute('aria-hidden')) svg.setAttribute('aria-hidden', el.getAttribute('aria-hidden'));
+          if (el.className) svg.setAttribute('class', el.className);
+          const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+          use.setAttribute('href', `#lucide-${name}`);
+          svg.appendChild(use);
+          el.replaceWith(svg);
+        });
       }
       function themeId(value) {
         return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -3417,6 +3431,8 @@
             saveState();
           }
           render();
+        } else {
+          refreshIcons();
         }
       }
       root.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
