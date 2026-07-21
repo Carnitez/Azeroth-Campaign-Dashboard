@@ -11,6 +11,13 @@ export const V2_RECOVERY_KEY = 'azeroth-command-center-v2-recovery';
 export const V2_SCHEMA_VERSION = 2;
 
 export const COLLECTION_NAMES = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'];
+const COLLECTION_MILESTONE_SEQUENCE = [10, 25, 50, 100, 250, 500];
+const APPEARANCE_MILESTONE_SEQUENCE = [100, 250, 500, 1000];
+
+export function nextCollectionMilestone(target, name) {
+  const sequence = name === 'Appearances' ? APPEARANCE_MILESTONE_SEQUENCE : COLLECTION_MILESTONE_SEQUENCE;
+  return sequence.find(value => value > Number(target)) ?? null;
+}
 export const PLANNED_ACTIVITY_CATEGORIES = ['Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Transmog', 'Achievements', 'Events', 'Custom'];
 export const PLANNED_ACTIVITY_STATUSES = ['todo', 'in_progress', 'completed', 'skipped'];
 export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'weekdays', 'interval', 'manual'];
@@ -642,6 +649,7 @@ export function groupByLocalDate(items, getDate = item => item.occurredAt ?? ite
 
 const Core = {
   V1_STORAGE_KEY, V2_STORAGE_KEY, V1_RECOVERY_KEY, V2_RECOVERY_KEY, V2_SCHEMA_VERSION, COLLECTION_NAMES,
+  nextCollectionMilestone,
   isPlainObject, clone, isFiniteNumber, asNumber, localDateKey, localDateTime, isoNow, deterministicId, createId,
   validateV2State, migrateV1ToV2, normalizeV2State, migrateState, createStarterState, persistV2, loadPersistedState,
   calculateGoldTotals, currentProgressValue, progressEventsForSnapshots, groupByLocalDate

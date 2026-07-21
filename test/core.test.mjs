@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import {
   V1_STORAGE_KEY, V2_STORAGE_KEY, V1_RECOVERY_KEY, V2_RECOVERY_KEY, createStarterState, validateV2State,
   migrateV1ToV2, migrateState, loadPersistedState, persistV2, calculateGoldTotals,
-  groupByLocalDate, localDateKey
+  groupByLocalDate, localDateKey, nextCollectionMilestone
 } from '../src/core.mjs';
 
 const fixture = async name => JSON.parse(await readFile(new URL(`./fixtures/${name}`, import.meta.url)));
@@ -125,4 +125,22 @@ test('local date grouping does not use UTC day boundaries', () => {
   assert.equal(localDateKey(early), '2026-07-19');
   const groups = groupByLocalDate([{ occurredAt: late }, { occurredAt: early }]);
   assert.equal(Object.keys(groups).length, 2);
+});
+
+test('next collection milestone follows the standard progression', () => {
+  assert.equal(nextCollectionMilestone(10, 'Mounts'), 25);
+  assert.equal(nextCollectionMilestone(25, 'Mounts'), 50);
+  assert.equal(nextCollectionMilestone(50, 'Mounts'), 100);
+  assert.equal(nextCollectionMilestone(500, 'Mounts'), null);
+});
+
+test('next collection milestone uses the appearances progression', () => {
+  assert.equal(nextCollectionMilestone(100, 'Appearances'), 250);
+  assert.equal(nextCollectionMilestone(250, 'Appearances'), 500);
+  assert.equal(nextCollectionMilestone(1000, 'Appearances'), null);
+});
+
+test('next collection milestone skips ahead past a custom target', () => {
+  assert.equal(nextCollectionMilestone(40, 'Mounts'), 50);
+  assert.equal(nextCollectionMilestone(600, 'Mounts'), null);
 });

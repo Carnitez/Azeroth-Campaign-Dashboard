@@ -1925,11 +1925,11 @@
     </section>
 
     <section class="acc-panel" id="acc-panel-collections" data-panel="collections" hidden>
-      <div class="acc-section-head"><div><h2>Collection progress</h2><span class="text-muted text-small">Enter the current owned count and your next milestone.</span></div></div>
+      <div class="acc-section-head"><div><h2>Collection progress</h2><span class="text-muted text-small">Enter the current owned count and your next milestone. Changes save automatically.</span></div></div>
       <div class="acc-collection-list" id="acc-collections"></div>
       <div class="acc-section acc-actions">
-        <button class="btn btn-primary" type="button" id="acc-save-collections">Save collection counts</button>
         <button class="btn" type="button" id="acc-set-baseline">Set current counts as baseline</button>
+        <span class="text-small text-muted">Fixes the reference point for the "+N since baseline" gains shown per tracker.</span>
       </div>
     </section>
 
@@ -2663,10 +2663,11 @@
         root.querySelector('#acc-collections').innerHTML = collectionNames.map(name => {
           const data = trackers.find(tracker => tracker.name === name) || { owned: 0, target: 10, baseline: 0 };
           const pct = Math.max(0, Math.min(100, data.target ? data.owned / data.target * 100 : 0));
+          const nextMilestone = data.owned >= data.target ? Core.nextCollectionMilestone(data.target, name) : null;
           return `<div class="acc-collection-row" data-collection="${escapeHtml(name)}">
             <div><strong>${escapeHtml(name)}</strong><div class="text-small text-muted">+${Math.max(0, data.owned - data.baseline).toLocaleString()} since baseline</div></div>
             <div><div class="acc-inline text-small"><span>${data.owned.toLocaleString()}</span><span class="text-muted">of ${data.target.toLocaleString()} milestone</span></div><div class="acc-progress-track" role="progressbar" aria-label="${escapeHtml(name)} milestone" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><div class="acc-progress-fill" style="width:${pct}%"></div></div></div>
-            <div class="acc-inline"><label class="form-label">Owned<input class="form-control" data-collection-owned type="number" min="0" value="${data.owned}"></label><label class="form-label">Milestone<input class="form-control" data-collection-target type="number" min="1" value="${data.target}"></label></div>
+            <div class="acc-inline"><label class="form-label">Owned<input class="form-control" data-collection-owned type="number" min="0" value="${data.owned}"></label><label class="form-label">Milestone<input class="form-control" data-collection-target type="number" min="1" value="${data.target}"></label>${nextMilestone ? `<button class="btn btn-ghost" type="button" data-collection-bump="${nextMilestone}">Next milestone: ${nextMilestone.toLocaleString()}?</button>` : ''}</div>
           </div>`;
         }).join('');
       }
@@ -3814,14 +3815,33 @@
         if (switcher) selectCharacter(switcher.dataset.commandSwitch);
       });
       root.querySelector('#acc-momentum-scope').addEventListener('change', e => { momentumScope = e.target.value === 'all' ? 'all' : 'active'; renderMomentum(); });
-      function updateCollections(setBaseline = false) {
+      function saveCollectionRow(row) {
         const c = character(); const trackers = ensureCollectionTrackers(c);
-        const recordedAt = new Date().toISOString();
-        root.querySelectorAll('[data-collection]').forEach(row => { const x = trackers.find(item => item.name === row.dataset.collection); if (!x) return; const previousOwned = Number(x.owned); x.owned = Math.max(0, Number(row.querySelector('[data-collection-owned]').value)); x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value)); if (setBaseline) x.baseline = x.owned; if (x.owned !== previousOwned) state.progressEvents.push({ id: uid('progress-collection'), entityType: 'character', entityId: c.id, metric: `collection:${String(x.name).toLowerCase()}:owned`, value: x.owned, recordedAt, source: 'collection-update' }); });
-        saveState(); render(); showToast(setBaseline ? 'Collection baseline updated.' : 'Collection counts saved.');
+        const x = trackers.find(item => item.name === row.dataset.collection);
+        if (!x) return;
+        const previousOwned = Number(x.owned);
+        x.owned = Math.max(0, Number(row.querySelector('[data-collection-owned]').value));
+        x.target = Math.max(1, Number(row.querySelector('[data-collection-target]').value));
+        if (x.owned !== previousOwned) state.progressEvents.push({ id: uid('progress-collection'), entityType: 'character', entityId: c.id, metric: `collection:${String(x.name).toLowerCase()}:owned`, value: x.owned, recordedAt: new Date().toISOString(), source: 'collection-update' });
+        saveState(); render(); showToast('Collection counts saved.');
       }
-      root.querySelector('#acc-save-collections').addEventListener('click', () => updateCollections(false));
-      root.querySelector('#acc-set-baseline').addEventListener('click', () => updateCollections(true));
+      root.querySelector('#acc-collections').addEventListener('change', e => {
+        const input = e.target.closest('[data-collection-owned], [data-collection-target]');
+        if (!input) return;
+        saveCollectionRow(input.closest('[data-collection]'));
+      });
+      root.querySelector('#acc-collections').addEventListener('click', e => {
+        const bump = e.target.closest('[data-collection-bump]');
+        if (!bump) return;
+        const row = bump.closest('[data-collection]');
+        row.querySelector('[data-collection-target]').value = bump.dataset.collectionBump;
+        saveCollectionRow(row);
+      });
+      root.querySelector('#acc-set-baseline').addEventListener('click', () => {
+        const trackers = ensureCollectionTrackers(character());
+        trackers.forEach(tracker => { tracker.baseline = tracker.owned; });
+        saveState(); render(); showToast('Collection baseline updated.');
+      });
       root.querySelector('#acc-ledger-form').elements.date.value = today();
       root.querySelector('#acc-ledger-form').addEventListener('submit', e => {
         e.preventDefault(); const f = new FormData(e.currentTarget); const c = character(); const revenue = Number(f.get('revenue')); const cost = Number(f.get('cost'));
