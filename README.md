@@ -32,7 +32,7 @@ Carnitez-Silvermoon EU is included as the initial campaign character. All data i
 
 The dashboard uses a compact campaign-management shell with a persistent desktop sidebar and a responsive mobile navigation layout. The Command Center, Agenda, and planner share one deterministic scoring system. It derives priorities and insights from canonical v2 campaign history; scores themselves are never stored. Suggestion impressions and explicit feedback stay locally in a bounded optional history collection. The active character's class selects the accent, progress, focus, surface, motif, and icon tokens; Night Elf characters add a restrained moonlit influence. Theme selection is derived from existing character fields, so older saved campaigns remain compatible.
 
-Use `Ctrl+K` or `Cmd+K` to open the command palette. Use `Alt+1` through `Alt+6` to move between Command Center, Collections, Gold, Journal, Activities, and Daily Agenda from the keyboard. While the session runner is open, `Space` pauses or resumes, `Enter` opens the current result form, `S` skips the current item, and `N` focuses the quick note field.
+Use `Ctrl+K` or `Cmd+K` to open the command palette. Use `Alt+1` through `Alt+6` to move between Command Center, Daily Agenda, Activities, Collections, Gold, and Journal from the keyboard. While the session runner is open, `Space` pauses or resumes, `Enter` opens the current result form, `S` skips the current item, and `N` focuses the quick note field.
 
 ## Run locally
 

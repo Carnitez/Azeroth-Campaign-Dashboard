@@ -1678,11 +1678,11 @@
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
         <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Command Center</span><kbd>Alt 1</kbd></button>
-        <button class="btn" type="button" data-tab="agenda" aria-pressed="false" aria-keyshortcuts="Alt+6"><i data-lucide="calendar-days" aria-hidden="true"></i><span>Daily Agenda</span><kbd>Alt 6</kbd></button>
-        <button class="btn" type="button" data-tab="activities" aria-pressed="false" aria-keyshortcuts="Alt+5"><i data-lucide="list-checks" aria-hidden="true"></i><span>Activities</span><kbd>Alt 5</kbd></button>
-        <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 2</kbd></button>
-        <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 3</kbd></button>
-        <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 4</kbd></button>
+        <button class="btn" type="button" data-tab="agenda" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="calendar-days" aria-hidden="true"></i><span>Daily Agenda</span><kbd>Alt 2</kbd></button>
+        <button class="btn" type="button" data-tab="activities" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="list-checks" aria-hidden="true"></i><span>Activities</span><kbd>Alt 3</kbd></button>
+        <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 4</kbd></button>
+        <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+5"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 5</kbd></button>
+        <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+6"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 6</kbd></button>
       </nav>
 
       <div class="acc-sidebar-footer">
@@ -2102,11 +2102,11 @@
     <div class="acc-shortcut-list">
       <div class="acc-shortcut-row"><span>Open command palette</span><kbd>Ctrl / Cmd K</kbd></div>
       <div class="acc-shortcut-row"><span>Command Center</span><kbd>Alt 1</kbd></div>
-      <div class="acc-shortcut-row"><span>Collections</span><kbd>Alt 2</kbd></div>
-      <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 3</kbd></div>
-      <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 4</kbd></div>
-      <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 5</kbd></div>
-      <div class="acc-shortcut-row"><span>Daily Agenda</span><kbd>Alt 6</kbd></div>
+      <div class="acc-shortcut-row"><span>Daily Agenda</span><kbd>Alt 2</kbd></div>
+      <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 3</kbd></div>
+      <div class="acc-shortcut-row"><span>Collections</span><kbd>Alt 4</kbd></div>
+      <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 5</kbd></div>
+      <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 6</kbd></div>
       <div class="acc-shortcut-row"><span>Pause or resume runner</span><kbd>Space</kbd></div>
       <div class="acc-shortcut-row"><span>Complete current activity</span><kbd>Enter</kbd></div>
       <div class="acc-shortcut-row"><span>Skip current activity</span><kbd>S</kbd></div>
@@ -3292,7 +3292,7 @@
           if (e.key.toLowerCase() === 'n' && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); root.querySelector('#acc-runner-note').focus(); return; }
         }
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-        const tabName = ({ '1': 'overview', '2': 'collections', '3': 'gold', '4': 'journal', '5': 'activities', '6': 'agenda' })[e.key];
+        const tabName = ({ '1': 'overview', '2': 'agenda', '3': 'activities', '4': 'collections', '5': 'gold', '6': 'journal' })[e.key];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
