@@ -404,10 +404,53 @@ export function scoreRecommendation(candidate, state, options = {}) {
   return { ...candidate, score, factors: factors.sort((a, b) => Math.abs(b.value) - Math.abs(a.value) || a.key.localeCompare(b.key)), reason: mainReason(factors, candidate) };
 }
 
+function aggregateRecommendation(items) {
+  const ids = items.map(item => item.sourceId).sort();
+  const score = Math.max(...items.map(item => item.score));
+  const first = items[0];
+  return {
+    id: `aggregate:collection:${ids.join(',')}`,
+    sourceType: 'aggregate',
+    sourceId: `collection:${ids.join(',')}`,
+    source: null,
+    title: `Set your collection baselines — ${items.length} trackers at zero`,
+    characterId: null,
+    character: null,
+    category: first.category,
+    progress: null,
+    reason: 'Unfinished collection milestone',
+    action: 'open-collections',
+    actionLabel: 'Update collections',
+    score,
+    factors: [],
+    aggregatedCount: items.length,
+    aggregatedIds: ids
+  };
+}
+
+function applyDiversityGuard(items) {
+  const groups = new Map();
+  const passthrough = [];
+  for (const item of items) {
+    if (item.sourceType !== 'collection') { passthrough.push(item); continue; }
+    const key = `${item.sourceType}:${item.reason}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+  const output = [...passthrough];
+  for (const group of groups.values()) {
+    if (group.length > 2) output.push(aggregateRecommendation(group));
+    else output.push(...group);
+  }
+  return output;
+}
+
 export function rankRecommendations(state, options = {}) {
   const candidates = options.candidates || generateRecommendationCandidates(state, options);
-  return deduplicateCandidates(candidates, { excludedKeys: options.excludedKeys }).map(candidate => scoreRecommendation(candidate, state, options))
+  const scored = deduplicateCandidates(candidates, { excludedKeys: options.excludedKeys }).map(candidate => scoreRecommendation(candidate, state, options))
     .filter(candidate => candidate.score > SCORING_CONFIG.unavailable / 2)
+    .sort((a, b) => b.score - a.score || String(a.title).localeCompare(String(b.title)) || String(a.id).localeCompare(String(b.id)));
+  return applyDiversityGuard(scored)
     .sort((a, b) => b.score - a.score || String(a.title).localeCompare(String(b.title)) || String(a.id).localeCompare(String(b.id)))
     .slice(0, Math.max(0, number(options.limit, 5)));
 }

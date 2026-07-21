@@ -107,6 +107,41 @@ test('cross-section deduplication keeps the first visible entity only', () => {
   assert.equal(output.nextUp.length, 0);
 });
 
+test('more than two identical collection-milestone recommendations collapse into one aggregate', () => {
+  const trackers = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances', 'Reputations'].map(name => ({ id: `tracker-${name}`, scope: 'character', characterId: 'a', name, owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }));
+  const campaign = state({ collectionTrackers: trackers });
+  const ranked = Recommendation.rankRecommendations(campaign, { now, limit: 10 });
+  assert.equal(ranked.filter(item => item.sourceType === 'collection').length, 0);
+  const aggregates = ranked.filter(item => item.sourceType === 'aggregate');
+  assert.equal(aggregates.length, 1);
+  assert.equal(aggregates[0].action, 'open-collections');
+  assert.match(aggregates[0].title, /6/);
+});
+
+test('exactly two matching recommendations are not collapsed', () => {
+  const trackers = ['Mounts', 'Pets'].map(name => ({ id: `tracker-${name}`, scope: 'character', characterId: 'a', name, owned: 0, target: 10, baseline: 0 }));
+  const campaign = state({ collectionTrackers: trackers });
+  const ranked = Recommendation.rankRecommendations(campaign, { now, limit: 10 });
+  assert.equal(ranked.filter(item => item.sourceType === 'collection').length, 2);
+  assert.equal(ranked.filter(item => item.sourceType === 'aggregate').length, 0);
+});
+
+test('collapsed aggregate leaves room for other distinct recommendations', () => {
+  const trackers = ['Achievements', 'Mounts', 'Pets', 'Toys', 'Appearances'].map(name => ({ id: `tracker-${name}`, scope: 'character', characterId: 'a', name, owned: 0, target: name === 'Appearances' ? 100 : 10, baseline: 0 }));
+  const campaign = state({ collectionTrackers: trackers, activities: [activity('work', { priority: 3 })] });
+  const ranked = Recommendation.rankRecommendations(campaign, { now, limit: 5 });
+  assert.ok(ranked.some(item => item.sourceType === 'activity' && item.sourceId === 'work'));
+  assert.equal(ranked.filter(item => item.sourceType === 'aggregate').length, 1);
+});
+
+test('diversity-guard aggregation is deterministic across repeated calls', () => {
+  const trackers = ['Achievements', 'Mounts', 'Pets', 'Toys'].map(name => ({ id: `tracker-${name}`, scope: 'character', characterId: 'a', name, owned: 0, target: 10, baseline: 0 }));
+  const campaign = state({ collectionTrackers: trackers });
+  const first = Recommendation.rankRecommendations(campaign, { now, limit: 10 });
+  const second = Recommendation.rankRecommendations(campaign, { now, limit: 10 });
+  assert.deepEqual(first, second);
+});
+
 test('impressions are deduplicated by local day', () => {
   const candidate = { sourceType: 'activity', sourceId: 'work', characterId: 'a' };
   const first = Recommendation.recordRecommendationImpressions([], [candidate], { now });
