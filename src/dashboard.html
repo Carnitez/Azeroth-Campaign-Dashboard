@@ -1919,11 +1919,11 @@
         <label class="form-label">Realm<input class="form-control" name="realm" maxlength="40" required></label>
         <label class="form-label">Region<select class="form-select" name="region"><option>EU</option><option>US</option><option>KR</option><option>TW</option></select></label>
         <label class="form-label">Faction<select class="form-select" name="faction"><option>Alliance</option><option>Horde</option></select></label>
-        <label class="form-label">Race<input class="form-control" name="race" maxlength="40" required></label>
-        <label class="form-label">Class<input class="form-control" name="className" maxlength="40" required></label>
-        <label class="form-label">Spec<input class="form-control" name="spec" maxlength="40"></label>
+        <label class="form-label">Race<select class="form-select" name="race" required></select></label>
+        <label class="form-label">Class<select class="form-select" name="className" required></select></label>
+        <label class="form-label">Spec<select class="form-select" name="spec"></select></label>
         <label class="form-label">Campaign role<select class="form-select" name="campaignRole"><option value="main">Main</option><option value="active_alt">Active alt</option><option value="occasional">Occasional</option><option value="resting">Resting</option></select></label>
-        <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" value="1" required></label>
+        <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="80" step="1" value="1" required></label>
         <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" value="0" required></label>
         <label class="form-label">Location<input class="form-control" name="location" maxlength="80"></label>
         <label class="form-label wide">Professions<input class="form-control" name="professions" maxlength="100" placeholder="Herbalism, Mining"></label>
@@ -2173,6 +2173,27 @@
       });
       const raceInfluences = Object.freeze({
         'night-elf': { secondary: '#8582ff', glow: 'rgb(112 108 255 / 14%)', motif: 'crescent-leaf' }
+      });
+      const WOW_CLASSES = Object.freeze(['Warrior', 'Paladin', 'Hunter', 'Rogue', 'Priest', 'Shaman', 'Mage', 'Warlock', 'Monk', 'Druid', 'Demon Hunter', 'Death Knight', 'Evoker']);
+      const CLASS_SPECS = Object.freeze({
+        Warrior: ['Arms', 'Fury', 'Protection'],
+        Paladin: ['Holy', 'Protection', 'Retribution'],
+        Hunter: ['Beast Mastery', 'Marksmanship', 'Survival'],
+        Rogue: ['Assassination', 'Outlaw', 'Subtlety'],
+        Priest: ['Discipline', 'Holy', 'Shadow'],
+        Shaman: ['Elemental', 'Enhancement', 'Restoration'],
+        Mage: ['Arcane', 'Fire', 'Frost'],
+        Warlock: ['Affliction', 'Demonology', 'Destruction'],
+        Monk: ['Brewmaster', 'Mistweaver', 'Windwalker'],
+        Druid: ['Balance', 'Feral', 'Guardian', 'Restoration'],
+        'Demon Hunter': ['Havoc', 'Vengeance'],
+        'Death Knight': ['Blood', 'Frost', 'Unholy'],
+        Evoker: ['Devastation', 'Preservation', 'Augmentation']
+      });
+      const NEUTRAL_RACES = Object.freeze(['Pandaren', 'Dracthyr']);
+      const RACES_BY_FACTION = Object.freeze({
+        Alliance: ['Human', 'Dwarf', 'Night Elf', 'Gnome', 'Draenei', 'Worgen', 'Void Elf', 'Lightforged Draenei', 'Dark Iron Dwarf', 'Kul Tiran', 'Mechagnome'],
+        Horde: ['Orc', 'Undead', 'Tauren', 'Troll', 'Blood Elf', 'Goblin', 'Nightborne', 'Highmountain Tauren', "Mag'har Orc", 'Zandalari Troll', 'Vulpera']
       });
       const pageMeta = Object.freeze({
         overview: { title: 'Command Center', description: 'Decide what to do next from real campaign progress.' },
@@ -3074,13 +3095,30 @@
         target.innerHTML = result.items.map((item, index) => `<article class="acc-plan-row" data-plan-id="${escapeHtml(item.activity.id)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.activity.characterId)?.name || 'Character')}</span><span>·</span><span>${escapeHtml(item.activity.category)}</span><span>·</span><span>${formatMinutes(item.plannedMinutes)}${item.usesHistoricalDuration ? ' from run history' : ' estimated'}</span><span>·</span><span>${escapeHtml(item.reason)}</span></span></div><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-plan-action="lock" aria-pressed="${String(plannerState.lockedIds.has(item.activity.id))}" aria-label="${plannerState.lockedIds.has(item.activity.id) ? 'Unlock' : 'Lock'} ${escapeHtml(item.activity.title)}"><i data-lucide="${plannerState.lockedIds.has(item.activity.id) ? 'lock-keyhole' : 'lock-keyhole-open'}" aria-hidden="true"></i></button><span class="acc-plan-order"><button class="btn btn-ghost" type="button" data-plan-action="up" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-action="down" ${index === result.items.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} down"><i data-lucide="chevron-down" aria-hidden="true"></i></button></span><button class="btn btn-ghost" type="button" data-plan-action="remove" aria-label="Remove ${escapeHtml(item.activity.title)} from plan"><i data-lucide="x" aria-hidden="true"></i></button></span></article>`).join('');
         refreshIcons();
       }
+      function populateSelectOptions(select, options, selected) {
+        select.innerHTML = options.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        if (selected && !options.includes(selected)) select.add(new Option(selected, selected));
+        select.value = selected || options[0] || '';
+      }
+      function racesForFaction(faction) {
+        return [...(RACES_BY_FACTION[faction] || []), ...NEUTRAL_RACES];
+      }
+      function refreshCharacterFormRace(form, selected) {
+        populateSelectOptions(form.elements.race, racesForFaction(form.elements.faction.value), selected);
+      }
+      function refreshCharacterFormSpec(form, selected) {
+        populateSelectOptions(form.elements.spec, CLASS_SPECS[form.elements.className.value] || [], selected);
+      }
       function openCharacterDialog(editing) {
         const form = root.querySelector('#acc-character-form');
         form.reset();
         const c = editing ? character() : null;
         root.querySelector('#acc-character-dialog-title').textContent = editing ? 'Edit character' : 'Add character';
         const defaults = c || { id: '', name: '', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: '', className: '', spec: '', campaignRole: rosterCharacters().length ? 'active_alt' : 'main', level: 1, gold: 0, location: '', professions: '' };
-        Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
+        Object.keys(defaults).forEach(key => { if (form.elements[key] && !['race', 'className', 'spec'].includes(key)) form.elements[key].value = defaults[key] ?? ''; });
+        populateSelectOptions(form.elements.className, WOW_CLASSES, defaults.className);
+        refreshCharacterFormSpec(form, defaults.spec);
+        refreshCharacterFormRace(form, defaults.race);
         form.elements.campaignRole.value = c?.campaignRole || (c?.id === state.activeCharacterId ? 'main' : 'active_alt');
         root.querySelector('#acc-character-dialog').showModal();
       }
@@ -3302,6 +3340,8 @@
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
       root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
       root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));
+      root.querySelector('#acc-character-form').elements.faction.addEventListener('change', e => refreshCharacterFormRace(e.currentTarget.form, ''));
+      root.querySelector('#acc-character-form').elements.className.addEventListener('change', e => refreshCharacterFormSpec(e.currentTarget.form, ''));
       root.querySelector('#acc-character-form').addEventListener('submit', e => {
         e.preventDefault();
         const f = new FormData(e.currentTarget), existing = state.characters.find(c => c.id === f.get('id'));
