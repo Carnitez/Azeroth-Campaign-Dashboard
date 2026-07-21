@@ -9,7 +9,8 @@ import {
   localWeekBounds,
   selectWeeklyMomentum,
   selectNextUp,
-  selectOnboardingState
+  selectOnboardingState,
+  selectCampaignStage
 } from '../src/selectors.mjs';
 
 const at = (day, hour = 12, minute = 0) => new Date(2026, 6, day, hour, minute, 0);
@@ -295,5 +296,57 @@ test('onboarding selector never mutates canonical state', () => {
   const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu')] });
   const before = structuredClone(campaign);
   selectOnboardingState(campaign);
+  assert.deepEqual(campaign, before);
+});
+
+test('a brand new campaign with no logged activity is classified fresh', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()] });
+  assert.equal(selectCampaignStage(campaign), 'fresh');
+});
+
+test('any planned activity marks the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'act', characterId: 'carnitez-silvermoon-eu', kind: 'planned', title: 'Work', status: 'todo', priority: 0 }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('a logged play session marks the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(1), durationMinutes: 30 }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('a saved session plan marks the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    sessionPlans: [{ id: 'plan', title: 'Plan', status: 'draft', characterIds: ['carnitez-silvermoon-eu'], items: [] }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('a logged gold entry marks the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'gold', characterId: 'carnitez-silvermoon-eu', kind: 'gold', occurredAt: iso(1), gold: { revenue: 10, cost: 0, delta: 10 } }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('a non-zero collection count marks the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu', { owned: 1 })]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('campaign stage selector never mutates canonical state', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu')] });
+  const before = structuredClone(campaign);
+  selectCampaignStage(campaign);
   assert.deepEqual(campaign, before);
 });

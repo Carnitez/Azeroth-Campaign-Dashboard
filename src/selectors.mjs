@@ -330,6 +330,22 @@ function characterLooksUnedited(character) {
     && character.spec === 'Guardian' && character.location === 'Shadowglen';
 }
 
+// Derived, never stored: classifies a campaign as "fresh" only while there is no
+// real evidence of use anywhere — no planned activities, no logged or planned
+// sessions, no gold entries, and every collection still at zero.
+export function selectCampaignStage(state) {
+  const roster = activeCharacters(state);
+  const rosterIds = new Set(roster.map(item => item.id));
+  const activities = list(state?.activities).filter(item => rosterIds.has(item.characterId));
+  const hasActivities = activities.some(item => Activities.isPlannedActivity(item));
+  const hasLoggedSessions = activities.some(item => item.kind === 'session') || list(state?.sessionPlans).length > 0;
+  const hasGoldEntries = activities.some(item => item.kind === 'gold');
+  const trackers = list(state?.collectionTrackers).filter(item => rosterIds.has(item.characterId));
+  const allCountsZero = trackers.every(item => number(item.owned) === 0);
+  const fresh = !hasActivities && !hasLoggedSessions && !hasGoldEntries && allCountsZero;
+  return fresh ? 'fresh' : 'active';
+}
+
 export function selectOnboardingState(state) {
   const roster = activeCharacters(state);
   const activeCharacter = roster.find(item => item.id === state?.activeCharacterId) || roster[0] || null;
@@ -337,7 +353,6 @@ export function selectOnboardingState(state) {
   const trackers = list(state?.collectionTrackers).filter(item => rosterIds.has(item.characterId));
   const activities = list(state?.activities).filter(item => Activities.isPlannedActivity(item) && rosterIds.has(item.characterId));
   const plans = list(state?.sessionPlans);
-  const allCountsZero = trackers.every(item => number(item.owned) === 0);
   const hasActivities = activities.length > 0;
   const hasSessions = plans.length > 0;
   const dismissed = Boolean(state?.preferences?.onboardingDismissed);
@@ -347,7 +362,7 @@ export function selectOnboardingState(state) {
     { id: 'activity', label: 'Create your first activity', action: 'create-activity', complete: hasActivities },
     { id: 'session', label: 'Plan your first session', action: 'plan-session', complete: hasSessions }
   ];
-  return { visible: allCountsZero && !hasActivities && !hasSessions && !dismissed, dismissed, steps, allComplete: steps.every(step => step.complete) };
+  return { visible: selectCampaignStage(state) === 'fresh' && !dismissed, dismissed, steps, allComplete: steps.every(step => step.complete) };
 }
 
 export const Selectors = Object.freeze({
@@ -359,7 +374,8 @@ export const Selectors = Object.freeze({
   localWeekBounds,
   selectWeeklyMomentum,
   selectNextUp,
-  selectOnboardingState
+  selectOnboardingState,
+  selectCampaignStage
 });
 
 globalThis.AzerothSelectors = Selectors;

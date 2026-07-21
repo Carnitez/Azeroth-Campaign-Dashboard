@@ -221,6 +221,7 @@ const fixedCommands = Object.freeze([
   ['nav-settings', 'Open Settings', 'Navigation', 'settings', 'navigate-focus', 'settings', 'backup import export'],
   ['character-edit', 'Edit active character', 'Character', 'pencil', 'edit-character', '', 'profile'],
   ['character-add', 'Add character', 'Character', 'user-plus', 'add-character', '', 'new alt'],
+  ['character-progress', 'Log level & gold', 'Character', 'map-pin', 'update-progress', '', 'level gold location snapshot'],
   ['create-goal', 'Add goal', 'Creation', 'target', 'add-goal', '', 'objective outcome'],
   ['create-objective', 'Add objective', 'Creation', 'circle-dot-dashed', 'add-objective', '', 'campaign task'],
   ['create-session', 'Log session', 'Creation', 'timer', 'log-session', '', 'play journal'],

@@ -1016,21 +1016,48 @@
     }
     #azeroth-command-center .acc-next-row {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 0.7rem;
       align-items: center;
       min-height: 3.7rem;
       padding: 0.55rem 0.25rem;
       border-bottom: 1px solid var(--border);
     }
+    #azeroth-command-center .acc-next-hero {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.5rem;
+      padding: 1rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    #azeroth-command-center .acc-next-hero .acc-row-title {
+      font-size: 1.05rem;
+    }
+    #azeroth-command-center .acc-next-hero .acc-recommend-actions {
+      justify-content: flex-start;
+    }
+    #azeroth-command-center .acc-next-hero .acc-recommend-actions .btn-primary {
+      min-height: 2.6rem;
+      padding-inline: 1.1rem;
+    }
+    #azeroth-command-center .acc-next-more {
+      margin-top: 0.6rem;
+    }
+    #azeroth-command-center .acc-next-more summary {
+      cursor: pointer;
+      color: var(--acc-secondary);
+      padding: 0.4rem 0.25rem;
+    }
     #azeroth-command-center .acc-recommend-actions { display: flex; align-items: center; gap: 0.35rem; }
     #azeroth-command-center .acc-recommend-actions details { position: relative; }
     #azeroth-command-center .acc-recommend-menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 0.3rem); display: grid; width: 11.5rem; padding: 0.35rem; border: 1px solid var(--border); border-radius: 6px; background: var(--popover); box-shadow: 0 12px 30px rgb(0 0 0 / 30%); }
     #azeroth-command-center .acc-recommend-menu .btn { justify-content: flex-start; border-color: transparent; }
-    #azeroth-command-center .acc-recommend-why { grid-column: 2 / -1; color: var(--muted-foreground); font-size: 0.68rem; }
+    #azeroth-command-center .acc-recommend-why { grid-column: 1 / -1; color: var(--muted-foreground); font-size: 0.68rem; }
     #azeroth-command-center .acc-recommend-why summary { width: max-content; cursor: pointer; color: var(--acc-secondary); }
     #azeroth-command-center .acc-recommend-why ul { margin: 0.35rem 0 0; padding-left: 1rem; }
-    #azeroth-command-center .acc-recommend-feedback { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; color: var(--muted-foreground); font-size: 0.68rem; }
+    #azeroth-command-center .acc-recommend-feedback { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; color: var(--muted-foreground); font-size: 0.68rem; }
     #azeroth-command-center .acc-recommend-feedback .btn { min-height: 1.8rem; padding: 0.25rem 0.5rem; }
     #azeroth-command-center .acc-insights { margin-top: 0.8rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
     #azeroth-command-center .acc-insight-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--border); }
@@ -1251,12 +1278,9 @@
         padding: 0 0.45rem;
       }
       #azeroth-command-center .acc-command-fact:first-child { border-left: 0; padding-left: 0; }
-      #azeroth-command-center .acc-next-row,
       #azeroth-command-center .acc-command-goal {
         grid-template-columns: auto minmax(0, 1fr);
       }
-      #azeroth-command-center .acc-next-row > .btn,
-      #azeroth-command-center .acc-next-row > .acc-recommend-actions,
       #azeroth-command-center .acc-command-goal > .acc-row-actions {
         grid-column: 2;
         justify-self: start;
@@ -1812,17 +1836,10 @@
         <div class="acc-onboarding-steps" id="acc-onboarding-steps"></div>
       </section>
 
-      <nav class="acc-quick-actions" aria-label="Quick actions">
+      <nav class="acc-quick-actions" id="acc-quick-actions" aria-label="Quick actions">
         <button class="btn btn-primary" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
-        <button class="btn" type="button" data-command-action="open-session" id="acc-quick-resume" hidden><i data-lucide="play" aria-hidden="true"></i> Resume session</button>
-        <button class="btn" type="button" data-command-action="start-next-session" id="acc-quick-start"><i data-lucide="play" aria-hidden="true"></i> Start saved session</button>
         <button class="btn" type="button" data-command-action="log-session"><i data-lucide="timer" aria-hidden="true"></i> Log session</button>
-        <button class="btn" type="button" data-command-action="add-goal"><i data-lucide="circle-plus" aria-hidden="true"></i> Add goal</button>
         <button class="btn" type="button" data-command-action="log-gold"><i data-lucide="coins" aria-hidden="true"></i> Log gold</button>
-        <button class="btn" type="button" data-command-action="update-progress"><i data-lucide="map-pin" aria-hidden="true"></i> Log level &amp; gold</button>
-        <button class="btn" type="button" data-command-action="edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
-        <button class="btn" type="button" data-command-action="switch-character"><i data-lucide="users" aria-hidden="true"></i> Switch</button>
-        <button class="btn" type="button" data-command-action="export"><i data-lucide="download" aria-hidden="true"></i> Export</button>
       </nav>
 
       <section class="acc-active-session" id="acc-active-session" aria-labelledby="acc-active-session-title" hidden>
@@ -1840,23 +1857,23 @@
 
       <div class="acc-command-grid">
         <div class="acc-command-column">
-          <section class="acc-command-section" aria-labelledby="acc-next-up-heading">
-            <div class="acc-section-head"><div><h2 id="acc-next-up-heading">Next Up</h2><span class="text-muted text-small">The strongest next actions from your saved campaign.</span></div></div>
+          <section class="acc-command-section" id="acc-next-up-section" aria-labelledby="acc-next-up-heading">
+            <div class="acc-section-head"><div><h2 id="acc-next-up-heading">Next Up</h2><span class="text-muted text-small">The strongest next action from your saved campaign.</span></div></div>
             <div class="acc-command-list" id="acc-next-up"></div>
           </section>
           <section class="acc-command-section" aria-labelledby="acc-active-goals-heading">
-            <div class="acc-section-head"><div><h2 id="acc-active-goals-heading">Active goals</h2><span class="text-muted text-small">Up to five unfinished goals, ordered by status and priority.</span></div><button class="btn" type="button" id="acc-add-goal"><i data-lucide="plus" aria-hidden="true"></i> Add goal</button></div>
+            <div class="acc-section-head" id="acc-active-goals-head"><div><h2 id="acc-active-goals-heading">Active goals</h2><span class="text-muted text-small">Up to five unfinished goals, ordered by status and priority.</span></div><button class="btn" type="button" id="acc-add-goal"><i data-lucide="plus" aria-hidden="true"></i> Add goal</button></div>
             <div class="acc-command-list" id="acc-command-goals"></div>
           </section>
         </div>
 
         <aside class="acc-command-column acc-command-side">
-          <section class="acc-command-section" aria-labelledby="acc-momentum-heading">
+          <section class="acc-command-section" id="acc-momentum-section" aria-labelledby="acc-momentum-heading">
             <div class="acc-section-head"><div><h2 id="acc-momentum-heading">Weekly momentum</h2><span class="text-muted text-small" id="acc-momentum-dates"></span></div><select class="form-select acc-momentum-scope" id="acc-momentum-scope" aria-label="Weekly momentum scope"><option value="active">Active character</option><option value="all">All characters</option></select></div>
             <div class="acc-momentum-grid" id="acc-momentum"></div>
             <div class="acc-momentum-strip" id="acc-momentum-strip" aria-hidden="true"></div>
           </section>
-          <section class="acc-command-section" aria-labelledby="acc-roster-heading">
+          <section class="acc-command-section" id="acc-roster-section" aria-labelledby="acc-roster-heading">
             <div class="acc-section-head"><div><h2 id="acc-roster-heading">Character attention</h2><span class="text-muted text-small">Campaign status across the active roster.</span></div></div>
             <div class="acc-command-list" id="acc-roster"></div>
           </section>
@@ -2504,6 +2521,14 @@
         root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
         renderActiveSession();
         renderOnboarding();
+        const stage = Selectors.selectCampaignStage(state);
+        root.querySelector('#acc-quick-actions').hidden = stage === 'fresh';
+        root.querySelector('#acc-today-summary').hidden = stage === 'fresh';
+        root.querySelector('.acc-command-grid').hidden = stage === 'fresh';
+        if (stage === 'fresh') {
+          root.querySelector('.acc-recent').hidden = true;
+          return;
+        }
         renderTodaySummary();
         renderNextUp();
         renderActiveGoals();
@@ -2528,11 +2553,7 @@
       function renderActiveSession() {
         const active = SessionEngine.selectActiveSession(state);
         const section = root.querySelector('#acc-active-session');
-        const quickResume = root.querySelector('#acc-quick-resume');
         section.hidden = !active;
-        quickResume.hidden = !active;
-        quickResume.dataset.sourceId = active?.id || '';
-        root.querySelector('#acc-quick-start').hidden = !(state.sessionPlans || []).length;
         if (!active) return;
         const current = active.items.find(item => item.id === active.currentItemId) || active.items.find(item => !['completed', 'skipped', 'partial'].includes(item.status));
         const remaining = active.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status)).length;
@@ -2541,30 +2562,34 @@
         root.querySelector('#acc-active-session-meta').innerHTML = `<span>${escapeHtml(active.title)}</span><span>·</span><span data-active-elapsed>${formatElapsed(SessionEngine.elapsedSessionMs(active))}</span><span>·</span><span>${remaining} remaining</span>`;
         root.querySelector('#acc-open-active-session').dataset.sessionId = active.id;
       }
-      function renderNextUp() {
-        const target = root.querySelector('#acc-next-up');
-        const active = SessionEngine.selectActiveSession(state);
-        const visibleGoals = Selectors.selectActiveGoals(state, { limit: 5 });
-        const excludedKeys = [...(active ? [`session:${active.id}`] : []), ...visibleGoals.map(goal => `goal:${goal.id}`)];
-        currentRecommendations = Selectors.selectNextUp(state, { limit: 5, now: new Date(), strategy: state.preferences?.planningStrategy || 'balanced', excludedKeys });
-        if (!currentRecommendations.length) {
-          target.innerHTML = '<div class="acc-empty">Nothing needs attention yet. Add a goal to give the Command Center a clear direction.<div class="acc-actions"><button class="btn" type="button" data-command-action="add-goal">Add first goal</button></div></div>';
-          return;
-        }
-        target.innerHTML = currentRecommendations.map((item, index) => {
-          const positive = item.factors.filter(factor => factor.value > 0).slice(0, 4);
-          const negative = item.factors.filter(factor => factor.value < 0 && factor.value > Recommendation.SCORING_CONFIG.unavailable / 2).slice(0, 2);
-          const activityActions = item.sourceType === 'activity' ? `<button class="btn" type="button" data-recommend-action="add-session">Add to session</button><button class="btn" type="button" data-recommend-action="snooze">Snooze</button><button class="btn" type="button" data-recommend-action="lower-priority">Lower priority</button><button class="btn" type="button" data-recommend-action="block">Mark blocked</button>` : '';
-          const history = Recommendation.recommendationHistoryFor(state.recommendationHistory, item);
-          const askFeedback = index === 0 && Number(history?.timesShown) >= 2 && !history?.lastUserResponse;
-          return `<article class="acc-next-row" data-recommendation-type="${escapeHtml(item.sourceType)}" data-recommendation-id="${escapeHtml(item.sourceId)}">
-            <span class="acc-next-rank" aria-hidden="true">${index + 1}</span>
+      function recommendationRowMarkup(item, { hero = false, askFeedback = false } = {}) {
+        const positive = item.factors.filter(factor => factor.value > 0).slice(0, 4);
+        const negative = item.factors.filter(factor => factor.value < 0 && factor.value > Recommendation.SCORING_CONFIG.unavailable / 2).slice(0, 2);
+        const activityActions = item.sourceType === 'activity' ? `<button class="btn" type="button" data-recommend-action="add-session">Add to session</button><button class="btn" type="button" data-recommend-action="snooze">Snooze</button><button class="btn" type="button" data-recommend-action="lower-priority">Lower priority</button><button class="btn" type="button" data-recommend-action="block">Mark blocked</button>` : '';
+        return `<article class="acc-next-row${hero ? ' acc-next-hero' : ''}" data-recommendation-type="${escapeHtml(item.sourceType)}" data-recommendation-id="${escapeHtml(item.sourceId)}">
             <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.title)}</span><span class="acc-row-meta"><span>${escapeHtml(item.character?.name || 'Account')}</span><span>·</span><span>${escapeHtml(item.category)}</span><span>·</span><span>${escapeHtml(item.reason)}</span>${progressMarkup(item.progress)}</span></div>
             <span class="acc-recommend-actions"><button class="btn btn-primary" type="button" data-recommend-action="do-now">${escapeHtml(item.sourceType === 'activity' ? 'Do this now' : item.actionLabel)}</button><details><summary class="btn btn-ghost" aria-label="More recommendation actions"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-recommend-menu">${activityActions}<button class="btn" type="button" data-recommend-action="not-today">Not today</button><button class="btn" type="button" data-recommend-action="dismiss">Dismiss suggestion</button></div></details></span>
             ${(positive.length || negative.length) ? `<details class="acc-recommend-why"><summary>Why this recommendation?</summary><ul>${positive.map(factor => `<li>${escapeHtml(factor.label)}</li>`).join('')}${negative.map(factor => `<li>Held back: ${escapeHtml(factor.label)}</li>`).join('')}</ul></details>` : ''}
             ${askFeedback ? '<span class="acc-recommend-feedback"><span>Was this recommendation useful?</span><button class="btn btn-ghost" type="button" data-recommend-feedback="useful">Useful</button><button class="btn btn-ghost" type="button" data-recommend-feedback="not_useful">Not useful</button><button class="btn btn-ghost" type="button" data-recommend-action="not-today">Not today</button></span>' : ''}
           </article>`;
-        }).join('');
+      }
+      function renderNextUp() {
+        const section = root.querySelector('#acc-next-up-section');
+        const target = root.querySelector('#acc-next-up');
+        const active = SessionEngine.selectActiveSession(state);
+        const visibleGoals = Selectors.selectActiveGoals(state, { limit: 5 });
+        const excludedKeys = [...(active ? [`session:${active.id}`] : []), ...visibleGoals.map(goal => `goal:${goal.id}`)];
+        currentRecommendations = Selectors.selectNextUp(state, { limit: 5, now: new Date(), strategy: state.preferences?.planningStrategy || 'balanced', excludedKeys });
+        section.hidden = !currentRecommendations.length;
+        if (!currentRecommendations.length) {
+          target.innerHTML = '';
+          return;
+        }
+        const [hero, ...rest] = currentRecommendations;
+        const heroHistory = Recommendation.recommendationHistoryFor(state.recommendationHistory, hero);
+        const askFeedback = Number(heroHistory?.timesShown) >= 2 && !heroHistory?.lastUserResponse;
+        target.innerHTML = recommendationRowMarkup(hero, { hero: true, askFeedback })
+          + (rest.length ? `<details class="acc-next-more"><summary>More suggestions (${rest.length})</summary>${rest.map(item => recommendationRowMarkup(item)).join('')}</details>` : '');
         if (activeTab === 'overview') {
           const impressions = Recommendation.recordRecommendationImpressions(state.recommendationHistory, currentRecommendations, { now: new Date() });
           if (impressions.changed) { state.recommendationHistory = impressions.history; saveState(); }
@@ -2572,10 +2597,12 @@
       }
       function renderActiveGoals() {
         const target = root.querySelector('#acc-command-goals');
+        const head = root.querySelector('#acc-active-goals-head');
         const characterMap = new Map(state.characters.map(item => [item.id, item]));
         const goals = Selectors.selectActiveGoals(state, { limit: 5 });
+        head.hidden = !goals.length;
         if (!goals.length) {
-          target.innerHTML = '<div class="acc-empty">Goals drive focused Next Up recommendations. Add one concrete outcome to begin.<div class="acc-actions"><button class="btn" type="button" data-command-action="add-goal">Create a goal</button></div></div>';
+          target.innerHTML = '<div class="acc-empty">No goals yet.<div class="acc-actions"><button class="btn btn-primary" type="button" data-command-action="add-goal">Add goal</button></div></div>';
           return;
         }
         target.innerHTML = goals.map(goal => {
@@ -2590,9 +2617,8 @@
         }).join('');
       }
       function renderMomentum() {
+        const section = root.querySelector('#acc-momentum-section');
         const momentum = Selectors.selectWeeklyMomentum(state, { scope: momentumScope, activeCharacterId: state.activeCharacterId, now: new Date() });
-        root.querySelector('#acc-momentum-scope').value = momentumScope;
-        root.querySelector('#acc-momentum-dates').textContent = `${momentum.bounds.startKey} – ${momentum.bounds.endKey}`;
         const metrics = [
           ['Sessions', momentum.sessions, String(momentum.sessions)],
           ['Time played', momentum.minutesPlayed, formatMinutes(momentum.minutesPlayed)],
@@ -2603,27 +2629,33 @@
           ['Collections', momentum.collectionUpdates, String(momentum.collectionUpdates)],
           ['Active characters', momentum.activeCharacters, String(momentum.activeCharacters)]
         ].filter(([, value]) => Number(value) !== 0);
-        const target = root.querySelector('#acc-momentum');
-        target.innerHTML = metrics.length ? metrics.map(([label,, display]) => `<div class="acc-momentum-item"><strong>${escapeHtml(display)}</strong><span>${escapeHtml(label)}</span></div>`).join('') : '<div class="acc-empty" style="grid-column:1/-1">No activity has been logged in the current local week.</div>';
+        section.hidden = !metrics.length;
+        if (!metrics.length) return;
+        root.querySelector('#acc-momentum-scope').value = momentumScope;
+        root.querySelector('#acc-momentum-dates').textContent = `${momentum.bounds.startKey} – ${momentum.bounds.endKey}`;
+        root.querySelector('#acc-momentum').innerHTML = metrics.map(([label,, display]) => `<div class="acc-momentum-item"><strong>${escapeHtml(display)}</strong><span>${escapeHtml(label)}</span></div>`).join('');
         const stripValues = [momentum.sessions, momentum.completed, momentum.collectionUpdates].filter(value => value > 0);
         const total = stripValues.reduce((sum, value) => sum + value, 0);
         root.querySelector('#acc-momentum-strip').innerHTML = total ? stripValues.map(value => `<span style="width:${value / total * 100}%"></span>`).join('') : '';
       }
       function renderRoster() {
+        const section = root.querySelector('#acc-roster-section');
         const target = root.querySelector('#acc-roster');
         const roster = Recommendation.characterAttention(state, { now: new Date() });
+        const hasFlag = roster.some(item => item.attention !== 'On track');
+        section.hidden = !(rosterCharacters().length >= 2 || hasFlag);
+        if (section.hidden) return;
         target.innerHTML = roster.map(item => `<article class="acc-roster-row" aria-current="${item.character.id === state.activeCharacterId}">
           <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.character.name)} <span class="text-muted">· ${Number(item.character.level) || 1}</span></span><span class="acc-row-meta"><span>${escapeHtml(item.character.race)} ${escapeHtml(item.character.className)}</span><span>·</span><span>${escapeHtml(item.character.realm)} ${escapeHtml(item.character.region)}</span><span>·</span><span>${escapeHtml(item.role.replace('_', ' '))}</span><span>·</span><span>${formatGold(item.character.gold)}</span><span>·</span><span>${item.lastActivity ? formatLocalDateTime(item.lastActivity.at) : 'No activity yet'}</span><span>·</span><span>${item.unfinished} unfinished</span><span class="acc-status" data-state="${escapeHtml(item.attention)}">${escapeHtml(item.attention)}</span></span></div>
           <button class="btn btn-ghost" type="button" data-command-switch="${escapeHtml(item.character.id)}" ${item.character.id === state.activeCharacterId || item.character.archivedAt ? 'disabled' : ''}>${item.character.archivedAt ? 'Archived' : item.character.id === state.activeCharacterId ? 'Selected' : 'Select'}</button>
         </article>`).join('');
       }
       function renderRecentActivity() {
+        const section = root.querySelector('.acc-recent');
         const target = root.querySelector('#acc-recent-activity');
         const feed = Selectors.selectRecentActivity(state, { limit: 10 });
-        if (!feed.length) {
-          target.innerHTML = '<div class="acc-empty">Sessions and progress updates will appear here as the campaign moves forward.<div class="acc-actions"><button class="btn" type="button" data-command-action="log-session">Log a session</button></div></div>';
-          return;
-        }
+        section.hidden = !feed.length;
+        if (!feed.length) return;
         const icons = { session: 'timer', gold: 'coins', goal: 'circle-check', progress: 'trending-up', collection: 'gem', note: 'notebook-pen', activity: 'list-checks' };
         target.innerHTML = feed.map(entry => {
           let value = '';
@@ -3351,6 +3383,7 @@
         else if (item.action === 'log-session') root.querySelector('#acc-session-dialog').showModal();
         else if (item.action === 'log-gold') { activateTab('gold'); focusAfterNavigation('#acc-ledger-form [name="activity"]'); }
         else if (item.action === 'update-collection') { activateTab('collections'); focusAfterNavigation('[data-collection-owned]'); }
+        else if (item.action === 'update-progress') root.querySelector('#acc-progress-dialog').showModal();
         else if (item.action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
         else if (item.action === 'plan-session') openPlanner();
         else if (item.action === 'save-current-plan') { if (plannerState.result?.items?.length) openPlanEditor(SessionEngine.createSavedPlan(plannerState.result, { status: 'draft' }, { id: uid('session-plan') })); else { openPlanner(); showToast('Generate a plan before saving it.'); } }
