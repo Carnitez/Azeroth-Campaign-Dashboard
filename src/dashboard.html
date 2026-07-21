@@ -782,17 +782,16 @@
         grid-column: auto;
       }
       #azeroth-command-center .acc-tabs {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: nowrap;
         overflow-x: auto;
+        gap: 0.3rem;
       }
       #azeroth-command-center .acc-tabs .btn {
+        flex: 0 0 auto;
         grid-template-columns: auto minmax(0, auto);
         justify-content: center;
-      }
-      #azeroth-command-center .acc-tabs .btn kbd,
-      #azeroth-command-center .acc-sidebar-footer {
-        display: none;
+        white-space: nowrap;
       }
       #azeroth-command-center .acc-page-header {
         position: relative;
@@ -1634,13 +1633,12 @@
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed { grid-template-columns: 1fr; }
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed :is(.acc-character-card .acc-identity, .acc-character-controls, .acc-tabs span) { display: flex; }
       #azeroth-command-center .acc-shell.acc-sidebar-collapsed .acc-sidebar { padding: 0.75rem; }
-      #azeroth-command-center .acc-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     }
     @media (max-width: 620px) {
       #azeroth-command-center .acc-command-trigger { min-width: 2rem; }
-      #azeroth-command-center .acc-command-trigger span { display: none; }
-      #azeroth-command-center .acc-tabs .btn { min-width: 0; padding-inline: 0.15rem; }
-      #azeroth-command-center .acc-tabs .btn span { white-space: normal; text-align: center; line-height: 1.05; overflow-wrap: anywhere; }
+      #azeroth-command-center .acc-command-trigger-label { display: none; }
+      #azeroth-command-center .acc-tabs .btn { min-width: 0; padding-inline: 0.4rem; }
+      #azeroth-command-center .acc-tabs .btn span { white-space: nowrap; }
       #azeroth-command-center .acc-activity-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       #azeroth-command-center .acc-activity-row { grid-template-columns: auto minmax(0, 1fr) auto; }
       #azeroth-command-center .acc-activity-row > .acc-row-copy { grid-column: 2; grid-row: 1 / span 2; }
@@ -1676,6 +1674,45 @@
       #azeroth-command-center .acc-history-row { grid-template-columns: minmax(0, 1fr); }
       #azeroth-command-center dialog { max-height: calc(100dvh - 1rem); max-width: calc(100vw - 1rem); overflow: auto; }
       #azeroth-command-center :is(.acc-panel, .acc-page-header, .acc-tabs) .btn { min-height: 2.5rem; }
+    }
+    @media (hover: none), (pointer: coarse) {
+      #azeroth-command-center kbd {
+        display: none;
+      }
+      #azeroth-command-center .acc-command-trigger-label {
+        display: none;
+      }
+      #azeroth-command-center .acc-command-trigger {
+        min-width: 2.25rem;
+        justify-content: center;
+      }
+    }
+    @media (max-width: 480px) {
+      #azeroth-command-center #acc-page-description {
+        display: none;
+      }
+      #azeroth-command-center .acc-character-card {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+      }
+      #azeroth-command-center .acc-character-card .acc-identity {
+        min-width: 0;
+      }
+      #azeroth-command-center #acc-character-meta {
+        display: none;
+      }
+      #azeroth-command-center .acc-character-controls {
+        flex: 0 0 auto;
+        width: auto;
+      }
+      #azeroth-command-center .acc-character-controls .acc-character-select {
+        max-width: 6.5rem;
+      }
+      #azeroth-command-center .acc-quick-actions {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
     }
   </style>
 
@@ -1738,7 +1775,7 @@
           <p class="text-muted" id="acc-page-description">Decide what to do next from real campaign progress.</p>
         </div>
         <div class="acc-toolbar">
-          <button class="btn acc-command-trigger" type="button" id="acc-open-command" aria-label="Open command palette" aria-keyshortcuts="Control+K Meta+K"><span><i data-lucide="search" aria-hidden="true"></i> Search commands</span><kbd>Ctrl K</kbd></button>
+          <button class="btn acc-command-trigger" type="button" id="acc-open-command" aria-label="Open command palette" aria-keyshortcuts="Control+K Meta+K"><span><i data-lucide="search" aria-hidden="true"></i> <span class="acc-command-trigger-label">Search commands</span></span><kbd>Ctrl K</kbd></button>
         </div>
       </header>
 
