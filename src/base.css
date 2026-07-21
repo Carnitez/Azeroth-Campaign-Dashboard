@@ -15,8 +15,8 @@
   --secondary-foreground: var(--foreground);
   --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
   --muted-foreground: light-dark(
-    rgb(26 28 31 / 49.4%),
-    rgb(255 255 255 / 49.8%)
+    rgb(26 28 31 / 68%),
+    rgb(255 255 255 / 68%)
   );
   --accent: light-dark(rgb(229 242 255), rgb(13 39 63));
   --accent-foreground: var(--primary);
