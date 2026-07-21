@@ -313,7 +313,7 @@ export function generateRecommendationCandidates(state, { now = new Date() } = {
       title: `${tracker.name}: ${number(tracker.target).toLocaleString()} milestone`, characterId: tracker.characterId,
       character: characters.get(tracker.characterId) || null, category: 'Collection', priority: 0, status: 'todo',
       progress: { current: number(tracker.owned), target: number(tracker.target) }, available: true,
-      action: 'open-collections', actionLabel: 'Update progress'
+      action: 'open-collections', actionLabel: 'Update collections'
     });
   }
   return output;

@@ -200,9 +200,16 @@
       font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     }
     #azeroth-command-center .acc-danger-zone {
-      border-top: 1px solid var(--border);
       margin-top: 1.25rem;
-      padding-top: 1rem;
+      padding: 0.85rem;
+      border: 1px solid color-mix(in srgb, var(--destructive) 35%, var(--border));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--destructive) 6%, transparent);
+    }
+    #azeroth-command-center .acc-danger-zone h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.85rem;
+      color: var(--destructive);
     }
     #azeroth-command-center .acc-btn-danger {
       border-color: color-mix(in srgb, var(--destructive) 45%, var(--border));
@@ -473,10 +480,20 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      width: 100%;
       margin-top: auto;
-      padding: 0.65rem 0.45rem 0;
+      padding: 0.65rem 0.45rem;
+      border: none;
       border-top: 1px solid var(--border);
+      background: none;
+      color: inherit;
+      font: inherit;
       font-size: 0.72rem;
+      text-align: left;
+      cursor: var(--cursor-interaction, pointer);
+    }
+    #azeroth-command-center .acc-sidebar-footer:hover {
+      background: color-mix(in srgb, var(--foreground) 6%, transparent);
     }
     #azeroth-command-center .acc-theme-dot {
       width: 0.55rem;
@@ -1707,10 +1724,10 @@
         <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+6"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 6</kbd></button>
       </nav>
 
-      <div class="acc-sidebar-footer">
+      <button class="acc-sidebar-footer" type="button" id="acc-open-data" aria-label="Open data and backup">
         <span class="acc-theme-dot" aria-hidden="true"></span>
         <span><strong id="acc-theme-label">Druid theme</strong><small>Stored locally · EU</small></span>
-      </div>
+      </button>
     </aside>
 
     <div class="acc-workspace">
@@ -1759,12 +1776,10 @@
         <button class="btn btn-primary" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
         <button class="btn" type="button" data-command-action="open-session" id="acc-quick-resume" hidden><i data-lucide="play" aria-hidden="true"></i> Resume session</button>
         <button class="btn" type="button" data-command-action="start-next-session" id="acc-quick-start"><i data-lucide="play" aria-hidden="true"></i> Start saved session</button>
-        <button class="btn" type="button" data-command-action="session-history"><i data-lucide="history" aria-hidden="true"></i> Session history</button>
         <button class="btn" type="button" data-command-action="log-session"><i data-lucide="timer" aria-hidden="true"></i> Log session</button>
         <button class="btn" type="button" data-command-action="add-goal"><i data-lucide="circle-plus" aria-hidden="true"></i> Add goal</button>
         <button class="btn" type="button" data-command-action="log-gold"><i data-lucide="coins" aria-hidden="true"></i> Log gold</button>
-        <button class="btn" type="button" data-command-action="collections"><i data-lucide="gem" aria-hidden="true"></i> Collections</button>
-        <button class="btn" type="button" data-command-action="update-progress"><i data-lucide="map-pin" aria-hidden="true"></i> Update progress</button>
+        <button class="btn" type="button" data-command-action="update-progress"><i data-lucide="map-pin" aria-hidden="true"></i> Log level &amp; gold</button>
         <button class="btn" type="button" data-command-action="edit-character"><i data-lucide="pencil" aria-hidden="true"></i> Edit character</button>
         <button class="btn" type="button" data-command-action="switch-character"><i data-lucide="users" aria-hidden="true"></i> Switch</button>
         <button class="btn" type="button" data-command-action="export"><i data-lucide="download" aria-hidden="true"></i> Export</button>
@@ -1914,24 +1929,10 @@
     </section>
 
     <section class="acc-panel" id="acc-panel-journal" data-panel="journal" hidden>
-      <div class="acc-two-col">
-        <section>
-          <div class="acc-section-head"><h2>Adventure journal</h2></div>
-          <div class="acc-journal" id="acc-journal"></div>
-        </section>
-        <section class="card">
-          <div class="acc-section-head"><h2>Data & backup</h2></div>
-          <p class="text-muted">Everything is stored in this browser. Export a backup occasionally, especially before clearing browser data.</p>
-          <p class="text-small text-muted">Recommendations are deterministic. They use your schedules, priorities, active character, local actions, and completed-session history. No game account or external service is read, and recommendation history never leaves this browser. You can always dismiss, snooze, or override a suggestion.</p>
-          <div class="acc-actions">
-            <button class="btn" type="button" id="acc-export"><i data-lucide="download" aria-hidden="true"></i> Export backup</button>
-            <button class="btn" type="button" id="acc-import"><i data-lucide="upload" aria-hidden="true"></i> Import backup</button>
-          </div>
-          <div class="acc-danger-zone">
-            <button class="btn acc-btn-danger" type="button" id="acc-delete-character"><i data-lucide="trash-2" aria-hidden="true"></i> Delete current character</button>
-          </div>
-        </section>
-      </div>
+      <section>
+        <div class="acc-section-head"><h2>Adventure journal</h2></div>
+        <div class="acc-journal" id="acc-journal"></div>
+      </section>
     </section>
       </main>
     </div>
@@ -2140,6 +2141,21 @@
       <div class="acc-shortcut-row"><span>Skip current activity</span><kbd>S</kbd></div>
       <div class="acc-shortcut-row"><span>Focus quick note</span><kbd>N</kbd></div>
       <div class="acc-shortcut-row"><span>Close dialog</span><kbd>Escape</kbd></div>
+    </div>
+  </dialog>
+
+  <dialog id="acc-data-dialog" aria-labelledby="acc-data-title">
+    <div class="acc-dialog-head"><h2 id="acc-data-title">Data & backup</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-data-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
+    <p class="text-muted">Everything is stored in this browser. Export a backup occasionally, especially before clearing browser data.</p>
+    <p class="text-small text-muted">Recommendations are deterministic. They use your schedules, priorities, active character, local actions, and completed-session history. No game account or external service is read, and recommendation history never leaves this browser. You can always dismiss, snooze, or override a suggestion.</p>
+    <div class="acc-actions">
+      <button class="btn" type="button" id="acc-export"><i data-lucide="download" aria-hidden="true"></i> Export backup</button>
+      <button class="btn" type="button" id="acc-import"><i data-lucide="upload" aria-hidden="true"></i> Import backup</button>
+    </div>
+    <div class="acc-danger-zone">
+      <h3>Danger zone</h3>
+      <p class="text-small text-muted">Removes the active character from your roster. Campaign records are preserved, and this can be undone immediately after.</p>
+      <button class="btn acc-btn-danger" type="button" id="acc-delete-character"><i data-lucide="trash-2" aria-hidden="true"></i> Delete current character</button>
     </div>
   </dialog>
 
@@ -3309,7 +3325,7 @@
         if (characterId && characterId !== state.activeCharacterId) selectCharacter(characterId);
         if (action === 'open-goal') openGoalDialog(sourceId);
         else if (action === 'agenda') activateTab('agenda');
-        else if (action === 'open-collections' || action === 'collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
+        else if (action === 'open-collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
         else if (action === 'edit-character') openCharacterDialog(true);
         else if (action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
@@ -3762,6 +3778,7 @@
       root.querySelector('#acc-ledger-body').addEventListener('click', e => { const button = e.target.closest('[data-ledger-delete]'); if (!button) return; removeWithUndo(state.activities, button.dataset.ledgerDelete, 'Gold activity removed.', (item, index) => state.activities.splice(index, 0, item)); });
       root.querySelector('#acc-journal').addEventListener('click', e => { const button = e.target.closest('[data-session-delete]'); if (!button) return; const index = state.activities.findIndex(item => item.id === button.dataset.sessionDelete); if (index < 0) return; const [removed] = state.activities.splice(index, 1); const c = character(); c.playedMinutes = Math.max(0, c.playedMinutes - Number(removed.durationMinutes)); c.gold = Math.max(0, Number(c.gold) - Number(removed.gold?.delta || 0)); saveState(); render(); showToast('Journal entry removed.', { tone: 'warning', actionLabel: 'Undo', onAction: () => { state.activities.splice(index, 0, removed); c.playedMinutes += Number(removed.durationMinutes); c.gold += Number(removed.gold?.delta || 0); saveState(); render(); showToast('Journal entry restored.'); } }); });
       root.querySelector('#acc-export').addEventListener('click', exportBackup);
+      root.querySelector('#acc-open-data').addEventListener('click', () => root.querySelector('#acc-data-dialog').showModal());
       root.querySelector('#acc-import').addEventListener('click', () => { root.querySelector('#acc-import-error').textContent = ''; root.querySelector('#acc-import-dialog').showModal(); });
       root.querySelector('#acc-import-form').addEventListener('submit', e => { e.preventDefault(); try { const incoming = JSON.parse(new FormData(e.currentTarget).get('payload')); const previous = structuredClone(state); state = Core.migrateState(incoming); saveState(); root.querySelector('#acc-import-dialog').close(); render(); showToast('Backup imported.', { actionLabel: 'Undo', onAction: () => { state = previous; saveState(); render(); showToast('Previous campaign restored.'); } }); } catch (error) { root.querySelector('#acc-import-error').textContent = error.message || 'That backup could not be read.'; } });
       root.querySelector('#acc-delete-character').addEventListener('click', () => { if (rosterCharacters().length === 1) { showToast('Add another character before deleting this one.', { tone: 'warning' }); return; } root.querySelector('#acc-delete-character-name').textContent = character().name; root.querySelector('#acc-delete-character-dialog').showModal(); });

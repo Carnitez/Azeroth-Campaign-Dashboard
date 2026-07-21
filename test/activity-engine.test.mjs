@@ -148,6 +148,13 @@ test('command search supports partial and subsequence matches across real record
   assert.ok(searchCommands(catalog, 'op act').some(item => item.id === 'nav-activities'));
 });
 
+test('the command palette never offers to switch to the already-active character', () => {
+  const campaign = state({ activeCharacterId: 'a', characters: [character('a'), character('b')] });
+  const catalog = buildCommandCatalog(campaign);
+  assert.equal(catalog.some(item => item.id === 'switch:a'), false);
+  assert.equal(catalog.some(item => item.id === 'switch:b'), true);
+});
+
 test('recent and frequently used commands rise before default commands', () => {
   const items = buildCommandCatalog(state());
   let preferences = recordCommandUse({}, 'create-activity', { now });

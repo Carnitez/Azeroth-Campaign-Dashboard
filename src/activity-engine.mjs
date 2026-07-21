@@ -241,7 +241,7 @@ export function buildCommandCatalog(state) {
   const characterMap = new Map(activeCharacters(state).map(character => [character.id, character]));
   const items = [...fixedCommands];
   for (const character of characterMap.values()) {
-    items.push({ id: `switch:${character.id}`, label: `Switch to ${character.name}`, category: 'Character', icon: 'user-round', action: 'switch-character', target: character.id, character: character.name, keywords: `${character.race} ${character.className} ${character.realm}` });
+    if (character.id !== state?.activeCharacterId) items.push({ id: `switch:${character.id}`, label: `Switch to ${character.name}`, category: 'Character', icon: 'user-round', action: 'switch-character', target: character.id, character: character.name, keywords: `${character.race} ${character.className} ${character.realm}` });
     items.push({ id: `edit:${character.id}`, label: `Edit ${character.name}`, category: 'Character', icon: 'pencil', action: 'edit-specific-character', target: character.id, character: character.name, keywords: `${character.race} ${character.className} profile` });
   }
   for (const goal of list(state?.goals).filter(goal => characterMap.has(goal.characterId))) {
