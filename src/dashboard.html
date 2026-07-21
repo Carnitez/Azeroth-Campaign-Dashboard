@@ -771,6 +771,7 @@
         border-right: 0;
         border-bottom: 1px solid var(--border);
         box-shadow: none;
+        min-width: 0;
       }
       #azeroth-command-center .acc-brand {
         display: none;
@@ -786,9 +787,11 @@
         flex-wrap: nowrap;
         overflow-x: auto;
         gap: 0.3rem;
+        min-width: 0;
       }
       #azeroth-command-center .acc-tabs .btn {
         flex: 0 0 auto;
+        width: auto;
         grid-template-columns: auto minmax(0, auto);
         justify-content: center;
         white-space: nowrap;
