@@ -1902,10 +1902,10 @@
         <label class="form-label">Order<select class="form-select" id="acc-agenda-sort"><option value="recommended">Recommended</option><option value="due">Due time</option><option value="priority">Priority</option><option value="character">Character</option><option value="duration">Estimated duration</option><option value="manual">Manual order</option></select></label>
       </div>
       <div class="acc-agenda-selection"><strong id="acc-agenda-selected">0 selected · 0m</strong><label class="form-label acc-inline" style="margin:0"><span>Available time</span><input class="form-control" id="acc-agenda-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-agenda-selected-plan" disabled>Create selected plan</button><button class="btn" type="button" id="acc-agenda-add-draft" disabled>Add to draft</button><button class="btn" type="button" id="acc-agenda-time-plan">Generate from today</button></div>
-      <section class="acc-agenda-section" aria-labelledby="acc-agenda-today-heading"><header><div><h2 id="acc-agenda-today-heading">Today</h2><span class="text-muted text-small">Available, due, optional, and completed work.</span></div></header><div id="acc-agenda-today"></div></section>
-      <section class="acc-agenda-section" aria-labelledby="acc-agenda-attention-heading"><header><div><h2 id="acc-agenda-attention-heading">Needs attention</h2><span class="text-muted text-small">Missed work and ready plans whose date has passed.</span></div></header><div class="acc-agenda-list" id="acc-agenda-attention"></div></section>
-      <section class="acc-agenda-section" aria-labelledby="acc-agenda-upcoming-heading"><header><div><h2 id="acc-agenda-upcoming-heading">Upcoming</h2><span class="text-muted text-small">Scheduled work across the next seven local days.</span></div></header><div id="acc-agenda-upcoming"></div></section>
-      <section class="acc-agenda-section" aria-labelledby="acc-agenda-recent-heading"><header><div><h2 id="acc-agenda-recent-heading">Recently completed</h2><span class="text-muted text-small">Recurring and one-time runs from canonical history.</span></div></header><div class="acc-agenda-list" id="acc-agenda-completed"></div></section>
+      <section class="acc-agenda-section" id="acc-agenda-today-section" aria-labelledby="acc-agenda-today-heading"><header id="acc-agenda-today-header"><div><h2 id="acc-agenda-today-heading">Today</h2><span class="text-muted text-small">Available, due, optional, and completed work.</span></div></header><div id="acc-agenda-today"></div></section>
+      <section class="acc-agenda-section" id="acc-agenda-attention-section" aria-labelledby="acc-agenda-attention-heading"><header><div><h2 id="acc-agenda-attention-heading">Needs attention</h2><span class="text-muted text-small">Missed work and ready plans whose date has passed.</span></div></header><div class="acc-agenda-list" id="acc-agenda-attention"></div></section>
+      <section class="acc-agenda-section" id="acc-agenda-upcoming-section" aria-labelledby="acc-agenda-upcoming-heading"><header><div><h2 id="acc-agenda-upcoming-heading">Upcoming</h2><span class="text-muted text-small">Scheduled work across the next seven local days.</span></div></header><div id="acc-agenda-upcoming"></div></section>
+      <section class="acc-agenda-section" id="acc-agenda-completed-section" aria-labelledby="acc-agenda-recent-heading"><header><div><h2 id="acc-agenda-recent-heading">Recently completed</h2><span class="text-muted text-small">Recurring and one-time runs from canonical history.</span></div></header><div class="acc-agenda-list" id="acc-agenda-completed"></div></section>
     </section>
 
     <section class="acc-panel" id="acc-panel-activities" data-panel="activities" hidden>
@@ -1954,12 +1954,13 @@
     </section>
 
     <section class="acc-panel" id="acc-panel-gold" data-panel="gold" hidden>
-      <div class="acc-stats">
+      <div class="acc-stats" id="acc-gold-stats" hidden>
         <div class="card viz-stat"><span class="text-muted">Recorded profit</span><span class="viz-stat-value" id="acc-profit-total">0g</span><span class="text-small text-muted">Revenue minus costs</span></div>
         <div class="card viz-stat"><span class="text-muted">Active farming time</span><span class="viz-stat-value" id="acc-farm-time">0m</span><span class="text-small text-muted">Ledger activities</span></div>
         <div class="card viz-stat"><span class="text-muted">Average profit/hour</span><span class="viz-stat-value" id="acc-profit-hour">—</span><span class="text-small text-muted">Measured activities only</span></div>
         <div class="card viz-stat"><span class="text-muted">Best activity</span><span class="viz-stat-value" id="acc-best-activity">—</span><span class="text-small text-muted" id="acc-best-rate">No data yet</span></div>
       </div>
+      <p class="text-muted" id="acc-gold-empty-hint" hidden>Record your first gold activity below to start tracking profit.</p>
       <div class="acc-two-col acc-section">
         <section class="card">
           <div class="acc-section-head"><h2>Add gold activity</h2></div>
@@ -1973,7 +1974,7 @@
             <button class="btn btn-primary wide" type="submit">Record activity</button>
           </form>
         </section>
-        <section>
+        <section id="acc-gold-ledger-section" hidden>
           <div class="acc-section-head"><h2>Activity ledger</h2></div>
           <div class="table-responsive">
             <table class="table table-sm">
@@ -2667,32 +2668,6 @@
           return `<article class="acc-activity-row"><time datetime="${escapeHtml(entry.occurredAt)}">${escapeHtml(formatLocalDateTime(entry.occurredAt))}</time><span class="acc-activity-mark"><i data-lucide="${icons[entry.kind] || 'sparkles'}" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(entry.title)}</span><span class="acc-row-meta"><span>${escapeHtml(entry.character?.name || 'Character')}</span><span>·</span><span>${escapeHtml(entry.category)}</span>${entry.detail ? `<span>·</span><span>${escapeHtml(entry.detail)}</span>` : ''}</span></div><span class="acc-row-actions"><span class="acc-activity-value">${escapeHtml(value)}</span>${action}</span></article>`;
         }).join('');
       }
-      function renderGoldChart(c) {
-        const points = progressFor(c, 'liquidGold').sort((a, b) => String(a.recordedAt).localeCompare(String(b.recordedAt))).map(event => ({ date: Core.localDateKey(event.recordedAt) || event.recordedAt, gold: event.value }));
-        const chart = root.querySelector('#acc-gold-chart');
-        if (!points.length) {
-          chart.innerHTML = '<div class="acc-empty">No gold snapshots yet.</div>';
-          return;
-        }
-        const width = 700, height = 190, left = 52, right = 18, top = 14, bottom = 32;
-        const maxGold = Math.max(1, ...points.map(p => Number(p.gold) || 0));
-        const x = i => points.length === 1 ? left : left + (i / (points.length - 1)) * (width - left - right);
-        const y = v => top + (1 - (Number(v) || 0) / maxGold) * (height - top - bottom);
-        const line = points.map((p, i) => `${i ? 'L' : 'M'} ${x(i).toFixed(1)} ${y(p.gold).toFixed(1)}`).join(' ');
-        const area = `${line} L ${x(points.length - 1).toFixed(1)} ${height - bottom} L ${x(0).toFixed(1)} ${height - bottom} Z`;
-        const labels = points.length > 1 ? [0, points.length - 1] : [0];
-        chart.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Gold balance over time, currently ${formatGold(c.gold)}">
-          <title>Gold balance over time</title><desc>${points.length} recorded balance snapshots. Current balance ${formatGold(c.gold)}.</desc>
-          <line class="axis-line" x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"></line>
-          <line class="grid-line" x1="${left}" y1="${top}" x2="${width-right}" y2="${top}"></line>
-          <text x="${left-8}" y="${top+4}" text-anchor="end">${Math.round(maxGold).toLocaleString()}g</text>
-          <text x="${left-8}" y="${height-bottom+4}" text-anchor="end">0g</text>
-          <path class="area" d="${area}"></path><path class="line" d="${line}"></path>
-          ${points.map((p,i) => `<circle class="dot" cx="${x(i)}" cy="${y(p.gold)}" r="4"><title>${escapeHtml(p.date)}: ${formatGold(p.gold)}</title></circle>`).join('')}
-          ${labels.map(i => `<text x="${x(i)}" y="${height-8}" text-anchor="${i === 0 ? 'start' : 'end'}">${escapeHtml(points[i].date)}</text>`).join('')}
-        </svg>`;
-        root.querySelector('#acc-chart-caption').textContent = `${points.length} balance snapshot${points.length === 1 ? '' : 's'} · ${formatGold(c.gold)} current`;
-      }
       function renderCollections(c) {
         const trackers = ensureCollectionTrackers(c);
         root.querySelector('#acc-collections').innerHTML = collectionNames.map(name => {
@@ -2707,28 +2682,28 @@
         }).join('');
       }
       function renderGold(c) {
-        const totals = Core.calculateGoldTotals(activitiesFor(c, 'gold'));
+        const ledger = activitiesFor(c, 'gold');
+        root.querySelector('#acc-gold-stats').hidden = !ledger.length;
+        root.querySelector('#acc-gold-ledger-section').hidden = !ledger.length;
+        root.querySelector('#acc-gold-empty-hint').hidden = Boolean(ledger.length);
+        if (!ledger.length) return;
+        const totals = Core.calculateGoldTotals(ledger);
         root.querySelector('#acc-profit-total').textContent = formatGold(totals.profit);
         root.querySelector('#acc-farm-time').textContent = formatMinutes(totals.minutes);
         root.querySelector('#acc-profit-hour').textContent = totals.hourlyRate === null ? '—' : formatGold(totals.hourlyRate);
         root.querySelector('#acc-best-activity').textContent = totals.best ? totals.best.activity.title : '—';
         root.querySelector('#acc-best-rate').textContent = totals.best ? `${formatGold(totals.best.rate)}/hour` : 'No data yet';
-        const tbody = root.querySelector('#acc-ledger-body');
-        const ledger = activitiesFor(c, 'gold');
-        if (!ledger.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="acc-empty">No gold activities recorded.</td></tr>';
-        } else {
-          tbody.innerHTML = [...ledger].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(x => {
-            const p = Number(x.gold?.revenue || 0) - Number(x.gold?.cost || 0), rate = Number(x.durationMinutes) ? p / Number(x.durationMinutes) * 60 : null;
-            return `<tr><td class="text-nowrap">${escapeHtml(Core.localDateKey(x.occurredAt) || x.occurredAt)}</td><td>${escapeHtml(x.title)}</td><td class="text-end">${formatGold(p)}</td><td class="text-end">${rate === null ? '—' : formatGold(rate)}</td><td><button class="btn btn-ghost" type="button" data-ledger-delete="${escapeHtml(x.id)}" aria-label="Delete ledger entry"><i data-lucide="x" aria-hidden="true"></i></button></td></tr>`;
-          }).join('');
-        }
+        root.querySelector('#acc-ledger-body').innerHTML = [...ledger].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(x => {
+          const p = Number(x.gold?.revenue || 0) - Number(x.gold?.cost || 0), rate = Number(x.durationMinutes) ? p / Number(x.durationMinutes) * 60 : null;
+          return `<tr><td class="text-nowrap">${escapeHtml(Core.localDateKey(x.occurredAt) || x.occurredAt)}</td><td>${escapeHtml(x.title)}</td><td class="text-end">${formatGold(p)}</td><td class="text-end">${rate === null ? '—' : formatGold(rate)}</td><td><button class="btn btn-ghost" type="button" data-ledger-delete="${escapeHtml(x.id)}" aria-label="Delete ledger entry"><i data-lucide="x" aria-hidden="true"></i></button></td></tr>`;
+        }).join('');
       }
       function renderJournal(c) {
         const target = root.querySelector('#acc-journal');
         const sessions = activitiesFor(c, 'session');
         if (!sessions.length) {
-          target.innerHTML = `<div class="acc-empty">${escapeHtml(c.name)}’s first adventure is waiting to be logged.</div>`;
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(c.name)}’s first adventure is waiting to be logged.<div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-journal-empty-log">Log a session</button></div></div>`;
+          root.querySelector('#acc-journal-empty-log')?.addEventListener('click', () => root.querySelector('#acc-session-dialog').showModal());
           return;
         }
         target.innerHTML = [...sessions].sort((a,b) => String(b.occurredAt).localeCompare(String(a.occurredAt))).map(s => `
@@ -2780,14 +2755,17 @@
         const hasAnyActivity = state.activities.some(ActivityEngine.isPlannedActivity);
         root.querySelector('.acc-agenda-filters').hidden = !hasAnyActivity;
         root.querySelector('.acc-agenda-selection').hidden = !hasAnyActivity;
+        root.querySelector('.acc-agenda-toolbar .acc-activity-toolbar').hidden = !hasAnyActivity;
         if (!hasAnyActivity) {
           root.querySelector('#acc-agenda-subtitle').textContent = 'No activities yet.';
           root.querySelector('#acc-agenda-active-session').hidden = true;
-          root.querySelector('#acc-agenda-today').innerHTML = '<div class="acc-empty">Create your first activity to start building the Daily Agenda.<div class="acc-actions"><button class="btn" type="button" id="acc-agenda-empty-create">Create activity</button></div></div>';
+          root.querySelector('#acc-agenda-today-section').hidden = false;
+          root.querySelector('#acc-agenda-today-header').hidden = true;
+          root.querySelector('#acc-agenda-today').innerHTML = '<div class="acc-empty">Create your first activity to start building the Daily Agenda.<div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-agenda-empty-create">Create activity</button></div></div>';
           root.querySelector('#acc-agenda-empty-create')?.addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
-          root.querySelector('#acc-agenda-attention').innerHTML = '';
-          root.querySelector('#acc-agenda-upcoming').innerHTML = '';
-          root.querySelector('#acc-agenda-completed').innerHTML = '';
+          root.querySelector('#acc-agenda-attention-section').hidden = true;
+          root.querySelector('#acc-agenda-upcoming-section').hidden = true;
+          root.querySelector('#acc-agenda-completed-section').hidden = true;
           renderAgendaSelection();
           return;
         }
@@ -2808,16 +2786,22 @@
           root.querySelector('#acc-agenda-active-meta').textContent = `${formatElapsed(SessionEngine.elapsedSessionMs(active))} · ${active.items.filter(item => !['completed', 'skipped', 'partial'].includes(item.status)).length} remaining`;
           root.querySelector('#acc-agenda-resume').dataset.sessionId = active.id;
         }
+        root.querySelector('#acc-agenda-today-header').hidden = false;
         const todayTarget = root.querySelector('#acc-agenda-today');
         const groups = ['inProgress', 'dueNow', 'availableToday', 'optional', 'completedToday'].map(key => [key, sortRows(agenda.groups[key])]).filter(([, rows]) => rows.length);
-        todayTarget.innerHTML = groups.length ? groups.map(([key, rows]) => `<section class="acc-agenda-group"><header><h3>${agendaGroupLabels[key]}</h3><span>${rows.length}</span></header><div class="acc-agenda-list">${rows.map(row => agendaRowMarkup(row, { selectable: key !== 'completedToday', manual: sortMode === 'manual' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No activities match today’s filters.</div>';
+        root.querySelector('#acc-agenda-today-section').hidden = !groups.length;
+        todayTarget.innerHTML = groups.map(([key, rows]) => `<section class="acc-agenda-group"><header><h3>${agendaGroupLabels[key]}</h3><span>${rows.length}</span></header><div class="acc-agenda-list">${rows.map(row => agendaRowMarkup(row, { selectable: key !== 'completedToday', manual: sortMode === 'manual' })).join('')}</div></section>`).join('');
         const overduePlans = (state.sessionPlans || []).filter(plan => plan.status === 'ready' && plan.plannedFor && plan.plannedFor < today()).map(plan => `<article class="acc-agenda-row"><span class="acc-activity-mark"><i data-lucide="calendar-x" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(plan.title)}</span><span class="acc-row-meta">Ready session · planned for ${escapeHtml(plan.plannedFor)}</span></div><span class="acc-agenda-when"><strong>${formatMinutes(plan.totalEstimatedMinutes)}</strong></span><span class="acc-agenda-actions"><button class="btn" type="button" data-session-open="${escapeHtml(plan.id)}">Open plan</button></span></article>`);
-        root.querySelector('#acc-agenda-attention').innerHTML = [...sortRows(agenda.groups.needsAttention).map(row => agendaRowMarkup(row, { selectable: false, manual: sortMode === 'manual' })), ...overduePlans].join('') || '<div class="acc-empty">Nothing needs attention.</div>';
+        const attentionRows = [...sortRows(agenda.groups.needsAttention).map(row => agendaRowMarkup(row, { selectable: false, manual: sortMode === 'manual' })), ...overduePlans];
+        root.querySelector('#acc-agenda-attention-section').hidden = !attentionRows.length;
+        root.querySelector('#acc-agenda-attention').innerHTML = attentionRows.join('');
         const upcomingByDate = new Map();
         for (const item of agenda.groups.upcoming) { if (!upcomingByDate.has(item.date)) upcomingByDate.set(item.date, []); upcomingByDate.get(item.date).push(item); }
-        root.querySelector('#acc-agenda-upcoming').innerHTML = upcomingByDate.size ? [...upcomingByDate].map(([date, rows]) => `<section class="acc-upcoming-day"><time class="acc-upcoming-date" datetime="${date}">${escapeHtml(formatLocalDate(date, { weekday: 'long' }))}</time><div class="acc-agenda-list">${sortRows(rows).map(item => agendaRowMarkup(item, { selectable: false, upcomingDate: date, manual: sortMode === 'manual' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No scheduled work in the next seven days.</div>';
+        root.querySelector('#acc-agenda-upcoming-section').hidden = !upcomingByDate.size;
+        root.querySelector('#acc-agenda-upcoming').innerHTML = [...upcomingByDate].map(([date, rows]) => `<section class="acc-upcoming-day"><time class="acc-upcoming-date" datetime="${date}">${escapeHtml(formatLocalDate(date, { weekday: 'long' }))}</time><div class="acc-agenda-list">${sortRows(rows).map(item => agendaRowMarkup(item, { selectable: false, upcomingDate: date, manual: sortMode === 'manual' })).join('')}</div></section>`).join('');
         const recentRuns = state.activities.filter(ActivityEngine.isPlannedActivity).flatMap(activity => Schedule.selectRunHistory(state, activity.id).map(run => ({ activity, run }))).filter(item => ['completed', 'partial'].includes(item.run.status)).sort((a, b) => String(b.run.occurredAt).localeCompare(String(a.run.occurredAt))).slice(0, 8);
-        root.querySelector('#acc-agenda-completed').innerHTML = recentRuns.length ? recentRuns.map(({ activity, run }) => agendaRowMarkup({ activity, availability: { ...Schedule.activityAvailability(activity, state), state: 'completed_period', lastCompletedAt: run.occurredAt } }, { selectable: false })).join('') : '<div class="acc-empty">Completed runs will appear here.</div>';
+        root.querySelector('#acc-agenda-completed-section').hidden = !recentRuns.length;
+        root.querySelector('#acc-agenda-completed').innerHTML = recentRuns.map(({ activity, run }) => agendaRowMarkup({ activity, availability: { ...Schedule.activityAvailability(activity, state), state: 'completed_period', lastCompletedAt: run.occurredAt } }, { selectable: false })).join('');
         renderAgendaSelection();
       }
       function renderAgendaSelection() {
@@ -2868,13 +2852,15 @@
         const hasAnyActivity = state.activities.some(ActivityEngine.isPlannedActivity);
         root.querySelector('#acc-activity-view-tabs').hidden = !hasAnyActivity;
         root.querySelector('.acc-activity-filters').hidden = !hasAnyActivity;
+        root.querySelector('#acc-open-planner').hidden = !hasAnyActivity;
+        root.querySelector('#acc-create-activity').hidden = !hasAnyActivity;
         const activities = ActivityEngine.selectPlannedActivities(state, currentActivityFilters());
         root.querySelector('#acc-activity-count').textContent = `${activities.length} activit${activities.length === 1 ? 'y' : 'ies'}`;
         const characterMap = new Map(state.characters.map(item => [item.id, item]));
         const target = root.querySelector('#acc-activity-list');
         if (!activities.length) {
           const copy = activityView === 'completed' ? 'Completed activities will collect here as you finish campaign work.' : activityView === 'upcoming' ? 'No activities are scheduled for a future date.' : 'Create the first real activity to give Next Up and the Session Planner something concrete to use.';
-          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn" type="button" data-activity-action="create">Create activity</button></div></div>`;
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn btn-primary" type="button" data-activity-action="create">Create activity</button></div></div>`;
           return;
         }
         target.innerHTML = activities.map(activity => {
@@ -2906,14 +2892,17 @@
       }
       function renderSessionHistory() {
         state.sessionPlans ||= [];
+        const hasAnySessionPlan = state.sessionPlans.length > 0;
+        root.querySelector('.acc-session-history .acc-view-tabs').hidden = !hasAnySessionPlan;
+        root.querySelector('#acc-history-plan-session').hidden = !hasAnySessionPlan;
         root.querySelectorAll('[data-session-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.sessionView === sessionView)));
         const sessions = SessionEngine.filterSessionHistory(state, { view: sessionView, now: new Date() });
         root.querySelector('#acc-session-count').textContent = `${sessions.length} saved session${sessions.length === 1 ? '' : 's'}`;
         const characterMap = new Map(state.characters.map(item => [item.id, item]));
         const target = root.querySelector('#acc-session-history-list');
         if (!sessions.length) {
-          const copy = sessionView === 'active' ? 'No session is running or paused.' : sessionView === 'completed' ? 'Completed sessions will remain here as a durable campaign history.' : 'No saved sessions match this view.';
-          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn" type="button" data-session-action="plan">Plan a session</button></div></div>`;
+          const copy = !hasAnySessionPlan ? 'No saved sessions yet.' : sessionView === 'active' ? 'No session is running or paused.' : sessionView === 'completed' ? 'Completed sessions will remain here as a durable campaign history.' : 'No saved sessions match this view.';
+          target.innerHTML = `<div class="acc-empty">${escapeHtml(copy)}<div class="acc-actions"><button class="btn btn-primary" type="button" data-session-action="plan">Plan a session</button></div></div>`;
           return;
         }
         target.innerHTML = sessions.map(plan => {
