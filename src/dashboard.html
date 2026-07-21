@@ -1008,6 +1008,14 @@
     #azeroth-command-center .acc-insight { display: grid; gap: 0.18rem; padding: 0.55rem; background: var(--card); }
     #azeroth-command-center .acc-insight span { color: var(--muted-foreground); font-size: 0.63rem; }
     #azeroth-command-center .acc-insight strong { font-size: 0.78rem; }
+    #azeroth-command-center .acc-onboarding { padding: 0.75rem 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+    #azeroth-command-center .acc-onboarding-steps { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
+    #azeroth-command-center .acc-onboarding-step { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.5rem; border-radius: 8px; background: var(--secondary); }
+    #azeroth-command-center .acc-onboarding-step[data-onboarding-complete="true"] { opacity: 0.6; }
+    #azeroth-command-center .acc-onboarding-check { display: grid; place-items: center; width: 1.3rem; height: 1.3rem; flex: none; border-radius: 999px; border: 1px solid var(--border); font-size: 0.7rem; color: var(--acc-progress); }
+    #azeroth-command-center .acc-onboarding-step[data-onboarding-complete="true"] .acc-onboarding-check { border-color: var(--acc-progress); background: color-mix(in srgb, var(--acc-progress) 18%, transparent); }
+    #azeroth-command-center .acc-onboarding-step span:nth-child(2) { flex: 1; }
+    #azeroth-command-center .acc-onboarding-step .btn { min-height: 1.9rem; padding: 0.25rem 0.6rem; }
     #azeroth-command-center .acc-next-rank {
       display: grid;
       width: 1.6rem;
@@ -1728,6 +1736,14 @@
         </div>
       </section>
 
+      <section class="acc-onboarding" id="acc-onboarding" aria-labelledby="acc-onboarding-title" hidden>
+        <div class="acc-section-head">
+          <div><h2 id="acc-onboarding-title">Getting started</h2><span class="text-muted text-small">Four quick steps to make this campaign yours.</span></div>
+          <button class="btn btn-ghost" type="button" id="acc-onboarding-dismiss">Dismiss</button>
+        </div>
+        <div class="acc-onboarding-steps" id="acc-onboarding-steps"></div>
+      </section>
+
       <nav class="acc-quick-actions" aria-label="Quick actions">
         <button class="btn" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
         <button class="btn" type="button" data-command-action="open-session" id="acc-quick-resume" hidden><i data-lucide="play" aria-hidden="true"></i> Resume session</button>
@@ -2406,12 +2422,20 @@
         root.querySelector('#acc-command-gold').textContent = formatGold(c.gold);
         root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
         renderActiveSession();
+        renderOnboarding();
         renderTodaySummary();
         renderNextUp();
         renderActiveGoals();
         renderMomentum();
         renderRoster();
         renderRecentActivity();
+      }
+      function renderOnboarding() {
+        const section = root.querySelector('#acc-onboarding');
+        const onboarding = Selectors.selectOnboardingState(state);
+        section.hidden = !onboarding.visible;
+        if (!onboarding.visible) return;
+        root.querySelector('#acc-onboarding-steps').innerHTML = onboarding.steps.map(step => `<div class="acc-onboarding-step" data-onboarding-complete="${step.complete}"><span class="acc-onboarding-check" aria-hidden="true">${step.complete ? '✓' : ''}</span><span>${escapeHtml(step.label)}</span>${step.complete ? '' : `<button class="btn btn-ghost" type="button" data-command-action="${escapeHtml(step.action)}">Go</button>`}</div>`).join('');
       }
       function renderTodaySummary() {
         const summary = Schedule.commandCenterTodaySummary(state, { now: new Date(), characterId: state.activeCharacterId });
@@ -3258,6 +3282,7 @@
         else if (action === 'agenda') activateTab('agenda');
         else if (action === 'open-collections' || action === 'collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
         else if (action === 'edit-character') openCharacterDialog(true);
+        else if (action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
         else if (action === 'add-goal') openGoalDialog();
         else if (action === 'open-activity') { activateTab('activities'); openActivityDialog(sourceId); }
@@ -3337,6 +3362,10 @@
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-onboarding-dismiss').addEventListener('click', () => {
+        state.preferences = { ...state.preferences, onboardingDismissed: true };
+        saveState(); renderOnboarding();
+      });
       root.querySelector('#acc-add-character').addEventListener('click', () => openCharacterDialog(false));
       root.querySelector('#acc-edit-character').addEventListener('click', () => openCharacterDialog(true));
       root.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => root.querySelector(`#${button.dataset.closeDialog}`).close()));

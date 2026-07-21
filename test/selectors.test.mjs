@@ -8,7 +8,8 @@ import {
   selectRecentActivity,
   localWeekBounds,
   selectWeeklyMomentum,
-  selectNextUp
+  selectNextUp,
+  selectOnboardingState
 } from '../src/selectors.mjs';
 
 const at = (day, hour = 12, minute = 0) => new Date(2026, 6, day, hour, minute, 0);
@@ -30,6 +31,10 @@ const state = (overrides = {}) => ({
   migration: { sourceVersion: 2, targetVersion: 2, migratedAt: iso(1) },
   ...overrides
 });
+const starterCharacter = (overrides = {}) => character('carnitez-silvermoon-eu', {
+  name: 'Carnitez', race: 'Night Elf', className: 'Druid', spec: 'Guardian', location: 'Shadowglen', ...overrides
+});
+const tracker = (id, characterId, overrides = {}) => ({ id, scope: 'character', characterId, name: id, owned: 0, target: 10, baseline: 0, ...overrides });
 
 test('Next Up prefers in-progress work, then priority, then recency', () => {
   const campaign = state({ goals: [
@@ -220,5 +225,75 @@ test('all Command Center selectors leave canonical state untouched', () => {
   selectRecentActivity(campaign);
   selectWeeklyMomentum(campaign, { scope: 'all', now: at(22) });
   selectNextUp(campaign, { now: at(22) });
+  assert.deepEqual(campaign, before);
+});
+
+test('onboarding checklist shows all steps incomplete on a fresh campaign', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()] });
+  const onboarding = selectOnboardingState(campaign);
+  assert.equal(onboarding.visible, true);
+  assert.equal(onboarding.allComplete, false);
+  assert.deepEqual(onboarding.steps.map(step => step.complete), [false, false, false, false]);
+});
+
+test('editing the starter character completes the character step only', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter({ name: 'Thrall' })] });
+  const onboarding = selectOnboardingState(campaign);
+  assert.deepEqual(onboarding.steps.map(step => step.complete), [true, false, false, false]);
+});
+
+test('a positive collection count completes the collections step only', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu', { owned: 3 })]
+  });
+  const onboarding = selectOnboardingState(campaign);
+  assert.deepEqual(onboarding.steps.map(step => step.complete), [false, true, false, false]);
+});
+
+test('a set baseline also completes the collections step', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu', { owned: 0, baseline: 0 }), tracker('pets', 'carnitez-silvermoon-eu', { owned: 5, baseline: 5 })]
+  });
+  const onboarding = selectOnboardingState(campaign);
+  assert.equal(onboarding.steps[1].complete, true);
+});
+
+test('having a planned activity completes the activity step only', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'act', characterId: 'carnitez-silvermoon-eu', kind: 'planned', title: 'Work', status: 'todo', priority: 0 }]
+  });
+  const onboarding = selectOnboardingState(campaign);
+  assert.deepEqual(onboarding.steps.map(step => step.complete), [false, false, true, false]);
+});
+
+test('having a saved session plan completes the session step and hides the fresh-campaign card', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    sessionPlans: [{ id: 'plan', title: 'Plan', status: 'draft', characterIds: ['carnitez-silvermoon-eu'], items: [] }]
+  });
+  const onboarding = selectOnboardingState(campaign);
+  assert.equal(onboarding.steps[3].complete, true);
+  assert.equal(onboarding.visible, false);
+});
+
+test('the dismissed preference hides the checklist regardless of progress', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], preferences: { onboardingDismissed: true } });
+  assert.equal(selectOnboardingState(campaign).visible, false);
+});
+
+test('a save without the onboarding preference still validates and defaults to not dismissed', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], preferences: {} });
+  const onboarding = selectOnboardingState(campaign);
+  assert.equal(onboarding.dismissed, false);
+  assert.equal(onboarding.visible, true);
+});
+
+test('onboarding selector never mutates canonical state', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu')] });
+  const before = structuredClone(campaign);
+  selectOnboardingState(campaign);
   assert.deepEqual(campaign, before);
 });

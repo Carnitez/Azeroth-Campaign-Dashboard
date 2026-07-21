@@ -320,6 +320,36 @@ export function selectNextUp(state, { limit = 5, now = new Date(), availableMinu
   });
 }
 
+const STARTER_CHARACTER_ID = 'carnitez-silvermoon-eu';
+
+// The starter character has no "confirmed" flag, so treat it as unedited only while
+// its identity fields still match the exact values createStarterState seeds it with.
+function characterLooksUnedited(character) {
+  return character?.id === STARTER_CHARACTER_ID
+    && character.name === 'Carnitez' && character.race === 'Night Elf' && character.className === 'Druid'
+    && character.spec === 'Guardian' && character.location === 'Shadowglen';
+}
+
+export function selectOnboardingState(state) {
+  const roster = activeCharacters(state);
+  const activeCharacter = roster.find(item => item.id === state?.activeCharacterId) || roster[0] || null;
+  const rosterIds = new Set(roster.map(item => item.id));
+  const trackers = list(state?.collectionTrackers).filter(item => rosterIds.has(item.characterId));
+  const activities = list(state?.activities).filter(item => Activities.isPlannedActivity(item) && rosterIds.has(item.characterId));
+  const plans = list(state?.sessionPlans);
+  const allCountsZero = trackers.every(item => number(item.owned) === 0);
+  const hasActivities = activities.length > 0;
+  const hasSessions = plans.length > 0;
+  const dismissed = Boolean(state?.preferences?.onboardingDismissed);
+  const steps = [
+    { id: 'character', label: 'Make this character yours', action: 'edit-character', complete: Boolean(roster.length > 1 || (activeCharacter && !characterLooksUnedited(activeCharacter))) },
+    { id: 'collections', label: 'Enter your collection counts', action: 'open-collections', complete: trackers.some(item => number(item.owned) > 0 || number(item.baseline) > 0) },
+    { id: 'activity', label: 'Create your first activity', action: 'create-activity', complete: hasActivities },
+    { id: 'session', label: 'Plan your first session', action: 'plan-session', complete: hasSessions }
+  ];
+  return { visible: allCountsZero && !hasActivities && !hasSessions && !dismissed, dismissed, steps, allComplete: steps.every(step => step.complete) };
+}
+
 export const Selectors = Object.freeze({
   selectActiveGoals,
   selectGoalObjectiveCounts,
@@ -328,7 +358,8 @@ export const Selectors = Object.freeze({
   selectRecentActivity,
   localWeekBounds,
   selectWeeklyMomentum,
-  selectNextUp
+  selectNextUp,
+  selectOnboardingState
 });
 
 globalThis.AzerothSelectors = Selectors;
