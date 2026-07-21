@@ -993,6 +993,20 @@
       padding: 0.55rem 0.25rem;
       border-bottom: 1px solid var(--border);
     }
+    #azeroth-command-center .acc-recommend-actions { display: flex; align-items: center; gap: 0.35rem; }
+    #azeroth-command-center .acc-recommend-actions details { position: relative; }
+    #azeroth-command-center .acc-recommend-menu { position: absolute; z-index: 15; right: 0; top: calc(100% + 0.3rem); display: grid; width: 11.5rem; padding: 0.35rem; border: 1px solid var(--border); border-radius: 6px; background: var(--popover); box-shadow: 0 12px 30px rgb(0 0 0 / 30%); }
+    #azeroth-command-center .acc-recommend-menu .btn { justify-content: flex-start; border-color: transparent; }
+    #azeroth-command-center .acc-recommend-why { grid-column: 2 / -1; color: var(--muted-foreground); font-size: 0.68rem; }
+    #azeroth-command-center .acc-recommend-why summary { width: max-content; cursor: pointer; color: var(--acc-secondary); }
+    #azeroth-command-center .acc-recommend-why ul { margin: 0.35rem 0 0; padding-left: 1rem; }
+    #azeroth-command-center .acc-recommend-feedback { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; color: var(--muted-foreground); font-size: 0.68rem; }
+    #azeroth-command-center .acc-recommend-feedback .btn { min-height: 1.8rem; padding: 0.25rem 0.5rem; }
+    #azeroth-command-center .acc-insights { margin-top: 0.8rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    #azeroth-command-center .acc-insight-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--border); }
+    #azeroth-command-center .acc-insight { display: grid; gap: 0.18rem; padding: 0.55rem; background: var(--card); }
+    #azeroth-command-center .acc-insight span { color: var(--muted-foreground); font-size: 0.63rem; }
+    #azeroth-command-center .acc-insight strong { font-size: 0.78rem; }
     #azeroth-command-center .acc-next-rank {
       display: grid;
       width: 1.6rem;
@@ -1062,6 +1076,8 @@
       font-size: 0.62rem;
     }
     #azeroth-command-center .acc-status[data-state="Active"],
+    #azeroth-command-center .acc-status[data-state="Active now"],
+    #azeroth-command-center .acc-status[data-state="Has work today"],
     #azeroth-command-center .acc-status[data-state="Recently completed"] {
       color: color-mix(in srgb, var(--acc-secondary) 78%, white);
       border-color: color-mix(in srgb, var(--acc-secondary) 22%, var(--border));
@@ -1202,6 +1218,7 @@
         grid-template-columns: auto minmax(0, 1fr);
       }
       #azeroth-command-center .acc-next-row > .btn,
+      #azeroth-command-center .acc-next-row > .acc-recommend-actions,
       #azeroth-command-center .acc-command-goal > .acc-row-actions {
         grid-column: 2;
         justify-self: start;
@@ -1543,7 +1560,7 @@
     #azeroth-command-center .acc-today-stat strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #azeroth-command-center .acc-today-summary > .btn { margin: auto 0.7rem; }
     #azeroth-command-center .acc-agenda-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 0.75rem; margin-bottom: 0.75rem; }
-    #azeroth-command-center .acc-agenda-filters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.45rem; padding: 0.65rem; border-block: 1px solid var(--border); background: color-mix(in srgb, var(--card) 75%, transparent); }
+    #azeroth-command-center .acc-agenda-filters { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.45rem; padding: 0.65rem; border-block: 1px solid var(--border); background: color-mix(in srgb, var(--card) 75%, transparent); }
     #azeroth-command-center .acc-agenda-selection { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
     #azeroth-command-center .acc-agenda-selection .form-control { width: 6rem; }
     #azeroth-command-center .acc-agenda-section { margin-top: 1rem; }
@@ -1609,6 +1626,7 @@
       #azeroth-command-center .acc-runner-note { grid-template-columns: minmax(0, 1fr); }
       #azeroth-command-center .acc-agenda-toolbar { align-items: stretch; flex-direction: column; }
       #azeroth-command-center .acc-agenda-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #azeroth-command-center .acc-insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       #azeroth-command-center .acc-agenda-row { grid-template-columns: auto minmax(0, 1fr); }
       #azeroth-command-center .acc-agenda-row > .acc-activity-mark,
       #azeroth-command-center .acc-agenda-row > .form-check { grid-column: 1; grid-row: 1 / span 2; }
@@ -1781,6 +1799,7 @@
         <label class="form-label">Priority<select class="form-select" id="acc-agenda-priority"><option value="">Any priority</option><option value="3">Critical</option><option value="2">High</option><option value="1">Normal</option><option value="0">Low</option></select></label>
         <label class="form-label">Schedule<select class="form-select" id="acc-agenda-schedule"><option value="">Any schedule</option><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekdays">Selected weekdays</option><option value="interval">Interval</option><option value="manual">Manual</option></select></label>
         <label class="form-label">State<select class="form-select" id="acc-agenda-state"><option value="">Any state</option><option value="available">Available</option><option value="completed">Completed</option><option value="missed">Missed</option><option value="upcoming">Upcoming</option><option value="paused">Paused</option></select></label>
+        <label class="form-label">Order<select class="form-select" id="acc-agenda-sort"><option value="recommended">Recommended</option><option value="due">Due time</option><option value="priority">Priority</option><option value="character">Character</option><option value="duration">Estimated duration</option><option value="manual">Manual order</option></select></label>
       </div>
       <div class="acc-agenda-selection"><strong id="acc-agenda-selected">0 selected · 0m</strong><label class="form-label acc-inline" style="margin:0"><span>Available time</span><input class="form-control" id="acc-agenda-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-agenda-selected-plan" disabled>Create selected plan</button><button class="btn" type="button" id="acc-agenda-add-draft" disabled>Add to draft</button><button class="btn" type="button" id="acc-agenda-time-plan">Generate from today</button></div>
       <section class="acc-agenda-section" aria-labelledby="acc-agenda-today-heading"><header><div><h2 id="acc-agenda-today-heading">Today</h2><span class="text-muted text-small">Available, due, optional, and completed work.</span></div></header><div id="acc-agenda-today"></div></section>
@@ -1875,6 +1894,7 @@
         <section class="card">
           <div class="acc-section-head"><h2>Data & backup</h2></div>
           <p class="text-muted">Everything is stored in this browser. Export a backup occasionally, especially before clearing browser data.</p>
+          <p class="text-small text-muted">Recommendations are deterministic. They use your schedules, priorities, active character, local actions, and completed-session history. No game account or external service is read, and recommendation history never leaves this browser. You can always dismiss, snooze, or override a suggestion.</p>
           <div class="acc-actions">
             <button class="btn" type="button" id="acc-export"><i data-lucide="download" aria-hidden="true"></i> Export backup</button>
             <button class="btn" type="button" id="acc-import"><i data-lucide="upload" aria-hidden="true"></i> Import backup</button>
@@ -1901,6 +1921,7 @@
         <label class="form-label">Race<input class="form-control" name="race" maxlength="40" required></label>
         <label class="form-label">Class<input class="form-control" name="className" maxlength="40" required></label>
         <label class="form-label">Spec<input class="form-control" name="spec" maxlength="40"></label>
+        <label class="form-label">Campaign role<select class="form-select" name="campaignRole"><option value="main">Main</option><option value="active_alt">Active alt</option><option value="occasional">Occasional</option><option value="resting">Resting</option></select></label>
         <label class="form-label">Level<input class="form-control" name="level" type="number" min="1" max="100" value="1" required></label>
         <label class="form-label">Gold<input class="form-control" name="gold" type="number" min="0" step="0.01" value="0" required></label>
         <label class="form-label">Location<input class="form-control" name="location" maxlength="80"></label>
@@ -1964,7 +1985,10 @@
         <label class="form-label">Scheduled date<input class="form-control" name="scheduledFor" type="date"></label>
         <label class="form-label">Tags<input class="form-control" name="tags" maxlength="160" placeholder="campaign, solo, weekly"></label>
         <label class="form-label wide">Notes<textarea class="form-control" name="notes" rows="3" maxlength="400"></textarea></label>
+        <label class="form-check wide"><input class="form-check-input" type="checkbox" name="blocked"><span>Blocked from recommendations</span></label>
+        <label class="form-label wide" data-activity-blocked-reason>Block reason<input class="form-control" name="blockedReason" maxlength="200" placeholder="Waiting on a decision, unlock, or prerequisite"></label>
       </div>
+      <section class="acc-insights" id="acc-activity-insights"><div class="acc-section-head"><div><h3>Insights</h3><span class="text-muted text-small">Based only on recorded runs.</span></div></div><div id="acc-activity-insight-content" class="acc-empty">Complete a few runs to build trustworthy insights.</div></section>
       <div class="acc-actions"><button class="btn btn-primary" type="submit" id="acc-activity-submit">Create activity</button><button class="btn" type="button" data-close-dialog="acc-activity-dialog">Cancel</button></div>
     </form>
   </dialog>
@@ -2011,7 +2035,7 @@
     <div class="acc-planner-presets" aria-label="Available time">
       <button class="btn" type="button" data-planner-minutes="15">15m</button><button class="btn" type="button" data-planner-minutes="30">30m</button><button class="btn" type="button" data-planner-minutes="60">60m</button><button class="btn" type="button" data-planner-minutes="90">90m</button><button class="btn" type="button" data-planner-minutes="120">120m</button>
     </div>
-    <div class="acc-inline"><label class="form-label" style="margin:0;flex:1">Available minutes<input class="form-control" id="acc-planner-minutes" type="number" min="1" max="720" value="60"></label><button class="btn btn-primary" type="button" id="acc-generate-plan">Generate plan</button></div>
+    <div class="acc-inline"><label class="form-label" style="margin:0;flex:1">Available minutes<input class="form-control" id="acc-planner-minutes" type="number" min="1" max="720" value="60"></label><label class="form-label" style="margin:0;flex:1">Strategy<select class="form-select" id="acc-planner-strategy"><option value="focused">Focused</option><option value="balanced">Balanced</option><option value="maximum_completion">Maximum completion</option><option value="gold_focused">Gold focused</option><option value="campaign_focused">Campaign focused</option></select></label><button class="btn btn-primary" type="button" id="acc-generate-plan">Generate plan</button></div>
     <div class="acc-planner-summary" id="acc-planner-summary" hidden></div>
     <div class="acc-plan-list" id="acc-plan-list" aria-live="polite"></div>
     <div class="acc-actions"><button class="btn" type="button" id="acc-regenerate-plan" hidden><i data-lucide="refresh-cw" aria-hidden="true"></i> Regenerate unlocked</button><button class="btn btn-primary" type="button" id="acc-save-plan" hidden><i data-lucide="save" aria-hidden="true"></i> Save plan</button><button class="btn" type="button" data-close-dialog="acc-planner-dialog">Done</button></div>
@@ -2126,6 +2150,7 @@
       const ActivityEngine = globalThis.AzerothActivities;
       const SessionEngine = globalThis.AzerothSessions;
       const Schedule = globalThis.AzerothSchedule;
+      const Recommendation = globalThis.AzerothRecommendations;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -2163,7 +2188,8 @@
       let activityView = 'today';
       let agendaSelected = new Set();
       let sessionView = 'active';
-      let plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+      let plannerState = { budgetMinutes: 60, strategy: 'balanced', lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+      let currentRecommendations = [];
       let sessionEditorPlan = null;
       let runnerPlanId = null;
       let resultReturnsToReview = false;
@@ -2389,16 +2415,32 @@
       }
       function renderNextUp() {
         const target = root.querySelector('#acc-next-up');
-        const recommendations = Selectors.selectNextUp(state, { limit: 5, now: new Date() });
-        if (!recommendations.length) {
+        const active = SessionEngine.selectActiveSession(state);
+        const visibleGoals = Selectors.selectActiveGoals(state, { limit: 5 });
+        const excludedKeys = [...(active ? [`session:${active.id}`] : []), ...visibleGoals.map(goal => `goal:${goal.id}`)];
+        currentRecommendations = Selectors.selectNextUp(state, { limit: 5, now: new Date(), strategy: state.preferences?.planningStrategy || 'balanced', excludedKeys });
+        if (!currentRecommendations.length) {
           target.innerHTML = '<div class="acc-empty">Nothing needs attention yet. Add a goal to give the Command Center a clear direction.<div class="acc-actions"><button class="btn" type="button" data-command-action="add-goal">Add first goal</button></div></div>';
           return;
         }
-        target.innerHTML = recommendations.map((item, index) => `<article class="acc-next-row">
-          <span class="acc-next-rank" aria-hidden="true">${index + 1}</span>
-          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.title)}</span><span class="acc-row-meta"><span>${escapeHtml(item.character?.name || 'Account')}</span><span>·</span><span>${escapeHtml(item.category)}</span><span>·</span><span>${escapeHtml(item.reason)}</span>${progressMarkup(item.progress)}</span></div>
-          <button class="btn" type="button" data-command-action="${escapeHtml(item.action)}" data-character-id="${escapeHtml(item.characterId || '')}" data-source-id="${escapeHtml(item.sourceId || '')}">${escapeHtml(item.actionLabel)}</button>
-        </article>`).join('');
+        target.innerHTML = currentRecommendations.map((item, index) => {
+          const positive = item.factors.filter(factor => factor.value > 0).slice(0, 4);
+          const negative = item.factors.filter(factor => factor.value < 0 && factor.value > Recommendation.SCORING_CONFIG.unavailable / 2).slice(0, 2);
+          const activityActions = item.sourceType === 'activity' ? `<button class="btn" type="button" data-recommend-action="add-session">Add to session</button><button class="btn" type="button" data-recommend-action="snooze">Snooze</button><button class="btn" type="button" data-recommend-action="lower-priority">Lower priority</button><button class="btn" type="button" data-recommend-action="block">Mark blocked</button>` : '';
+          const history = Recommendation.recommendationHistoryFor(state.recommendationHistory, item);
+          const askFeedback = index === 0 && Number(history?.timesShown) >= 2 && !history?.lastUserResponse;
+          return `<article class="acc-next-row" data-recommendation-type="${escapeHtml(item.sourceType)}" data-recommendation-id="${escapeHtml(item.sourceId)}">
+            <span class="acc-next-rank" aria-hidden="true">${index + 1}</span>
+            <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.title)}</span><span class="acc-row-meta"><span>${escapeHtml(item.character?.name || 'Account')}</span><span>·</span><span>${escapeHtml(item.category)}</span><span>·</span><span>${escapeHtml(item.reason)}</span>${progressMarkup(item.progress)}</span></div>
+            <span class="acc-recommend-actions"><button class="btn btn-primary" type="button" data-recommend-action="do-now">${escapeHtml(item.sourceType === 'activity' ? 'Do this now' : item.actionLabel)}</button><details><summary class="btn btn-ghost" aria-label="More recommendation actions"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-recommend-menu">${activityActions}<button class="btn" type="button" data-recommend-action="not-today">Not today</button><button class="btn" type="button" data-recommend-action="dismiss">Dismiss suggestion</button></div></details></span>
+            <details class="acc-recommend-why"><summary>Why this recommendation?</summary><ul>${positive.map(factor => `<li>${escapeHtml(factor.label)}</li>`).join('')}${negative.map(factor => `<li>Held back: ${escapeHtml(factor.label)}</li>`).join('')}</ul></details>
+            ${askFeedback ? '<span class="acc-recommend-feedback"><span>Was this recommendation useful?</span><button class="btn btn-ghost" type="button" data-recommend-feedback="useful">Useful</button><button class="btn btn-ghost" type="button" data-recommend-feedback="not_useful">Not useful</button><button class="btn btn-ghost" type="button" data-recommend-action="not-today">Not today</button></span>' : ''}
+          </article>`;
+        }).join('');
+        if (activeTab === 'overview') {
+          const impressions = Recommendation.recordRecommendationImpressions(state.recommendationHistory, currentRecommendations, { now: new Date() });
+          if (impressions.changed) { state.recommendationHistory = impressions.history; saveState(); }
+        }
       }
       function renderActiveGoals() {
         const target = root.querySelector('#acc-command-goals');
@@ -2441,10 +2483,10 @@
       }
       function renderRoster() {
         const target = root.querySelector('#acc-roster');
-        const roster = Selectors.selectCharacterAttention(state, { now: new Date() });
+        const roster = Recommendation.characterAttention(state, { now: new Date() });
         target.innerHTML = roster.map(item => `<article class="acc-roster-row" aria-current="${item.character.id === state.activeCharacterId}">
-          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.character.name)} <span class="text-muted">· ${Number(item.character.level) || 1}</span></span><span class="acc-row-meta"><span>${escapeHtml(item.character.race)} ${escapeHtml(item.character.className)}</span><span>·</span><span>${escapeHtml(item.character.realm)} ${escapeHtml(item.character.region)}</span><span>·</span><span>${formatGold(item.character.gold)}</span><span>·</span><span>${item.lastActivity ? formatLocalDateTime(item.lastActivity.at) : 'No activity yet'}</span><span>·</span><span>${item.unfinished} unfinished</span><span class="acc-status" data-state="${escapeHtml(item.attention)}">${escapeHtml(item.attention)}</span></span></div>
-          <button class="btn btn-ghost" type="button" data-command-switch="${escapeHtml(item.character.id)}" ${item.character.id === state.activeCharacterId ? 'disabled' : ''}>${item.character.id === state.activeCharacterId ? 'Selected' : 'Select'}</button>
+          <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.character.name)} <span class="text-muted">· ${Number(item.character.level) || 1}</span></span><span class="acc-row-meta"><span>${escapeHtml(item.character.race)} ${escapeHtml(item.character.className)}</span><span>·</span><span>${escapeHtml(item.character.realm)} ${escapeHtml(item.character.region)}</span><span>·</span><span>${escapeHtml(item.role.replace('_', ' '))}</span><span>·</span><span>${formatGold(item.character.gold)}</span><span>·</span><span>${item.lastActivity ? formatLocalDateTime(item.lastActivity.at) : 'No activity yet'}</span><span>·</span><span>${item.unfinished} unfinished</span><span class="acc-status" data-state="${escapeHtml(item.attention)}">${escapeHtml(item.attention)}</span></span></div>
+          <button class="btn btn-ghost" type="button" data-command-switch="${escapeHtml(item.character.id)}" ${item.character.id === state.activeCharacterId || item.character.archivedAt ? 'disabled' : ''}>${item.character.archivedAt ? 'Archived' : item.character.id === state.activeCharacterId ? 'Selected' : 'Select'}</button>
         </article>`).join('');
       }
       function renderRecentActivity() {
@@ -2545,6 +2587,8 @@
       function renderAgendaOptions() {
         const scope = root.querySelector('#acc-agenda-scope');
         scope.value = ['active', 'all'].includes(state.preferences?.agendaScope) ? state.preferences.agendaScope : 'active';
+        const sort = root.querySelector('#acc-agenda-sort');
+        sort.value = ['recommended', 'due', 'priority', 'character', 'duration', 'manual'].includes(state.preferences?.agendaSort) ? state.preferences.agendaSort : 'recommended';
         const characterFilter = root.querySelector('#acc-agenda-character');
         const selectedCharacter = characterFilter.value;
         characterFilter.innerHTML = `<option value="">Any character</option>${rosterCharacters().map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}`;
@@ -2554,7 +2598,7 @@
         category.innerHTML = `<option value="">Any category</option>${ActivityEngine.ACTIVITY_CATEGORIES.map(value => `<option>${escapeHtml(value)}</option>`).join('')}`;
         category.value = ActivityEngine.ACTIVITY_CATEGORIES.includes(selectedCategory) ? selectedCategory : '';
       }
-      function agendaRowMarkup(row, { selectable = true, upcomingDate = '' } = {}) {
+      function agendaRowMarkup(row, { selectable = true, upcomingDate = '', manual = false } = {}) {
         const activity = row.activity;
         const availability = row.availability || Schedule.activityAvailability(activity, state, { now: new Date() });
         const owner = state.characters.find(item => item.id === activity.characterId);
@@ -2567,13 +2611,15 @@
           ${selectable && available ? `<label class="form-check"><input class="form-check-input" type="checkbox" data-agenda-select ${selected ? 'checked' : ''} aria-label="Select ${escapeHtml(activity.title)}"></label>` : '<span class="acc-activity-mark" aria-hidden="true"><i data-lucide="circle-dot" aria-hidden="true"></i></span>'}
           <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Former character')}${otherCharacter ? ' · other character' : ''}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(availabilityLabels[availability.state] || availability.state)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span></span></div>
           <span class="acc-agenda-when"><strong>${formatMinutes(activity.estimatedMinutes)}</strong><span>${escapeHtml(due)}</span></span>
-          <span class="acc-agenda-actions">${available ? `<button class="btn btn-primary" type="button" data-agenda-action="start">Start</button><button class="btn" type="button" data-agenda-action="complete">Complete</button>` : ''}<details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover">${available ? '<button class="btn btn-ghost" type="button" data-agenda-action="add-draft">Add to draft</button><button class="btn btn-ghost" type="button" data-agenda-action="new-plan">Create plan</button><button class="btn btn-ghost" type="button" data-agenda-action="log-run">Log a run</button><button class="btn btn-ghost" type="button" data-agenda-action="snooze">Snooze</button><button class="btn btn-ghost" type="button" data-agenda-action="skip">Skip occurrence</button>' : ''}<button class="btn btn-ghost" type="button" data-agenda-action="schedule">Edit schedule</button><button class="btn btn-ghost" type="button" data-agenda-action="history">Run history</button><button class="btn btn-ghost" type="button" data-agenda-action="open">Open activity</button>${otherCharacter ? '<button class="btn btn-ghost" type="button" data-agenda-action="switch">Switch character</button>' : ''}${availability.schedule?.type === 'manual' && availability.state === 'completed_period' ? '<button class="btn btn-ghost" type="button" data-agenda-action="reset-manual">Reset manual activity</button>' : ''}${availability.record?.id ? `<button class="btn btn-ghost" type="button" data-agenda-action="undo-occurrence" data-occurrence-id="${escapeHtml(availability.record.id)}">Undo occurrence</button>` : ''}</div></details></span>
+          <span class="acc-agenda-actions">${manual ? '<button class="btn btn-ghost" type="button" data-agenda-action="manual-up" aria-label="Move activity up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-agenda-action="manual-down" aria-label="Move activity down"><i data-lucide="chevron-down" aria-hidden="true"></i></button>' : ''}${available ? `<button class="btn btn-primary" type="button" data-agenda-action="start">Start</button><button class="btn" type="button" data-agenda-action="complete">Complete</button>` : ''}<details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover">${available ? '<button class="btn btn-ghost" type="button" data-agenda-action="add-draft">Add to draft</button><button class="btn btn-ghost" type="button" data-agenda-action="new-plan">Create plan</button><button class="btn btn-ghost" type="button" data-agenda-action="log-run">Log a run</button><button class="btn btn-ghost" type="button" data-agenda-action="snooze">Snooze</button><button class="btn btn-ghost" type="button" data-agenda-action="skip">Skip occurrence</button>' : ''}<button class="btn btn-ghost" type="button" data-agenda-action="schedule">Edit schedule</button><button class="btn btn-ghost" type="button" data-agenda-action="history">Run history</button><button class="btn btn-ghost" type="button" data-agenda-action="open">Open activity</button>${otherCharacter ? '<button class="btn btn-ghost" type="button" data-agenda-action="switch">Switch character</button>' : ''}${availability.schedule?.type === 'manual' && availability.state === 'completed_period' ? '<button class="btn btn-ghost" type="button" data-agenda-action="reset-manual">Reset manual activity</button>' : ''}${availability.record?.id ? `<button class="btn btn-ghost" type="button" data-agenda-action="undo-occurrence" data-occurrence-id="${escapeHtml(availability.record.id)}">Undo occurrence</button>` : ''}</div></details></span>
         </article>`;
       }
       function renderAgenda() {
         renderAgendaOptions();
         const filters = currentAgendaFilters();
         const agenda = Schedule.selectAgenda(state, filters);
+        const sortMode = root.querySelector('#acc-agenda-sort').value;
+        const sortRows = rows => Recommendation.rankAgendaRows(rows, state, { now: filters.now, sortMode, strategy: state.preferences?.planningStrategy || 'balanced', manualOrder: state.preferences?.agendaManualOrder });
         const activeIds = new Set(agenda.rows.map(row => row.activity.id));
         agendaSelected = new Set([...agendaSelected].filter(id => activeIds.has(id)));
         root.querySelector('#acc-agenda-subtitle').textContent = `${formatLocalDate(new Date(), { weekday: 'long' })} · ${agenda.rows.length} scheduled activit${agenda.rows.length === 1 ? 'y' : 'ies'} in scope`;
@@ -2588,13 +2634,13 @@
           root.querySelector('#acc-agenda-resume').dataset.sessionId = active.id;
         }
         const todayTarget = root.querySelector('#acc-agenda-today');
-        const groups = ['inProgress', 'dueNow', 'availableToday', 'optional', 'completedToday'].map(key => [key, agenda.groups[key]]).filter(([, rows]) => rows.length);
-        todayTarget.innerHTML = groups.length ? groups.map(([key, rows]) => `<section class="acc-agenda-group"><header><h3>${agendaGroupLabels[key]}</h3><span>${rows.length}</span></header><div class="acc-agenda-list">${rows.map(row => agendaRowMarkup(row, { selectable: key !== 'completedToday' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No activities match today’s filters.</div>';
+        const groups = ['inProgress', 'dueNow', 'availableToday', 'optional', 'completedToday'].map(key => [key, sortRows(agenda.groups[key])]).filter(([, rows]) => rows.length);
+        todayTarget.innerHTML = groups.length ? groups.map(([key, rows]) => `<section class="acc-agenda-group"><header><h3>${agendaGroupLabels[key]}</h3><span>${rows.length}</span></header><div class="acc-agenda-list">${rows.map(row => agendaRowMarkup(row, { selectable: key !== 'completedToday', manual: sortMode === 'manual' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No activities match today’s filters.</div>';
         const overduePlans = (state.sessionPlans || []).filter(plan => plan.status === 'ready' && plan.plannedFor && plan.plannedFor < today()).map(plan => `<article class="acc-agenda-row"><span class="acc-activity-mark"><i data-lucide="calendar-x" aria-hidden="true"></i></span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(plan.title)}</span><span class="acc-row-meta">Ready session · planned for ${escapeHtml(plan.plannedFor)}</span></div><span class="acc-agenda-when"><strong>${formatMinutes(plan.totalEstimatedMinutes)}</strong></span><span class="acc-agenda-actions"><button class="btn" type="button" data-session-open="${escapeHtml(plan.id)}">Open plan</button></span></article>`);
-        root.querySelector('#acc-agenda-attention').innerHTML = [...agenda.groups.needsAttention.map(row => agendaRowMarkup(row, { selectable: false })), ...overduePlans].join('') || '<div class="acc-empty">Nothing needs attention.</div>';
+        root.querySelector('#acc-agenda-attention').innerHTML = [...sortRows(agenda.groups.needsAttention).map(row => agendaRowMarkup(row, { selectable: false, manual: sortMode === 'manual' })), ...overduePlans].join('') || '<div class="acc-empty">Nothing needs attention.</div>';
         const upcomingByDate = new Map();
         for (const item of agenda.groups.upcoming) { if (!upcomingByDate.has(item.date)) upcomingByDate.set(item.date, []); upcomingByDate.get(item.date).push(item); }
-        root.querySelector('#acc-agenda-upcoming').innerHTML = upcomingByDate.size ? [...upcomingByDate].map(([date, rows]) => `<section class="acc-upcoming-day"><time class="acc-upcoming-date" datetime="${date}">${escapeHtml(formatLocalDate(date, { weekday: 'long' }))}</time><div class="acc-agenda-list">${rows.map(item => agendaRowMarkup(item, { selectable: false, upcomingDate: date })).join('')}</div></section>`).join('') : '<div class="acc-empty">No scheduled work in the next seven days.</div>';
+        root.querySelector('#acc-agenda-upcoming').innerHTML = upcomingByDate.size ? [...upcomingByDate].map(([date, rows]) => `<section class="acc-upcoming-day"><time class="acc-upcoming-date" datetime="${date}">${escapeHtml(formatLocalDate(date, { weekday: 'long' }))}</time><div class="acc-agenda-list">${sortRows(rows).map(item => agendaRowMarkup(item, { selectable: false, upcomingDate: date, manual: sortMode === 'manual' })).join('')}</div></section>`).join('') : '<div class="acc-empty">No scheduled work in the next seven days.</div>';
         const recentRuns = state.activities.filter(ActivityEngine.isPlannedActivity).flatMap(activity => Schedule.selectRunHistory(state, activity.id).map(run => ({ activity, run }))).filter(item => ['completed', 'partial'].includes(item.run.status)).sort((a, b) => String(b.run.occurredAt).localeCompare(String(a.run.occurredAt))).slice(0, 8);
         root.querySelector('#acc-agenda-completed').innerHTML = recentRuns.length ? recentRuns.map(({ activity, run }) => agendaRowMarkup({ activity, availability: { ...Schedule.activityAvailability(activity, state), state: 'completed_period', lastCompletedAt: run.occurredAt } }, { selectable: false })).join('') : '<div class="acc-empty">Completed runs will appear here.</div>';
         renderAgendaSelection();
@@ -2664,7 +2710,7 @@
           const lastValue = activity.availability.lastCompletedAt;
           return `<article class="acc-activity-row" data-activity-id="${escapeHtml(activity.id)}" data-status="${escapeHtml(activity.effectiveStatus)}">
             <button class="btn btn-ghost acc-activity-check" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}" aria-label="${completeLabel} ${escapeHtml(activity.title)}"><i data-lucide="${completed ? 'circle-check-big' : skipped ? 'rotate-ccw' : 'circle'}" aria-hidden="true"></i></button>
-            <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Character')}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(activityStatusLabels[activity.effectiveStatus] || activity.effectiveStatus)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span>${activity.repeatType !== 'one_time' ? `<span class="acc-chip">${escapeHtml(activityRepeatLabels[activity.repeatType])}</span>` : ''}${tags}</span>${activity.description ? `<span class="text-small text-muted">${escapeHtml(activity.description)}</span>` : ''}</div>
+            <div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(owner?.name || 'Character')}</span><span>·</span><span>${escapeHtml(activity.category)}</span><span>·</span><span>${escapeHtml(activityStatusLabels[activity.effectiveStatus] || activity.effectiveStatus)}</span><span class="acc-chip" data-priority="${Number(activity.priority)}">${escapeHtml(activityPriorityLabels[Number(activity.priority)] || 'Normal')}</span>${activity.blockedAt ? '<span class="acc-chip">Blocked</span>' : ''}${activity.repeatType !== 'one_time' ? `<span class="acc-chip">${escapeHtml(activityRepeatLabels[activity.repeatType])}</span>` : ''}${tags}</span>${activity.description ? `<span class="text-small text-muted">${escapeHtml(activity.description)}</span>` : ''}</div>
             <span class="acc-activity-estimate" title="${escapeHtml(scheduleText)}${lastValue ? ` · Last ${escapeHtml(formatLocalDate(lastValue, { time: true }))}` : ''}">${formatMinutes(activity.estimatedMinutes)}${nextValue ? `<small class="text-muted"> · ${escapeHtml(formatLocalDate(nextValue, { time: String(nextValue).includes('T') }))}</small>` : ''}</span>
             <span class="acc-activity-actions"><button class="btn" type="button" data-activity-action="edit">Open</button><details class="acc-activity-menu"><summary class="btn btn-ghost" aria-label="More actions for ${escapeHtml(activity.title)}"><i data-lucide="ellipsis" aria-hidden="true"></i></summary><div class="acc-activity-menu-popover"><button class="btn btn-ghost" type="button" data-activity-action="edit">Edit</button><button class="btn btn-ghost" type="button" data-activity-action="schedule">Edit schedule</button><button class="btn btn-ghost" type="button" data-activity-action="history">Run history</button><button class="btn btn-ghost" type="button" data-activity-action="${activity.availability.state === 'paused' ? 'resume-schedule' : 'pause-schedule'}">${activity.availability.state === 'paused' ? 'Resume schedule' : 'Pause schedule'}</button><button class="btn btn-ghost" type="button" data-activity-action="${completed || skipped ? 'undo' : 'complete'}">${completeLabel}</button><button class="btn btn-ghost" type="button" data-activity-action="duplicate">Duplicate</button><button class="btn btn-ghost acc-btn-danger" type="button" data-activity-action="delete">Delete</button></div></details></span>
           </article>`;
@@ -2701,8 +2747,9 @@
         }).join('');
       }
       function openPlanner() {
-        plannerState = { budgetMinutes: 60, lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
+        plannerState = { budgetMinutes: 60, strategy: state.preferences?.planningStrategy || 'balanced', lockedIds: new Set(), excludedIds: new Set(), order: [], result: null };
         root.querySelector('#acc-planner-minutes').value = 60;
+        root.querySelector('#acc-planner-strategy').value = plannerState.strategy;
         renderPlanner();
         root.querySelector('#acc-planner-dialog').showModal();
       }
@@ -2855,6 +2902,34 @@
         if (!next) { openSessionHistory('upcoming'); showToast('No saved session is ready yet.'); return; }
         startSavedSession(next.id);
       }
+      function renderActivityInsights(activity) {
+        const section = root.querySelector('#acc-activity-insights');
+        const target = root.querySelector('#acc-activity-insight-content');
+        section.hidden = !activity;
+        if (!activity) return;
+        const metrics = Recommendation.historicalActivityMetrics(state, activity);
+        if (!metrics.runs) {
+          target.className = 'acc-empty';
+          target.textContent = 'No recorded runs yet. Complete this activity through a session to build insights.';
+          return;
+        }
+        const values = [
+          ['Runs completed', String(metrics.completed)],
+          ['Typical duration', metrics.trustedDuration ? formatMinutes(metrics.medianDuration) : `${metrics.durationSamples}/${Recommendation.MIN_HISTORY_SAMPLES} timed runs`],
+          ['Completion rate', `${Math.round((metrics.completionRate || 0) * 100)}%`],
+          ['Last completed', metrics.lastCompletedAt ? formatLocalDateTime(metrics.lastCompletedAt) : 'Not completed'],
+          ['Gold earned', formatGold(metrics.totalGoldEarned)],
+          ['Median gold/hour', metrics.medianGoldPerHour === null ? `${metrics.goldSamples}/${Recommendation.MIN_HISTORY_SAMPLES} measured runs` : `${formatGold(metrics.medianGoldPerHour)}/h`],
+          ['Recent result', metrics.recentResult?.status || 'None'],
+          ['Estimated vs actual', metrics.trustedDuration && metrics.estimateVarianceMinutes !== null ? `${metrics.estimateVarianceMinutes > 0 ? '+' : ''}${Math.round(metrics.estimateVarianceMinutes)}m` : 'More runs needed']
+        ];
+        target.className = 'acc-insight-grid';
+        target.innerHTML = values.map(([label, value]) => `<div class="acc-insight"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
+      }
+      function renderBlockedFields() {
+        const form = root.querySelector('#acc-activity-form');
+        root.querySelector('[data-activity-blocked-reason]').hidden = !form.elements.blocked.checked;
+      }
       function openActivityDialog(activityId = null, defaults = {}) {
         const form = root.querySelector('#acc-activity-form');
         form.reset();
@@ -2867,6 +2942,10 @@
           if (!form.elements[key]) continue;
           form.elements[key].value = key === 'tags' ? (Array.isArray(value) ? value.join(', ') : value || '') : value ?? '';
         }
+        form.elements.blocked.checked = Boolean(activity?.blockedAt);
+        form.elements.blockedReason.value = activity?.blockedReason || '';
+        renderBlockedFields();
+        renderActivityInsights(activity);
         root.querySelector('#acc-activity-dialog').showModal();
         requestAnimationFrame(() => form.elements.title.focus());
       }
@@ -2887,10 +2966,13 @@
       function activityById(activityId) { return state.activities.find(item => item.id === activityId && ActivityEngine.isPlannedActivity(item)); }
       function completeAgendaActivity(activityId) {
         const activity = activityById(activityId); if (!activity) return;
+        const recommended = currentRecommendations.find(item => item.sourceType === 'activity' && item.sourceId === activityId);
         try {
           const result = Schedule.completeCurrentOccurrence(activity, state, {}, { now: new Date() });
           if (result.duplicate) { showToast('This occurrence is already complete.'); return; }
-          state = result.state; saveState(); render();
+          state = result.state;
+          if (recommended) state.recommendationHistory = Recommendation.applyRecommendationFeedback(state.recommendationHistory, recommended, 'completed', { now: new Date() });
+          saveState(); render();
           showToast('Occurrence completed.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Completion undone.'); } });
         } catch (error) { showToast(error.message, { tone: 'warning' }); }
       }
@@ -2919,6 +3001,27 @@
         agendaSelected.clear(); replaceSessionPlan(plan); openPlanEditor(plan); showToast('Activities added to the latest editable plan.');
       }
       function startAgendaActivity(activityId) { createAgendaPlan([activityId], { start: true, open: false }); }
+      function recommendationFor(sourceType, sourceId) {
+        return currentRecommendations.find(item => item.sourceType === sourceType && item.sourceId === sourceId)
+          || Recommendation.generateRecommendationCandidates(state, { now: new Date() }).find(item => item.sourceType === sourceType && item.sourceId === sourceId)
+          || { sourceType, sourceId, characterId: activityById(sourceId)?.characterId || null };
+      }
+      function recordRecommendationResponse(candidate, response, { rerender = false } = {}) {
+        state.recommendationHistory = Recommendation.applyRecommendationFeedback(state.recommendationHistory, candidate, response, { now: new Date() });
+        saveState();
+        if (rerender) render();
+      }
+      function moveAgendaManual(activityId, direction) {
+        const validIds = state.activities.filter(ActivityEngine.isPlannedActivity).map(activity => activity.id);
+        const valid = new Set(validIds);
+        const order = [...new Set([...(state.preferences?.agendaManualOrder || []).filter(id => valid.has(id)), ...validIds])];
+        const index = order.indexOf(activityId);
+        const next = index + direction;
+        if (index < 0 || next < 0 || next >= order.length) return;
+        [order[index], order[next]] = [order[next], order[index]];
+        state.preferences = { ...state.preferences, agendaManualOrder: order };
+        saveState(); renderAgenda(); refreshIcons();
+      }
       function openScheduleDialog(activityId) {
         const activity = activityById(activityId); if (!activity) return;
         const schedule = Schedule.normalizeSchedule(activity); const form = root.querySelector('#acc-schedule-form'); form.reset();
@@ -2949,7 +3052,8 @@
       function generatePlanner({ reset = false } = {}) {
         if (reset) plannerState = { ...plannerState, lockedIds: new Set(), excludedIds: new Set(), order: [] };
         plannerState.budgetMinutes = Math.max(1, Number(root.querySelector('#acc-planner-minutes').value) || 30);
-        plannerState.result = ActivityEngine.planSession(state, { budgetMinutes: plannerState.budgetMinutes, activeCharacterId: state.activeCharacterId, lockedIds: [...plannerState.lockedIds], excludedIds: [...plannerState.excludedIds], currentOrder: plannerState.order, now: new Date() });
+        plannerState.strategy = root.querySelector('#acc-planner-strategy').value || 'balanced';
+        plannerState.result = ActivityEngine.planSession(state, { budgetMinutes: plannerState.budgetMinutes, strategy: plannerState.strategy, activeCharacterId: state.activeCharacterId, lockedIds: [...plannerState.lockedIds], excludedIds: [...plannerState.excludedIds], currentOrder: plannerState.order, now: new Date() });
         plannerState.order = plannerState.result.items.map(item => item.activity.id);
         renderPlanner();
       }
@@ -2958,14 +3062,15 @@
         const summary = root.querySelector('#acc-planner-summary');
         const target = root.querySelector('#acc-plan-list');
         root.querySelectorAll('[data-planner-minutes]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.plannerMinutes) === Number(plannerState.budgetMinutes))));
+        root.querySelector('#acc-planner-strategy').value = plannerState.strategy || 'balanced';
         root.querySelector('#acc-regenerate-plan').hidden = !result;
         root.querySelector('#acc-save-plan').hidden = !result || !result.items.length;
         if (!result) { summary.hidden = true; target.innerHTML = '<div class="acc-empty">Choose the time available, then generate a plan from your existing activities.</div>'; return; }
         summary.hidden = false;
-        summary.innerHTML = `<span><strong>${formatMinutes(result.totalMinutes)}</strong> planned · ${result.items.length} activit${result.items.length === 1 ? 'y' : 'ies'}</span><span class="text-muted text-small">${result.characterIds.length} character${result.characterIds.length === 1 ? '' : 's'} · ${result.categories.map(escapeHtml).join(', ') || 'No categories'}</span>`;
+        summary.innerHTML = `<span><strong>${formatMinutes(result.totalMinutes)}</strong> planned · ${result.items.length} activit${result.items.length === 1 ? 'y' : 'ies'}</span><span class="text-muted text-small">${escapeHtml(Recommendation.PLANNING_STRATEGIES[result.strategy]?.label || 'Balanced')} · ${result.characterIds.length} character${result.characterIds.length === 1 ? '' : 's'} · ${result.categories.map(escapeHtml).join(', ') || 'No categories'}</span>`;
         if (!result.items.length) { target.innerHTML = '<div class="acc-empty">No eligible activities fit this time budget. Create an activity or increase the available time.</div>'; return; }
         const characterMap = new Map(state.characters.map(item => [item.id, item]));
-        target.innerHTML = result.items.map((item, index) => `<article class="acc-plan-row" data-plan-id="${escapeHtml(item.activity.id)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.activity.characterId)?.name || 'Character')}</span><span>·</span><span>${escapeHtml(item.activity.category)}</span><span>·</span><span>${formatMinutes(item.activity.estimatedMinutes)}</span><span>·</span><span>${escapeHtml(item.reason)}</span></span></div><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-plan-action="lock" aria-pressed="${String(plannerState.lockedIds.has(item.activity.id))}" aria-label="${plannerState.lockedIds.has(item.activity.id) ? 'Unlock' : 'Lock'} ${escapeHtml(item.activity.title)}"><i data-lucide="${plannerState.lockedIds.has(item.activity.id) ? 'lock-keyhole' : 'lock-keyhole-open'}" aria-hidden="true"></i></button><span class="acc-plan-order"><button class="btn btn-ghost" type="button" data-plan-action="up" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-action="down" ${index === result.items.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} down"><i data-lucide="chevron-down" aria-hidden="true"></i></button></span><button class="btn btn-ghost" type="button" data-plan-action="remove" aria-label="Remove ${escapeHtml(item.activity.title)} from plan"><i data-lucide="x" aria-hidden="true"></i></button></span></article>`).join('');
+        target.innerHTML = result.items.map((item, index) => `<article class="acc-plan-row" data-plan-id="${escapeHtml(item.activity.id)}"><span class="acc-next-rank">${index + 1}</span><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.activity.title)}</span><span class="acc-row-meta"><span>${escapeHtml(characterMap.get(item.activity.characterId)?.name || 'Character')}</span><span>·</span><span>${escapeHtml(item.activity.category)}</span><span>·</span><span>${formatMinutes(item.plannedMinutes)}${item.usesHistoricalDuration ? ' from run history' : ' estimated'}</span><span>·</span><span>${escapeHtml(item.reason)}</span></span></div><span class="acc-activity-actions"><button class="btn btn-ghost" type="button" data-plan-action="lock" aria-pressed="${String(plannerState.lockedIds.has(item.activity.id))}" aria-label="${plannerState.lockedIds.has(item.activity.id) ? 'Unlock' : 'Lock'} ${escapeHtml(item.activity.title)}"><i data-lucide="${plannerState.lockedIds.has(item.activity.id) ? 'lock-keyhole' : 'lock-keyhole-open'}" aria-hidden="true"></i></button><span class="acc-plan-order"><button class="btn btn-ghost" type="button" data-plan-action="up" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} up"><i data-lucide="chevron-up" aria-hidden="true"></i></button><button class="btn btn-ghost" type="button" data-plan-action="down" ${index === result.items.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(item.activity.title)} down"><i data-lucide="chevron-down" aria-hidden="true"></i></button></span><button class="btn btn-ghost" type="button" data-plan-action="remove" aria-label="Remove ${escapeHtml(item.activity.title)} from plan"><i data-lucide="x" aria-hidden="true"></i></button></span></article>`).join('');
         refreshIcons();
       }
       function openCharacterDialog(editing) {
@@ -2973,8 +3078,9 @@
         form.reset();
         const c = editing ? character() : null;
         root.querySelector('#acc-character-dialog-title').textContent = editing ? 'Edit character' : 'Add character';
-        const defaults = c || { id: '', name: '', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: '', className: '', spec: '', level: 1, gold: 0, location: '', professions: '' };
+        const defaults = c || { id: '', name: '', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: '', className: '', spec: '', campaignRole: rosterCharacters().length ? 'active_alt' : 'main', level: 1, gold: 0, location: '', professions: '' };
         Object.keys(defaults).forEach(key => { if (form.elements[key]) form.elements[key].value = defaults[key] ?? ''; });
+        form.elements.campaignRole.value = c?.campaignRole || (c?.id === state.activeCharacterId ? 'main' : 'active_alt');
         root.querySelector('#acc-character-dialog').showModal();
       }
       function openGoalDialog(goalId = null, defaults = {}) {
@@ -3134,6 +3240,7 @@
         root.querySelectorAll('[data-panel]').forEach(panel => panel.hidden = panel.dataset.panel !== activeTab);
         root.querySelector('#acc-page-title').textContent = pageMeta[tabName].title;
         root.querySelector('#acc-page-description').textContent = pageMeta[tabName].description;
+        if (tabName === 'overview') { renderNextUp(); refreshIcons(); }
         if (focusTab) activeButton?.focus();
       }
       function renderRecovery() {
@@ -3197,7 +3304,7 @@
       root.querySelector('#acc-character-form').addEventListener('submit', e => {
         e.preventDefault();
         const f = new FormData(e.currentTarget), existing = state.characters.find(c => c.id === f.get('id'));
-        const values = { name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim() };
+        const values = { name: f.get('name').trim(), realm: f.get('realm').trim(), region: f.get('region'), faction: f.get('faction'), race: f.get('race').trim(), className: f.get('className').trim(), spec: f.get('spec').trim(), campaignRole: f.get('campaignRole'), level: Number(f.get('level')), gold: Number(f.get('gold')), location: f.get('location').trim(), professions: f.get('professions').trim() };
         if (existing) { Object.assign(existing, values); appendCurrentProgress(existing); }
         else {
           const id = uid('character');
@@ -3240,6 +3347,12 @@
         if (id === 'acc-agenda-scope') { state.preferences = { ...state.preferences, agendaScope: event.target.value }; saveState(); }
         renderAgenda(); refreshIcons();
       }));
+      root.querySelector('#acc-agenda-sort').addEventListener('change', event => {
+        const value = event.target.value;
+        const plannedIds = state.activities.filter(ActivityEngine.isPlannedActivity).map(activity => activity.id);
+        state.preferences = { ...state.preferences, agendaSort: value, ...(value === 'manual' && !state.preferences?.agendaManualOrder?.length ? { agendaManualOrder: plannedIds } : {}) };
+        saveState(); renderAgenda(); refreshIcons();
+      });
       root.querySelector('#acc-agenda-create').addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
       root.querySelector('#acc-agenda-plan').addEventListener('click', openPlanner);
       root.querySelector('#acc-agenda-resume').addEventListener('click', event => openSavedSession(event.currentTarget.dataset.sessionId));
@@ -3256,7 +3369,8 @@
         const planButton = event.target.closest('[data-session-open]'); if (planButton) { openSavedSession(planButton.dataset.sessionOpen); return; }
         const action = event.target.closest('[data-agenda-action]'); if (!action) return; const row = action.closest('[data-agenda-id]'); const id = row?.dataset.agendaId; const activity = activityById(id); if (!activity) return;
         const name = action.dataset.agendaAction;
-        if (name === 'start' || name === 'log-run') startAgendaActivity(id);
+        if (name === 'manual-up' || name === 'manual-down') moveAgendaManual(id, name === 'manual-up' ? -1 : 1);
+        else if (name === 'start' || name === 'log-run') startAgendaActivity(id);
         else if (name === 'complete') completeAgendaActivity(id);
         else if (name === 'add-draft') addActivitiesToDraft([id]);
         else if (name === 'new-plan') createAgendaPlan([id]);
@@ -3283,12 +3397,12 @@
         if (form.elements.preset.value === 'later') until = new Date(now.getTime() + 2 * 60 * 60 * 1000);
         else if (form.elements.preset.value === 'tomorrow') { until = Schedule.addLocalDays(now, 1); until.setHours(9, 0, 0, 0); }
         else until = form.elements.customAt.value ? new Date(form.elements.customAt.value) : null;
-        try { const result = Schedule.snoozeCurrentOccurrence(activity, state, until, { notes: form.elements.notes.value }, { now }); state = result.state; saveState(); root.querySelector('#acc-snooze-dialog').close(); render(); showToast('Occurrence snoozed.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Snooze removed.'); } }); }
+        try { const result = Schedule.snoozeCurrentOccurrence(activity, state, until, { notes: form.elements.notes.value }, { now }); state = result.state; state.recommendationHistory = Recommendation.applyRecommendationFeedback(state.recommendationHistory, recommendationFor('activity', activity.id), 'snoozed', { now }); saveState(); root.querySelector('#acc-snooze-dialog').close(); render(); showToast('Occurrence snoozed.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Snooze removed.'); } }); }
         catch (error) { root.querySelector('#acc-snooze-error').textContent = error.message; }
       });
       root.querySelector('#acc-skip-form').addEventListener('submit', event => {
         event.preventDefault(); const form = event.currentTarget; const activity = activityById(form.elements.activityId.value); if (!activity) return;
-        try { const result = Schedule.skipCurrentOccurrence(activity, state, { reason: form.elements.reason.value }, { now: new Date() }); state = result.state; saveState(); root.querySelector('#acc-skip-dialog').close(); render(); showToast('Occurrence skipped.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Skip undone.'); } }); }
+        try { const now = new Date(); const result = Schedule.skipCurrentOccurrence(activity, state, { reason: form.elements.reason.value }, { now }); state = result.state; state.recommendationHistory = Recommendation.applyRecommendationFeedback(state.recommendationHistory, recommendationFor('activity', activity.id), 'skipped', { now }); saveState(); root.querySelector('#acc-skip-dialog').close(); render(); showToast('Occurrence skipped.', { actionLabel: 'Undo', onAction: () => { state = Schedule.undoOccurrence(state, result.record.id); saveState(); render(); showToast('Skip undone.'); } }); }
         catch (error) { showToast(error.message, { tone: 'warning' }); }
       });
       root.querySelector('#acc-run-history-list').addEventListener('click', event => {
@@ -3299,6 +3413,7 @@
       root.querySelectorAll('[data-activity-view]').forEach(button => button.addEventListener('click', () => { activityView = button.dataset.activityView; renderActivities(); refreshIcons(); }));
       ['acc-activity-character-filter', 'acc-activity-category-filter', 'acc-activity-priority-filter', 'acc-activity-status-filter', 'acc-activity-sort'].forEach(id => root.querySelector(`#${id}`).addEventListener('change', () => { renderActivities(); refreshIcons(); }));
       ['acc-activity-search', 'acc-activity-tags-filter'].forEach(id => root.querySelector(`#${id}`).addEventListener('input', () => { renderActivities(); refreshIcons(); }));
+      root.querySelector('#acc-activity-form').elements.blocked.addEventListener('change', renderBlockedFields);
       root.querySelector('#acc-activity-form').addEventListener('submit', e => {
         e.preventDefault();
         const form = e.currentTarget, data = new FormData(form), id = data.get('id');
@@ -3306,7 +3421,8 @@
         const existing = index >= 0 ? state.activities[index] : null; const repeatType = data.get('repeatType'); const scheduledFor = data.get('scheduledFor') || null;
         let schedule = existing?.schedule ? { ...Schedule.normalizeSchedule(existing), type: repeatType } : null;
         if (!schedule && (repeatType !== 'one_time' || scheduledFor)) schedule = { type: repeatType, startDate: scheduledFor || today(), dueTime: null, weekdays: ['weekly', 'weekdays'].includes(repeatType) ? [new Date().getDay()] : [], intervalValue: 1, intervalUnit: 'days', endDate: null, timezoneMode: 'local', graceMinutes: 0, paused: false, pausedUntil: null };
-        const input = { title: data.get('title'), description: data.get('description'), characterId: data.get('characterId'), category: data.get('category'), priority: Number(data.get('priority')), status: data.get('status'), estimatedMinutes: Number(data.get('estimatedMinutes')), repeatType, scheduledFor, tags: data.get('tags'), notes: data.get('notes'), ...(schedule ? { schedule } : {}) };
+        const blocked = data.get('blocked') === 'on';
+        const input = { title: data.get('title'), description: data.get('description'), characterId: data.get('characterId'), category: data.get('category'), priority: Number(data.get('priority')), status: data.get('status'), estimatedMinutes: Number(data.get('estimatedMinutes')), repeatType, scheduledFor, tags: data.get('tags'), notes: data.get('notes'), blockedAt: blocked ? (existing?.blockedAt || new Date().toISOString()) : null, blockedReason: blocked ? data.get('blockedReason') : '', ...(schedule ? { schedule } : {}) };
         if (index >= 0) state.activities[index] = ActivityEngine.updatePlannedActivity(state.activities[index], input);
         else state.activities.push(ActivityEngine.createPlannedActivity(input, { id: uid('activity-plan') }));
         saveState(); form.reset(); root.querySelector('#acc-activity-dialog').close(); render(); showToast(index >= 0 ? 'Activity updated.' : 'Activity created.');
@@ -3325,7 +3441,7 @@
         else if (action.dataset.activityAction === 'history') openRunHistory(id);
         else if (action.dataset.activityAction === 'pause-schedule') { replaceActivity(id, item => Schedule.pauseSchedule(item)); showToast('Schedule paused.'); }
         else if (action.dataset.activityAction === 'resume-schedule') { replaceActivity(id, item => Schedule.resumeSchedule(item)); showToast('Schedule resumed.'); }
-        else if (action.dataset.activityAction === 'duplicate') { state.activities.push(ActivityEngine.duplicatePlannedActivity(activity, { id: uid('activity-plan') })); saveState(); render(); showToast('Activity duplicated.'); }
+        else if (action.dataset.activityAction === 'duplicate') { const copy = ActivityEngine.duplicatePlannedActivity(activity, { id: uid('activity-plan') }); delete copy.blockedAt; delete copy.blockedReason; state.activities.push(copy); saveState(); render(); showToast('Activity duplicated.'); }
         else if (action.dataset.activityAction === 'delete') { root.querySelector('#acc-delete-activity-form').elements.id.value = id; root.querySelector('#acc-delete-activity-name').textContent = activity.title; root.querySelector('#acc-delete-activity-dialog').showModal(); }
       });
       root.querySelector('#acc-delete-activity-form').addEventListener('submit', e => { e.preventDefault(); const id = e.currentTarget.elements.id.value; root.querySelector('#acc-delete-activity-dialog').close(); removeWithUndo(state.activities, id, 'Activity deleted.', (item, index) => state.activities.splice(index, 0, item)); });
@@ -3453,6 +3569,12 @@
       });
       root.querySelector('#acc-session-runner-dialog').addEventListener('close', () => { clearInterval(runnerTimer); runnerTimer = null; });
       root.querySelectorAll('[data-planner-minutes]').forEach(button => button.addEventListener('click', () => { plannerState.budgetMinutes = Number(button.dataset.plannerMinutes); root.querySelector('#acc-planner-minutes').value = plannerState.budgetMinutes; renderPlanner(); }));
+      root.querySelector('#acc-planner-strategy').addEventListener('change', event => {
+        plannerState.strategy = event.target.value;
+        state.preferences = { ...state.preferences, planningStrategy: plannerState.strategy };
+        saveState();
+        if (plannerState.result) generatePlanner(); else renderPlanner();
+      });
       root.querySelector('#acc-generate-plan').addEventListener('click', () => generatePlanner({ reset: true }));
       root.querySelector('#acc-regenerate-plan').addEventListener('click', () => generatePlanner());
       root.querySelector('#acc-plan-list').addEventListener('click', e => {
@@ -3482,6 +3604,37 @@
         if (e.target.matches('[data-command-goal-toggle]')) completeGoal(e.target.dataset.commandGoalToggle);
       });
       root.querySelector('#acc-panel-overview').addEventListener('click', e => {
+        const recommendationRow = e.target.closest('[data-recommendation-type][data-recommendation-id]');
+        const recommendationAction = e.target.closest('[data-recommend-action]');
+        const recommendationFeedback = e.target.closest('[data-recommend-feedback]');
+        if (recommendationRow && (recommendationAction || recommendationFeedback)) {
+          const item = recommendationFor(recommendationRow.dataset.recommendationType, recommendationRow.dataset.recommendationId);
+          if (recommendationFeedback) {
+            recordRecommendationResponse(item, recommendationFeedback.dataset.recommendFeedback, { rerender: true });
+            showToast('Thanks. Future suggestions will take that into account.');
+            return;
+          }
+          const name = recommendationAction.dataset.recommendAction;
+          if (name === 'do-now') {
+            recordRecommendationResponse(item, item.sourceType === 'activity' || item.action === 'start-session' ? 'started' : 'opened');
+            if (item.sourceType === 'activity') startAgendaActivity(item.sourceId);
+            else performCommandAction(item.action, item.characterId, item.sourceId);
+          } else if (name === 'add-session') {
+            recordRecommendationResponse(item, 'opened'); addActivitiesToDraft([item.sourceId]);
+          } else if (name === 'snooze') openSnoozeDialog(item.sourceId);
+          else if (name === 'lower-priority') {
+            replaceActivity(item.sourceId, activity => ActivityEngine.updatePlannedActivity(activity, { priority: Math.max(0, Number(activity.priority) - 1) }));
+            showToast('Priority lowered.');
+          } else if (name === 'block') {
+            replaceActivity(item.sourceId, activity => ActivityEngine.updatePlannedActivity(activity, { blockedAt: new Date().toISOString(), blockedReason: 'Blocked from recommendations' }));
+            showToast('Activity marked blocked. You can unblock it from the activity editor.');
+          } else if (name === 'not-today') {
+            recordRecommendationResponse(item, 'not_today', { rerender: true }); showToast('Hidden until tomorrow.');
+          } else if (name === 'dismiss') {
+            recordRecommendationResponse(item, 'dismissed', { rerender: true }); showToast('Suggestion dismissed for seven days. The source item was kept.');
+          }
+          return;
+        }
         const action = e.target.closest('[data-command-action]');
         if (action) { performCommandAction(action.dataset.commandAction, action.dataset.characterId, action.dataset.sourceId); return; }
         const edit = e.target.closest('[data-command-edit-goal]');

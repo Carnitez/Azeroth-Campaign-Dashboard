@@ -153,6 +153,13 @@ test('upcoming seven-day projection omits empty dates and remains ordered', () =
   assert.deepEqual(projection.map(value => value.date), ['2026-07-20', '2026-07-22', '2026-07-24']);
 });
 
+test('legacy unscheduled one-time work is not repeated across upcoming days', () => {
+  const item = activity('unscheduled-once', null, { scheduledFor: null, repeatType: 'one_time' });
+  const projection = Schedule.projectUpcoming(state([item]), { now: now(), days: 7 });
+  assert.equal(projection.filter(row => row.activity.id === item.id).length, 1);
+  assert.equal(projection.find(row => row.activity.id === item.id)?.date, '2026-07-20');
+});
+
 test('due times distinguish later today from due now', () => {
   const item = activity('timed', { type: 'daily', dueTime: '15:00' });
   assert.equal(Schedule.activityAvailability(item, state([item]), { now: now(20, '10:00') }).state, 'due_later_today');

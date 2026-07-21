@@ -354,16 +354,18 @@ export function projectUpcoming(state, { now = new Date(), days = 7, characterId
   const rosterIds = new Set(list(state?.characters).filter(character => !character.archivedAt).map(character => character.id));
   const output = [];
   for (const activity of list(state?.activities).filter(item => item.kind === 'planned' && rosterIds.has(item.characterId))) {
+    const activitySchedule = normalizeSchedule(activity);
     if (characterId && activity.characterId !== characterId) continue;
     if (category && activity.category !== category) continue;
     if (priority !== '' && number(activity.priority) !== number(priority)) continue;
-    if (scheduleType && normalizeSchedule(activity).type !== scheduleType) continue;
+    if (scheduleType && activitySchedule.type !== scheduleType) continue;
     for (let offset = 0; offset < days; offset += 1) {
       const date = addLocalDays(now, offset); const dateKey = Core.localDateKey(date);
+      if (activitySchedule.legacyUnscheduled && offset > 0) continue;
       if (!scheduledOnDate(activity, dateKey)) continue;
       const key = occurrenceKeyForDate(activity, dateKey);
       const complete = completionKeys(state, activity).has(key) || Boolean(activeOccurrenceRecord(state, activity.id, key, 'skipped'));
-      output.push({ activity, date: dateKey, occurrenceKey: key, completed: complete, availability: offset === 0 ? activityAvailability(activity, state, { now }) : { state: complete ? 'completed_period' : 'upcoming', schedule: normalizeSchedule(activity), expectedDate: dateKey } });
+      output.push({ activity, date: dateKey, occurrenceKey: key, completed: complete, availability: offset === 0 ? activityAvailability(activity, state, { now }) : { state: complete ? 'completed_period' : 'upcoming', schedule: activitySchedule, expectedDate: dateKey } });
     }
   }
   return output.sort((a, b) => a.date.localeCompare(b.date) || number(b.activity.priority) - number(a.activity.priority) || String(a.activity.title).localeCompare(String(b.activity.title)));

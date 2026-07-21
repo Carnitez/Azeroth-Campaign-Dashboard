@@ -5,6 +5,7 @@
 
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
 const Schedule = globalThis.AzerothSchedule ?? await import('./schedule-engine.mjs');
+const Recommendations = globalThis.AzerothRecommendations ?? await import('./recommendation-engine.mjs');
 
 export const ACTIVITY_CATEGORIES = Object.freeze([
   'Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts',
@@ -49,7 +50,8 @@ export function createPlannedActivity(input, { id = Core.createId('activity-plan
     createdAt: nowIso,
     updatedAt: nowIso,
     completedAt: status === 'completed' ? nowIso : null,
-    ...(input?.manualResetAt ? { manualResetAt: input.manualResetAt } : {})
+    ...(input?.manualResetAt ? { manualResetAt: input.manualResetAt } : {}),
+    ...(input?.blockedAt ? { blockedAt: input.blockedAt, blockedReason: String(input.blockedReason || '').trim() } : {})
   };
   if (Core.isPlainObject(input?.schedule)) {
     const schedule = Schedule.normalizeSchedule({ ...activity, schedule: input.schedule });
@@ -175,39 +177,7 @@ function plannerReason(activity, activeCharacterId, limitedTime) {
 }
 
 export function planSession(state, options = {}) {
-  const budgetMinutes = Math.max(1, Math.round(number(options.budgetMinutes, 30)));
-  const cap = budgetMinutes + 5;
-  const lockedIds = new Set(list(options.lockedIds));
-  const selectedIds = new Set(list(options.selectedIds));
-  for (const id of selectedIds) lockedIds.add(id);
-  const excludedIds = new Set(list(options.excludedIds));
-  const order = list(options.currentOrder);
-  const orderIndex = new Map(order.map((id, index) => [id, index]));
-  const eligible = selectPlannedActivities(state, { view: 'today', now: options.now ?? new Date() })
-    .filter(activity => !excludedIds.has(activity.id) && !['completed', 'skipped'].includes(activity.effectiveStatus));
-  const locked = eligible.filter(activity => lockedIds.has(activity.id))
-    .sort((a, b) => (orderIndex.get(a.id) ?? Infinity) - (orderIndex.get(b.id) ?? Infinity));
-  const unlocked = eligible.filter(activity => !lockedIds.has(activity.id))
-    .sort(plannerComparator(options.activeCharacterId ?? state?.activeCharacterId, budgetMinutes <= 60, selectedIds));
-  const selected = [];
-  let totalMinutes = 0;
-  for (const activity of [...locked, ...unlocked]) {
-    const minutes = Math.max(1, number(activity.estimatedMinutes, 30));
-    if (totalMinutes + minutes > cap) continue;
-    selected.push({
-      activity,
-      locked: lockedIds.has(activity.id),
-      reason: plannerReason(activity, options.activeCharacterId ?? state?.activeCharacterId, budgetMinutes <= 60)
-    });
-    totalMinutes += minutes;
-  }
-  return {
-    budgetMinutes,
-    totalMinutes,
-    items: selected,
-    characterIds: [...new Set(selected.map(item => item.activity.characterId))],
-    categories: [...new Set(selected.map(item => item.activity.category))]
-  };
+  return Recommendations.planSessionWithStrategy(state, { strategy: 'balanced', ...options });
 }
 
 export function reorderPlan(items, fromIndex, toIndex) {

@@ -5,8 +5,8 @@
 
 const Core = globalThis.AzerothCore ?? await import('./core.mjs');
 const Activities = globalThis.AzerothActivities ?? await import('./activity-engine.mjs');
-const Sessions = globalThis.AzerothSessions ?? await import('./session-engine.mjs');
 const Schedule = globalThis.AzerothSchedule ?? await import('./schedule-engine.mjs');
+const Recommendations = globalThis.AzerothRecommendations ?? await import('./recommendation-engine.mjs');
 
 const DAY_MS = 86_400_000;
 const RECENT_DAYS = 7;
@@ -29,13 +29,6 @@ function newestDate(...values) {
 
 function goalUpdatedAt(goal) {
   return newestDate(goal?.updatedAt, goal?.completedAt, goal?.createdAt);
-}
-
-function goalProgress(goal) {
-  const current = goal?.progress?.current ?? goal?.current ?? goal?.value;
-  const target = goal?.progress?.target ?? goal?.target;
-  if (!Number.isFinite(Number(current)) || !Number.isFinite(Number(target)) || Number(target) <= 0) return null;
-  return { current: Number(current), target: Number(target) };
 }
 
 function statusRank(status) {
@@ -308,110 +301,23 @@ export function selectWeeklyMomentum(state, { scope = 'active', activeCharacterI
   };
 }
 
-function recommendationComparator(a, b) {
-  return number(a.sourceRank) - number(b.sourceRank)
-    || a.statusRank - b.statusRank
-    || b.priority - a.priority
-    || b.recentAt - a.recentAt
-    || a.activeRank - b.activeRank
-    || a.actionableRank - b.actionableRank
-    || a.typeRank - b.typeRank
-    || String(a.title).localeCompare(String(b.title))
-    || String(a.id).localeCompare(String(b.id));
-}
-
-export function selectNextUp(state, { limit = 5, now = new Date() } = {}) {
-  const roster = activeCharacters(state);
-  const rosterIds = new Set(roster.map(character => character.id));
-  const map = charactersById(state);
-  const activeId = rosterIds.has(state?.activeCharacterId) ? state.activeCharacterId : roster[0]?.id;
-  const recentCutoff = timestamp(now) - RECENT_DAYS * DAY_MS;
-  const unfinishedGoals = list(state?.goals).filter(goal => !isFinished(goal) && (goal.scope === 'account' || rosterIds.has(goal.characterId)));
-  const highestPriority = unfinishedGoals.reduce((highest, goal) => Math.max(highest, number(goal.priority)), -Infinity);
-  const candidates = list(state?.sessionPlans).map(plan => Sessions.sessionRecommendation(plan, state, { now })).filter(Boolean);
-  candidates.push(...Activities.selectPlannedActivities(state, { view: 'today', now }).filter(activity => !['completed', 'skipped'].includes(activity.effectiveStatus)).map(activity => {
-    const character = map.get(activity.characterId) ?? null;
-    const reason = activity.effectiveStatus === 'in_progress' ? 'Already in progress'
-      : number(activity.priority) >= 2 ? 'High-priority activity'
-      : activity.characterId === activeId ? 'Active character activity'
-      : 'Ready to work on';
-    return {
-      id: `activity:${activity.id}`, sourceType: 'activity', sourceId: activity.id,
-      title: activity.title, characterId: activity.characterId, character,
-      reason: activity.availability.state === 'due_today' ? 'Due today' : reason, category: activity.category || 'Activity', progress: null,
-      action: 'open-activity', actionLabel: 'Open activity', sourceRank: 0,
-      statusRank: statusRank(activity.effectiveStatus), priority: number(activity.priority), recentAt: timestamp(activity.updatedAt),
-      activeRank: activity.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
-    };
-  }));
-  candidates.push(...unfinishedGoals.map(goal => {
-    const updatedAt = goalUpdatedAt(goal);
-    const character = map.get(goal.characterId) ?? null;
-    let reason = 'Unfinished goal';
-    if (goal.status === 'in_progress') reason = 'Already in progress';
-    else if (number(goal.priority) === highestPriority && highestPriority > 0) reason = 'Highest-priority unfinished goal';
-    else if (goal.updatedAt && timestamp(goal.updatedAt) >= recentCutoff) reason = 'Recently updated';
-    return {
-      id: `goal:${goal.id}`, sourceType: 'goal', sourceId: goal.id,
-      title: goal.title, characterId: goal.characterId, character,
-      reason, category: goal.category || 'Goal', progress: goalProgress(goal),
-      action: 'open-goal', actionLabel: 'Open goal', sourceRank: goal.category === 'Current content' ? 2 : 1,
-      statusRank: statusRank(goal.status), priority: number(goal.priority), recentAt: timestamp(updatedAt),
-      activeRank: goal.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 0
-    };
-  }));
-
-  const latestProgressByMetric = new Map();
-  list(state?.progressEvents).forEach(event => {
-    const key = `${event.entityId}:${event.metric}`;
-    if (timestamp(event.recordedAt) > timestamp(latestProgressByMetric.get(key)?.recordedAt)) latestProgressByMetric.set(key, event);
+export function selectNextUp(state, { limit = 5, now = new Date(), availableMinutes = null, strategy = state?.preferences?.planningStrategy || 'balanced', excludedKeys = [] } = {}) {
+  const ranked = Recommendations.rankRecommendations(state, { limit, now, availableMinutes, strategy, excludedKeys });
+  const rankedGoals = list(state?.goals).filter(goal => !isFinished(goal));
+  const highestRankedPriority = rankedGoals.reduce((highest, goal) => Math.max(highest, number(goal.priority)), -Infinity);
+  const rankedRecentCutoff = timestamp(now) - RECENT_DAYS * DAY_MS;
+  return ranked.map(item => {
+    let reason = item.reason;
+    if (item.sourceType === 'session') reason = item.status === 'in_progress' ? 'Active session' : item.status === 'paused' ? 'Paused session' : 'Ready for today';
+    else if (item.sourceType === 'activity') reason = item.availability?.state === 'due_today' ? 'Due today' : item.status === 'in_progress' ? 'Already in progress' : number(item.priority) >= 2 ? 'High-priority activity' : item.characterId === state?.activeCharacterId ? 'Active character activity' : 'Ready to work on';
+    else if (item.sourceType === 'goal') {
+      if (item.status === 'in_progress') reason = 'Already in progress';
+      else if (number(item.priority) === highestRankedPriority && highestRankedPriority > 0) reason = 'Highest-priority unfinished goal';
+      else if (item.source?.updatedAt && item.source.updatedAt !== item.source.createdAt && timestamp(item.source.updatedAt) >= rankedRecentCutoff) reason = 'Recently updated';
+      else reason = 'Unfinished goal';
+    } else if (item.sourceType === 'collection') reason = item.progress?.target && item.progress.current / item.progress.target >= 0.8 ? 'Close to the next milestone' : 'Unfinished collection milestone';
+    return { ...item, reason };
   });
-  for (const tracker of list(state?.collectionTrackers)) {
-    if (!rosterIds.has(tracker.characterId) || number(tracker.target) <= 0 || number(tracker.owned) >= number(tracker.target)) continue;
-    const character = map.get(tracker.characterId) ?? null;
-    const ratio = number(tracker.owned) / number(tracker.target);
-    const event = latestProgressByMetric.get(`${tracker.characterId}:collection:${String(tracker.name).toLowerCase()}:owned`);
-    candidates.push({
-      id: `collection:${tracker.id}`, sourceType: 'collection', sourceId: tracker.id,
-      title: `${tracker.name}: ${number(tracker.target).toLocaleString()} milestone`, characterId: tracker.characterId, character,
-      reason: ratio >= 0.8 ? 'Close to the next milestone' : 'Unfinished collection milestone', category: 'Collection',
-      progress: { current: number(tracker.owned), target: number(tracker.target) },
-      action: 'open-collections', actionLabel: 'Update progress', sourceRank: 3,
-      statusRank: 1, priority: -1, recentAt: timestamp(event?.recordedAt), activeRank: tracker.characterId === activeId ? 0 : 1, actionableRank: 0, typeRank: 1
-    });
-  }
-
-  const attention = selectCharacterAttention(state, { now });
-  for (const item of attention) {
-    const character = item.character;
-    if (item.attention === 'Profile incomplete') {
-      candidates.push({
-        id: `profile:${character.id}`, sourceType: 'character', sourceId: character.id,
-        title: `Complete ${character.name || 'character'}'s profile`, characterId: character.id, character,
-        reason: `Missing ${item.missingFields.join(', ')}`, category: 'Character', progress: null,
-        action: 'edit-character', actionLabel: 'Edit character', sourceRank: 4,
-        statusRank: 1, priority: -2, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 2
-      });
-    } else if (item.attention === 'Needs attention') {
-      candidates.push({
-        id: `attention:${character.id}`, sourceType: 'character', sourceId: character.id,
-        title: `Continue ${character.name}'s campaign`, characterId: character.id, character,
-        reason: 'No recent activity', category: 'Character', progress: null,
-        action: 'switch-character', actionLabel: 'Select character', sourceRank: 4,
-        statusRank: 1, priority: -3, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 2, typeRank: 2
-      });
-    } else if (item.attention === 'No current goals') {
-      candidates.push({
-        id: `no-goals:${character.id}`, sourceType: 'character', sourceId: character.id,
-        title: `Choose ${character.name}'s next objective`, characterId: character.id, character,
-        reason: 'No current goals', category: 'Planning', progress: null,
-        action: 'add-goal', actionLabel: 'Add goal', sourceRank: 4,
-        statusRank: 1, priority: -4, recentAt: timestamp(item.lastActivity?.at), activeRank: character.id === activeId ? 0 : 1, actionableRank: 1, typeRank: 3
-      });
-    }
-  }
-
-  return candidates.sort(recommendationComparator).slice(0, Math.max(0, limit));
 }
 
 export const Selectors = Object.freeze({
