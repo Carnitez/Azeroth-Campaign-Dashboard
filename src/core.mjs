@@ -17,7 +17,7 @@ export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'we
 
 const KNOWN_CHARACTER_FIELDS = new Set([
   'id', 'name', 'realm', 'region', 'faction', 'race', 'raceId', 'className', 'classId', 'spec',
-  'professions', 'level', 'gold', 'playedMinutes', 'location', 'createdAt', 'archivedAt', 'legacy', 'extensions'
+  'professions', 'level', 'gold', 'playedMinutes', 'location', 'campaignRole', 'createdAt', 'archivedAt', 'legacy', 'extensions'
 ]);
 
 const KNOWN_GOAL_FIELDS = new Set([
@@ -28,7 +28,7 @@ const KNOWN_GOAL_FIELDS = new Set([
 const KNOWN_SESSION_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'minutes', 'durationMinutes', 'goldDelta', 'note', 'title', 'legacy', 'extensions']);
 const KNOWN_LEDGER_FIELDS = new Set(['id', 'date', 'timestamp', 'occurredAt', 'activity', 'minutes', 'revenue', 'cost', 'notes', 'legacy', 'extensions']);
 const KNOWN_COLLECTION_FIELDS = new Set(['id', 'owned', 'target', 'baseline', 'legacy', 'extensions']);
-const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'sessionPlans', 'activityOccurrences', 'legacy', 'extensions']);
+const KNOWN_TOP_LEVEL_FIELDS = new Set(['version', 'activeId', 'characters', 'preferences', 'migration', 'schemaVersion', 'activeCharacterId', 'goals', 'activities', 'progressEvents', 'collectionTrackers', 'sessionPlans', 'activityOccurrences', 'recommendationHistory', 'legacy', 'extensions']);
 
 export function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -119,6 +119,7 @@ function validateCharacter(character, index, errors) {
   if (!isFiniteNumber(character.playedMinutes, { min: 0 })) addError(errors, `${path}.playedMinutes`, 'must be a non-negative number');
   if (!validDateValue(character.createdAt)) addError(errors, `${path}.createdAt`, 'must be a valid date or timestamp');
   if (character.professions !== undefined && !Array.isArray(character.professions) && typeof character.professions !== 'string') addError(errors, `${path}.professions`, 'must be a string or array');
+  if (character.campaignRole !== undefined && !['main', 'active_alt', 'occasional', 'resting'].includes(character.campaignRole)) addError(errors, `${path}.campaignRole`, 'has an unknown campaign role');
 }
 
 function validateGoal(goal, index, errors) {
@@ -176,6 +177,8 @@ function validateActivity(activity, index, errors) {
       }
     }
     if (activity.manualResetAt !== undefined && !validDateValue(activity.manualResetAt)) addError(errors, `${path}.manualResetAt`, 'must be a timestamp');
+    if (activity.blockedAt !== undefined && activity.blockedAt !== null && !validDateValue(activity.blockedAt)) addError(errors, `${path}.blockedAt`, 'must be null or a timestamp');
+    if (activity.blockedReason !== undefined && typeof activity.blockedReason !== 'string') addError(errors, `${path}.blockedReason`, 'must be a string');
   } else {
     if (!validDateValue(activity.occurredAt)) addError(errors, `${path}.occurredAt`, 'must be a valid date or timestamp');
     if (!isFiniteNumber(activity.durationMinutes, { min: 0 })) addError(errors, `${path}.durationMinutes`, 'must be a non-negative number');
@@ -198,6 +201,18 @@ function validateActivityOccurrence(record, index, errors) {
   for (const field of ['expectedAt', 'completedAt', 'skippedAt', 'snoozedAt', 'snoozedUntil', 'undoneAt']) if (record[field] !== null && record[field] !== undefined && !validDateValue(record[field])) addError(errors, `${path}.${field}`, 'must be null or a timestamp');
   if (record.notes !== undefined && typeof record.notes !== 'string') addError(errors, `${path}.notes`, 'must be a string');
   if (record.reason !== undefined && typeof record.reason !== 'string') addError(errors, `${path}.reason`, 'must be a string');
+}
+
+function validateRecommendationHistory(record, index, errors) {
+  const path = `recommendationHistory[${index}]`;
+  if (!isPlainObject(record)) { addError(errors, path, 'must be an object'); return; }
+  for (const field of ['id', 'entityId', 'recommendationType']) if (typeof record[field] !== 'string' || !record[field]) addError(errors, `${path}.${field}`, 'must be a non-empty string');
+  if (record.characterId !== null && record.characterId !== undefined && typeof record.characterId !== 'string') addError(errors, `${path}.characterId`, 'must be null or a string');
+  if (!validDateValue(record.firstShownAt)) addError(errors, `${path}.firstShownAt`, 'must be a timestamp');
+  if (!validDateValue(record.lastShownAt)) addError(errors, `${path}.lastShownAt`, 'must be a timestamp');
+  if (!Number.isInteger(record.timesShown) || record.timesShown < 1) addError(errors, `${path}.timesShown`, 'must be a positive integer');
+  if (record.lastUserResponse !== null && record.lastUserResponse !== undefined && !['opened', 'started', 'completed', 'skipped', 'dismissed', 'snoozed', 'ignored', 'useful', 'not_useful', 'not_today'].includes(record.lastUserResponse)) addError(errors, `${path}.lastUserResponse`, 'has an unknown response');
+  if (record.dismissedUntil !== null && record.dismissedUntil !== undefined && !validDateValue(record.dismissedUntil)) addError(errors, `${path}.dismissedUntil`, 'must be null or a timestamp');
 }
 
 function validateProgressEvent(event, index, errors) {
@@ -283,6 +298,8 @@ export function validateV2State(input) {
   if ((input.sessionPlans || []).filter(plan => plan?.status === 'in_progress').length > 1) addError(errors, 'sessionPlans', 'cannot contain more than one running session');
   if (input.activityOccurrences !== undefined && !Array.isArray(input.activityOccurrences)) addError(errors, 'activityOccurrences', 'must be an array when present');
   else (input.activityOccurrences || []).forEach((record, index) => validateActivityOccurrence(record, index, errors));
+  if (input.recommendationHistory !== undefined && !Array.isArray(input.recommendationHistory)) addError(errors, 'recommendationHistory', 'must be an array when present');
+  else (input.recommendationHistory || []).forEach((record, index) => validateRecommendationHistory(record, index, errors));
   if (!isPlainObject(input.migration)) addError(errors, 'migration', 'must be an object');
   else {
     if (!Number.isInteger(input.migration.sourceVersion)) addError(errors, 'migration.sourceVersion', 'must be an integer');
@@ -311,6 +328,7 @@ function migrateCharacter(rawCharacter, index, nowIsoValue) {
     gold: asNumber(rawCharacter?.gold, 0, { min: 0 }),
     playedMinutes: asNumber(rawCharacter?.playedMinutes, 0, { min: 0 }),
     location: typeof rawCharacter?.location === 'string' ? rawCharacter.location : '',
+    ...(['main', 'active_alt', 'occasional', 'resting'].includes(rawCharacter?.campaignRole) ? { campaignRole: rawCharacter.campaignRole } : {}),
     createdAt: validDateValue(rawCharacter?.createdAt) ? rawCharacter.createdAt : nowIsoValue,
     ...(mergeLegacy(rawCharacter?.legacy, unknown) ? { legacy: mergeLegacy(rawCharacter?.legacy, unknown) } : {})
   };
@@ -469,6 +487,7 @@ export function migrateV1ToV2(input, { now = new Date() } = {}) {
     collectionTrackers,
     sessionPlans: [],
     activityOccurrences: [],
+    recommendationHistory: [],
     migration: { sourceVersion: 1, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue, warnings },
     ...(Object.keys(rawLegacy).length ? { legacy: clone(rawLegacy) } : {})
   };
@@ -481,6 +500,7 @@ export function normalizeV2State(input) {
   const normalized = clone(input);
   if (normalized.sessionPlans === undefined) normalized.sessionPlans = [];
   if (normalized.activityOccurrences === undefined) normalized.activityOccurrences = [];
+  if (normalized.recommendationHistory === undefined) normalized.recommendationHistory = [];
   return normalized;
 }
 
@@ -502,7 +522,7 @@ export function createStarterState({ now = new Date() } = {}) {
   const nowIsoValue = isoNow(now);
   const characterId = 'carnitez-silvermoon-eu';
   const character = {
-    id: characterId, name: 'Carnitez', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: 'Night Elf', className: 'Druid', spec: 'Guardian', professions: 'Herbalism, Mining', level: 1, gold: 0, playedMinutes: 0, location: 'Shadowglen', createdAt: date
+    id: characterId, name: 'Carnitez', realm: 'Silvermoon', region: 'EU', faction: 'Alliance', race: 'Night Elf', className: 'Druid', spec: 'Guardian', professions: 'Herbalism, Mining', campaignRole: 'main', level: 1, gold: 0, playedMinutes: 0, location: 'Shadowglen', createdAt: date
   };
   const goals = [
     ['Current content', 'Complete every available quest in Shadowglen'],
@@ -524,6 +544,7 @@ export function createStarterState({ now = new Date() } = {}) {
     collectionTrackers,
     sessionPlans: [],
     activityOccurrences: [],
+    recommendationHistory: [],
     migration: { sourceVersion: V2_SCHEMA_VERSION, targetVersion: V2_SCHEMA_VERSION, migratedAt: nowIsoValue }
   };
 }
