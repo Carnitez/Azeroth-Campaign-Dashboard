@@ -80,7 +80,7 @@ test('character attention states and counts are deterministic', () => {
   const campaign = state({
     characters: [
       character('active'), character('idle'), character('empty'),
-      character('incomplete', { spec: '' }), character('complete'), character('archived', { archivedAt: iso(20) })
+      character('incomplete', { className: '' }), character('complete'), character('archived', { archivedAt: iso(20) })
     ],
     activeCharacterId: 'active',
     goals: [

@@ -271,7 +271,7 @@ test('minimum sample threshold prevents one run from becoming trusted history', 
 });
 
 test('character attention recognizes active, due, incomplete, and unplanned states', () => {
-  const characters = [character('active'), character('due'), character('incomplete', { spec: '' }), character('empty')];
+  const characters = [character('active'), character('due'), character('incomplete', { className: '' }), character('empty')];
   const campaign = state({ activeCharacterId: 'active', characters, activities: [activity('active-work', { characterId: 'active' }), activity('due-work', { characterId: 'due', schedule: { ...activity('x').schedule, dueTime: '09:00' } })], sessionPlans: [session('running', 'in_progress', { characterIds: ['active'] })] });
   const labels = Object.fromEntries(Recommendation.characterAttention(campaign, { now }).map(item => [item.character.id, item.attention]));
   assert.equal(labels.active, 'Active now');

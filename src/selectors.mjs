@@ -95,9 +95,9 @@ export function selectLastActivityByCharacter(state) {
   }));
 }
 
+// Matches recommendation-engine.mjs: name and class are all that is actually required.
 function missingProfileFields(character) {
-  return ['name', 'realm', 'region', 'race', 'className', 'spec', 'location']
-    .filter(field => typeof character?.[field] !== 'string' || !character[field].trim());
+  return ['name', 'className'].filter(field => typeof character?.[field] !== 'string' || !character[field].trim());
 }
 
 export function selectCharacterAttention(state, { now = new Date() } = {}) {

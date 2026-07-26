@@ -1788,8 +1788,8 @@
   <section class="acc-recovery" id="acc-recovery-state" hidden aria-live="polite">
     <div class="acc-recovery-card">
       <span class="acc-eyebrow">Campaign data protection</span>
-      <h1>We could not safely load this campaign</h1>
-      <p id="acc-recovery-message">Your saved data is still intact. Nothing has been replaced.</p>
+      <h1>Your campaign data is safe</h1>
+      <p id="acc-recovery-message">We could not read it this time, so nothing has been changed or replaced.</p>
       <p class="acc-recovery-error" id="acc-recovery-error" hidden></p>
       <div class="acc-recovery-actions">
         <button class="btn" type="button" id="acc-recovery-export">Export saved data</button>
@@ -1984,7 +1984,7 @@
         <label class="form-label"><span class="sr-only">Filter by character</span><select class="form-select" id="acc-activity-character-filter" aria-label="Filter by character"><option value="">All characters</option></select></label>
         <label class="form-label"><span class="sr-only">Filter by category</span><select class="form-select" id="acc-activity-category-filter" aria-label="Filter by category"><option value="">All categories</option></select></label>
         <label class="form-label"><span class="sr-only">Filter by priority</span><select class="form-select" id="acc-activity-priority-filter" aria-label="Filter by priority"><option value="">All priorities</option><option value="3">Critical</option><option value="2">High</option><option value="1">Normal</option><option value="0">Low</option></select></label>
-        <label class="form-label"><span class="sr-only">Filter by status</span><select class="form-select" id="acc-activity-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
+        <label class="form-label"><span class="sr-only">Filter by status</span><select class="form-select" id="acc-activity-status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="todo">To do</option><option value="in_progress">In progress</option><option value="completed">Complete</option><option value="skipped">Skipped</option></select></label>
         <label class="form-label"><span class="sr-only">Filter by tags</span><input class="form-control" id="acc-activity-tags-filter" placeholder="Tags"></label>
         <label class="form-label"><span class="sr-only">Sort activities</span><select class="form-select" id="acc-activity-sort" aria-label="Sort activities"><option value="next_available">Next available</option><option value="due">Due time</option><option value="priority">Priority</option><option value="estimated">Estimated time</option><option value="recently_completed">Recently completed</option><option value="recent">Recently updated</option><option value="alphabetical">Alphabetical</option></select></label>
       </div>
@@ -2126,7 +2126,7 @@
           <label class="form-label" id="acc-activity-character-field">Character<select class="form-select" name="characterId" required></select></label>
           <label class="form-label">Category<select class="form-select" name="category" required></select></label>
           <label class="form-label">Priority<select class="form-select" name="priority"><option value="0">Low</option><option value="1" selected>Normal</option><option value="2">High</option><option value="3">Critical</option></select></label>
-          <label class="form-label" id="acc-activity-status-field">Status<select class="form-select" name="status"><option value="todo">Todo</option><option value="in_progress">In progress</option><option value="completed">Completed</option><option value="skipped">Skipped</option></select></label>
+          <label class="form-label" id="acc-activity-status-field">Status<select class="form-select" name="status"><option value="todo">To do</option><option value="in_progress">In progress</option><option value="completed">Complete</option><option value="skipped">Skipped</option></select></label>
           <label class="form-label">Estimated minutes<input class="form-control" name="estimatedMinutes" type="number" min="1" max="1440" value="30" required></label>
           <label class="form-label">Repeat<select class="form-select" name="repeatType"><option value="one_time">One-time</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekdays">Selected weekdays</option><option value="interval">Interval</option><option value="manual">Manual</option></select></label>
           <label class="form-label">Scheduled date<input class="form-control" name="scheduledFor" type="date"></label>
@@ -2673,8 +2673,8 @@
       }
       function renderCommandCenter(c) {
         root.querySelector('#acc-command-name').textContent = c.name;
-        root.querySelector('#acc-command-profile').textContent = `${c.race || 'Race not set'} ${c.className || 'Class not set'} · ${c.realm || 'Realm not set'} ${c.region || ''}`.trim();
-        root.querySelector('#acc-command-context').textContent = `${c.spec || 'Specialisation not set'} · ${c.location || 'Location not recorded'}`;
+        root.querySelector('#acc-command-profile').textContent = [[c.race, c.className].filter(Boolean).join(' '), [c.realm, c.region].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+        root.querySelector('#acc-command-context').textContent = [c.spec, c.location].filter(Boolean).join(' · ');
         root.querySelector('#acc-command-level').textContent = c.level;
         root.querySelector('#acc-command-gold').textContent = formatGold(c.gold);
         root.querySelector('#acc-command-played').textContent = formatMinutes(c.playedMinutes);
@@ -3061,7 +3061,7 @@
         root.querySelector('#acc-agenda-selected-plan').disabled = !selected.length;
         root.querySelector('#acc-agenda-add-draft').disabled = !selected.length;
       }
-      const activityStatusLabels = { todo: 'Todo', in_progress: 'In progress', completed: 'Completed', skipped: 'Skipped' };
+      const activityStatusLabels = { todo: 'To do', in_progress: 'In progress', completed: 'Complete', skipped: 'Skipped' };
       const activityPriorityLabels = ['Low', 'Normal', 'High', 'Critical'];
       const activityRepeatLabels = { one_time: 'One-time', daily: 'Daily', weekly: 'Weekly', weekdays: 'Selected days', interval: 'Interval', manual: 'Manual' };
       function renderActivityOptions() {
@@ -3873,7 +3873,7 @@
         recovery.hidden = !recoveryState;
         shell.hidden = Boolean(recoveryState);
         if (!recoveryState) return;
-        root.querySelector('#acc-recovery-message').textContent = 'Your saved data is still intact. Nothing has been replaced. Export the raw value or retry before choosing starter data.';
+        root.querySelector('#acc-recovery-message').textContent = 'We could not read it this time, so nothing has been changed or replaced. Export a copy or retry before choosing starter data.';
         const error = root.querySelector('#acc-recovery-error');
         error.textContent = recoveryState.reason || 'The stored campaign data could not be validated.';
         error.hidden = false;

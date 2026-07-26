@@ -455,8 +455,11 @@ export function rankRecommendations(state, options = {}) {
     .slice(0, Math.max(0, number(options.limit, 5)));
 }
 
+// A character only needs a name and a class to be usable; realm, spec and location are
+// flavour the recommendation engine never reads, so their absence is not a problem to
+// report back to the player.
 function missingProfileFields(character) {
-  return ['name', 'realm', 'region', 'race', 'className', 'spec', 'location'].filter(field => typeof character?.[field] !== 'string' || !character[field].trim());
+  return ['name', 'className'].filter(field => typeof character?.[field] !== 'string' || !character[field].trim());
 }
 
 export function characterAttention(state, { now = new Date() } = {}) {
