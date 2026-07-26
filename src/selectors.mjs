@@ -333,10 +333,16 @@ function characterLooksUnedited(character) {
 // Derived, never stored: classifies a campaign as "fresh" only while there is no
 // real evidence of use anywhere — no planned activities, no logged or planned
 // sessions, no gold entries, and every collection still at zero.
+//
+// Records carried over by the v1→v2 migration are history, not evidence that the v2
+// board has been set up: a migrated save can hold play sessions and gold rows while
+// still having nothing the recommendation engine can act on. Migrated collection
+// counts are the exception — those are real, usable numbers, so they still count.
 export function selectCampaignStage(state) {
   const roster = activeCharacters(state);
   const rosterIds = new Set(roster.map(item => item.id));
-  const activities = list(state?.activities).filter(item => rosterIds.has(item.characterId));
+  const activities = list(state?.activities)
+    .filter(item => rosterIds.has(item.characterId) && item.source !== 'legacy-v1');
   const hasActivities = activities.some(item => Activities.isPlannedActivity(item));
   const hasLoggedSessions = activities.some(item => item.kind === 'session') || list(state?.sessionPlans).length > 0;
   const hasGoldEntries = activities.some(item => item.kind === 'gold');

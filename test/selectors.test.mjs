@@ -344,6 +344,42 @@ test('a non-zero collection count marks the campaign active', () => {
   assert.equal(selectCampaignStage(campaign), 'active');
 });
 
+test('a v1-migrated play session alone still classifies fresh', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'legacy-sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(1), durationMinutes: 45, gold: { revenue: 0, cost: 0, delta: 0, affectsBalance: true }, source: 'legacy-v1' }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'fresh');
+});
+
+test('a v1-migrated gold entry alone still classifies fresh', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'legacy-gold', characterId: 'carnitez-silvermoon-eu', kind: 'gold', occurredAt: iso(1), durationMinutes: 20, gold: { revenue: 10, cost: 0, delta: 10 }, source: 'legacy-v1' }]
+  });
+  assert.equal(selectCampaignStage(campaign), 'fresh');
+});
+
+test('a user-logged session still marks the campaign active alongside migrated history', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [
+      { id: 'legacy-sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(1), durationMinutes: 45, gold: { delta: 0 }, source: 'legacy-v1' },
+      { id: 'real-sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(2), durationMinutes: 30, gold: { delta: 0 } }
+    ]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
+test('migrated collection counts are real data and still mark the campaign active', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [{ id: 'legacy-sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(1), durationMinutes: 45, gold: { delta: 0 }, source: 'legacy-v1' }],
+    collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu', { owned: 42 })]
+  });
+  assert.equal(selectCampaignStage(campaign), 'active');
+});
+
 test('campaign stage selector never mutates canonical state', () => {
   const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu')] });
   const before = structuredClone(campaign);
