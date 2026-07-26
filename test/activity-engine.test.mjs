@@ -145,7 +145,7 @@ test('command search supports partial and subsequence matches across real record
   const catalog = buildCommandCatalog(campaign);
   assert.equal(searchCommands(catalog, 'dragon weekly')[0].id, 'activity:activity-one');
   assert.equal(searchCommands(catalog, '20k')[0].id, 'goal:goal-1');
-  assert.ok(searchCommands(catalog, 'op act').some(item => item.id === 'nav-activities'));
+  assert.ok(searchCommands(catalog, 'op camp').some(item => item.id === 'nav-activities'));
 });
 
 test('the command palette never offers to switch to the already-active character', () => {

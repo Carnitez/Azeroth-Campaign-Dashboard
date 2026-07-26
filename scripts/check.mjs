@@ -12,6 +12,12 @@ if (!html.includes('acc-toast-region')) failures.push('Save and deletion feedbac
 if (!html.includes('acc-delete-character-dialog')) failures.push('Character deletion confirmation is missing.');
 if (/\b(?:alert|confirm)\s*\(/.test(html)) failures.push('Native alert or confirm prompts found.');
 if (!html.includes('acc-sidebar')) failures.push('Application sidebar is missing.');
+for (const tab of ['today', 'campaign', 'progress', 'history']) {
+  if (!html.includes(`data-tab="${tab}"`)) failures.push(`The ${tab} tab is missing.`);
+}
+if (!html.includes('id="acc-guided"')) failures.push('The guided Today screen is missing.');
+if (!html.includes('id="acc-template-dialog"')) failures.push('The activity template picker is missing.');
+if (!html.includes('id="acc-coach"')) failures.push('The coach hint is missing.');
 if (!html.includes('classThemes')) failures.push('Character class theme configuration is missing.');
 if (!html.includes("'night-elf'")) failures.push('Night Elf theme influence is missing.');
 if (!html.includes('AzerothSelectors')) failures.push('Command Center selectors are missing.');

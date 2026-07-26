@@ -1822,12 +1822,10 @@
       </div>
 
       <nav class="acc-tabs" aria-label="Dashboard sections">
-        <button class="btn" type="button" data-tab="overview" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Command Center</span><kbd>Alt 1</kbd></button>
-        <button class="btn" type="button" data-tab="agenda" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="calendar-days" aria-hidden="true"></i><span>Daily Agenda</span><kbd>Alt 2</kbd></button>
-        <button class="btn" type="button" data-tab="activities" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="list-checks" aria-hidden="true"></i><span>Activities</span><kbd>Alt 3</kbd></button>
-        <button class="btn" type="button" data-tab="collections" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="gem" aria-hidden="true"></i><span>Collections</span><kbd>Alt 4</kbd></button>
-        <button class="btn" type="button" data-tab="gold" aria-pressed="false" aria-keyshortcuts="Alt+5"><i data-lucide="coins" aria-hidden="true"></i><span>Gold</span><kbd>Alt 5</kbd></button>
-        <button class="btn" type="button" data-tab="journal" aria-pressed="false" aria-keyshortcuts="Alt+6"><i data-lucide="book-open" aria-hidden="true"></i><span>Journal</span><kbd>Alt 6</kbd></button>
+        <button class="btn" type="button" data-tab="today" aria-pressed="true" aria-keyshortcuts="Alt+1"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Today</span><kbd>Alt 1</kbd></button>
+        <button class="btn" type="button" data-tab="campaign" aria-pressed="false" aria-keyshortcuts="Alt+2"><i data-lucide="list-checks" aria-hidden="true"></i><span>Campaign</span><kbd>Alt 2</kbd></button>
+        <button class="btn" type="button" data-tab="progress" aria-pressed="false" aria-keyshortcuts="Alt+3"><i data-lucide="gem" aria-hidden="true"></i><span>Progress</span><kbd>Alt 3</kbd></button>
+        <button class="btn" type="button" data-tab="history" aria-pressed="false" aria-keyshortcuts="Alt+4"><i data-lucide="book-open" aria-hidden="true"></i><span>History</span><kbd>Alt 4</kbd></button>
       </nav>
 
       <button class="acc-sidebar-footer" type="button" id="acc-open-data" aria-label="Open data and backup">
@@ -2270,12 +2268,10 @@
     <div class="acc-dialog-head"><h2 id="acc-shortcuts-title">Keyboard shortcuts</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-shortcuts-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
     <div class="acc-shortcut-list">
       <div class="acc-shortcut-row"><span>Open command palette</span><kbd>Ctrl / Cmd K</kbd></div>
-      <div class="acc-shortcut-row"><span>Command Center</span><kbd>Alt 1</kbd></div>
-      <div class="acc-shortcut-row"><span>Daily Agenda</span><kbd>Alt 2</kbd></div>
-      <div class="acc-shortcut-row"><span>Activities</span><kbd>Alt 3</kbd></div>
-      <div class="acc-shortcut-row"><span>Collections</span><kbd>Alt 4</kbd></div>
-      <div class="acc-shortcut-row"><span>Economy</span><kbd>Alt 5</kbd></div>
-      <div class="acc-shortcut-row"><span>Journal</span><kbd>Alt 6</kbd></div>
+      <div class="acc-shortcut-row"><span>Today</span><kbd>Alt 1</kbd></div>
+      <div class="acc-shortcut-row"><span>Campaign</span><kbd>Alt 2</kbd></div>
+      <div class="acc-shortcut-row"><span>Progress</span><kbd>Alt 3</kbd></div>
+      <div class="acc-shortcut-row"><span>History</span><kbd>Alt 4</kbd></div>
       <div class="acc-shortcut-row"><span>Pause or resume runner</span><kbd>Space</kbd></div>
       <div class="acc-shortcut-row"><span>Complete current activity</span><kbd>Enter</kbd></div>
       <div class="acc-shortcut-row"><span>Skip current activity</span><kbd>S</kbd></div>
@@ -2380,16 +2376,29 @@
         Horde: ['Orc', 'Undead', 'Tauren', 'Troll', 'Blood Elf', 'Goblin', 'Nightborne', 'Highmountain Tauren', "Mag'har Orc", 'Zandalari Troll', 'Vulpera']
       });
       const pageMeta = Object.freeze({
-        overview: { title: 'Command Center', description: 'Decide what to do next from real campaign progress.' },
-        agenda: { title: 'Daily Agenda', description: 'See what is available, due, missed, and coming next.' },
-        activities: { title: 'Activities', description: 'Plan and complete the work that moves your campaign forward.' },
-        collections: { title: 'Collections', description: 'Track account gains and keep the next milestone in reach.' },
-        gold: { title: 'Gold operations', description: 'Measure activities, costs, profit, and time without guesswork.' },
-        journal: { title: 'Adventure journal', description: 'Review sessions and keep campaign data safe.' }
+        today: { title: 'Today', description: 'What to play right now, and everything due today.' },
+        campaign: { title: 'Campaign', description: 'The activities and plans that move your campaign forward.' },
+        progress: { title: 'Progress', description: 'Collections, gold, and how the campaign is tracking.' },
+        history: { title: 'History', description: 'Completed sessions and your adventure journal.' }
       });
+      /*
+       * Four tabs, but the underlying panels are unchanged. Every existing deep link
+       * still names a panel ('collections', 'gold', ...), so both names resolve here and
+       * land on the right tab rather than needing a rename across the whole app.
+       */
+      const TAB_PANELS = Object.freeze({
+        today: ['overview', 'agenda'],
+        campaign: ['activities'],
+        progress: ['collections', 'gold'],
+        history: ['journal']
+      });
+      const PANEL_TO_TAB = Object.freeze(Object.fromEntries(
+        Object.entries(TAB_PANELS).flatMap(([tab, panels]) => panels.map(panel => [panel, tab]))
+      ));
+      const resolveTab = name => TAB_PANELS[name] ? name : PANEL_TO_TAB[name] || null;
       let state = null;
       let recoveryState = null;
-      let activeTab = 'overview';
+      let activeTab = 'today';
       let momentumScope = 'active';
       let activityView = 'today';
       let agendaSelected = new Set();
@@ -2840,7 +2849,7 @@
         const askFeedback = Number(heroHistory?.timesShown) >= 2 && !heroHistory?.lastUserResponse;
         target.innerHTML = recommendationRowMarkup(hero, { hero: true, askFeedback })
           + (rest.length ? `<details class="acc-next-more"><summary>More suggestions (${rest.length})</summary>${rest.map(item => recommendationRowMarkup(item)).join('')}</details>` : '');
-        if (activeTab === 'overview') {
+        if (activeTab === 'today') {
           const impressions = Recommendation.recordRecommendationImpressions(state.recommendationHistory, currentRecommendations, { now: new Date() });
           if (impressions.changed) { state.recommendationHistory = impressions.history; saveState(); }
         }
@@ -3799,7 +3808,7 @@
         else if (item.action === 'navigate-focus') {
           if (item.target === 'campaign') { activateTab('overview'); focusAfterNavigation('#acc-next-up-heading'); }
           else if (item.target === 'analytics') { activateTab('overview'); focusAfterNavigation('#acc-momentum-scope'); }
-          else if (item.target === 'settings') { activateTab('journal'); focusAfterNavigation('#acc-export'); }
+          else if (item.target === 'settings') root.querySelector('#acc-data-dialog').showModal();
         } else if (item.action === 'focus-characters') focusAfterNavigation('#acc-character-select');
         else if (item.action === 'edit-character') openCharacterDialog(true);
         else if (item.action === 'add-character') openCharacterDialog(false);
@@ -3857,14 +3866,16 @@
         else if (action === 'export') exportBackup();
       }
       function activateTab(tabName, focusTab = false) {
-        if (!pageMeta[tabName]) return;
-        activeTab = tabName;
-        const activeButton = root.querySelector(`[data-tab="${tabName}"]`);
+        const tab = resolveTab(tabName);
+        if (!tab) return;
+        activeTab = tab;
+        const visible = new Set(TAB_PANELS[tab]);
+        const activeButton = root.querySelector(`[data-tab="${tab}"]`);
         root.querySelectorAll('[data-tab]').forEach(button => button.setAttribute('aria-pressed', String(button === activeButton)));
-        root.querySelectorAll('[data-panel]').forEach(panel => panel.hidden = panel.dataset.panel !== activeTab);
-        root.querySelector('#acc-page-title').textContent = pageMeta[tabName].title;
-        root.querySelector('#acc-page-description').textContent = pageMeta[tabName].description;
-        if (tabName === 'overview') { renderNextUp(); refreshIcons(); }
+        root.querySelectorAll('[data-panel]').forEach(panel => panel.hidden = !visible.has(panel.dataset.panel));
+        root.querySelector('#acc-page-title').textContent = pageMeta[tab].title;
+        root.querySelector('#acc-page-description').textContent = pageMeta[tab].description;
+        if (tab === 'today') { renderNextUp(); refreshIcons(); }
         if (focusTab) activeButton?.focus();
       }
       function renderRecovery() {
@@ -3918,7 +3929,7 @@
           if (e.key.toLowerCase() === 'n' && ['in_progress', 'paused'].includes(plan?.status)) { e.preventDefault(); root.querySelector('#acc-runner-note').focus(); return; }
         }
         if (!e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-        const tabName = ({ '1': 'overview', '2': 'agenda', '3': 'activities', '4': 'collections', '5': 'gold', '6': 'journal' })[e.key];
+        const tabName = ({ '1': 'today', '2': 'campaign', '3': 'progress', '4': 'history' })[e.key];
         if (!tabName) return; e.preventDefault(); activateTab(tabName, true);
       });
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
