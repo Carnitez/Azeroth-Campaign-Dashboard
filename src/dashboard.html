@@ -1077,6 +1077,15 @@
     #azeroth-command-center .acc-template-row[data-owned="true"] { opacity: 0.55; }
     #azeroth-command-center .acc-template-group { padding: 0.35rem 0.6rem; background: var(--secondary); color: var(--muted-foreground); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; }
     #azeroth-command-center .acc-onboarding { padding: 0.75rem 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+    #azeroth-command-center .acc-wizard { display: grid; gap: 0.75rem; margin-top: 0.75rem; }
+    #azeroth-command-center .acc-wizard-question { margin: 0; font-size: 1.05rem; font-weight: 620; }
+    #azeroth-command-center .acc-wizard-hint { color: var(--muted-foreground); font-size: 0.72rem; }
+    #azeroth-command-center .acc-chip-row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    #azeroth-command-center .acc-chip-row .btn[aria-pressed="true"] { border-color: var(--acc-primary); color: var(--acc-on-primary); background: var(--acc-primary); }
+    #azeroth-command-center .acc-wizard-identity { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px; background: var(--secondary); }
+    #azeroth-command-center .acc-wizard-identity .acc-character-avatar { width: 2.4rem; height: 2.4rem; }
+    #azeroth-command-center .acc-wizard-identity div { display: grid; gap: 0.1rem; }
+    #azeroth-command-center .acc-wizard-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
     #azeroth-command-center .acc-onboarding-steps { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
     #azeroth-command-center .acc-onboarding-step { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.5rem; border-radius: 8px; background: var(--secondary); }
     #azeroth-command-center .acc-onboarding-step[data-onboarding-complete="true"] { opacity: 0.6; }
@@ -1842,10 +1851,10 @@
 
       <section class="acc-onboarding" id="acc-onboarding" aria-labelledby="acc-onboarding-title" hidden>
         <div class="acc-section-head">
-          <div><h2 id="acc-onboarding-title">Getting started</h2><span class="text-muted text-small">Four quick steps to make this campaign yours.</span></div>
-          <button class="btn btn-ghost" type="button" id="acc-onboarding-dismiss">Dismiss</button>
+          <div><h2 id="acc-onboarding-title">Let’s set up your campaign</h2><span class="text-muted text-small" id="acc-wizard-progress">Step 1 of 3</span></div>
+          <button class="btn btn-ghost" type="button" id="acc-onboarding-dismiss">Skip, I’ll set up manually</button>
         </div>
-        <div class="acc-onboarding-steps" id="acc-onboarding-steps"></div>
+        <div class="acc-wizard" id="acc-wizard-body"></div>
       </section>
 
       <nav class="acc-quick-actions" id="acc-quick-actions" aria-label="Quick actions">
@@ -2409,6 +2418,12 @@
         const rest = m % 60;
         return h ? `${h}h ${rest}m` : `${rest}m`;
       }
+      function formatChipMinutes(minutes) {
+        const value = Math.max(0, Number(minutes) || 0);
+        if (value < 60) return `${value}m`;
+        const hours = value / 60;
+        return Number.isInteger(hours) ? `${hours}h` : `${Math.floor(value / 60)}h ${value % 60}m`;
+      }
       function formatElapsed(milliseconds) {
         const seconds = Math.max(0, Math.floor((Number(milliseconds) || 0) / 1000));
         const hours = Math.floor(seconds / 3600);
@@ -2566,12 +2581,102 @@
         renderRoster();
         renderRecentActivity();
       }
+      const INTEREST_CHIPS = Object.freeze([
+        ['mounts', 'Mounts'], ['pets', 'Pets'], ['transmog', 'Transmog'], ['achievements', 'Achievements'],
+        ['gold', 'Gold'], ['raiding', 'Raiding'], ['mythics', 'Mythic+'], ['pvp', 'PvP'],
+        ['professions', 'Professions'], ['reputation', 'Reputation'], ['leveling', 'Leveling']
+      ]);
+      const INTEREST_GOALS = Object.freeze({
+        mounts: 'Add ten mounts to the collection',
+        pets: 'Reach a full team of max-level pets',
+        transmog: 'Complete one full transmog set',
+        achievements: 'Finish the achievement you keep almost completing',
+        gold: 'Earn your first 10,000 gold',
+        raiding: 'Clear the current raid on normal',
+        mythics: 'Time a +10 keystone',
+        pvp: 'Reach your first PvP rating milestone',
+        professions: 'Max one profession',
+        reputation: 'Reach renown with one faction',
+        leveling: 'Reach max level'
+      });
+      const SESSION_LENGTH_CHIPS = [15, 30, 60, 90];
+      let wizardState = { step: 1, interests: new Set(), minutes: 60 };
+      // Spread the seeded activities across cadences so the first board has something
+      // for today as well as something for the week, rather than eight dailies.
+      function seedTemplateIds(interests, limit = 8) {
+        const packs = Templates.packsForPlaystyles([...interests]);
+        const seen = new Set();
+        const byCadence = { daily: [], weekly: [], manual: [] };
+        for (const pack of packs) {
+          for (const item of Templates.templatesForPack(pack.id)) {
+            if (seen.has(item.id)) continue;
+            seen.add(item.id);
+            (byCadence[item.cadence] || byCadence.manual).push(item.id);
+          }
+        }
+        const order = ['daily', 'weekly', 'manual'];
+        const picked = [];
+        for (let round = 0; picked.length < limit; round += 1) {
+          const before = picked.length;
+          for (const cadence of order) {
+            if (picked.length >= limit) break;
+            if (byCadence[cadence][round]) picked.push(byCadence[cadence][round]);
+          }
+          if (picked.length === before) break;
+        }
+        return picked;
+      }
+      function finishWizard() {
+        const interests = [...wizardState.interests];
+        const minutes = wizardState.minutes;
+        const now = new Date();
+        const active = character();
+        const seeded = Templates.addTemplatesToState(state, seedTemplateIds(interests), { characterId: active.id, now });
+        state = seeded.state;
+        state.preferences = { ...state.preferences, interests, defaultSessionMinutes: minutes, onboardingCompletedAt: now.toISOString() };
+        const existingGoals = new Set(state.goals.map(goal => String(goal.title).trim().toLowerCase()));
+        let order = state.goals.length;
+        for (const interest of interests) {
+          const title = INTEREST_GOALS[interest];
+          if (!title || existingGoals.has(title.trim().toLowerCase())) continue;
+          existingGoals.add(title.trim().toLowerCase());
+          state.goals.push({ id: uid('goal'), characterId: active.id, scope: 'character', category: 'Current content', title, status: 'todo', priority: 0, dueDate: null, recurrence: null, estimatedMinutes: null, createdAt: now.toISOString(), completedAt: null, order: order++ });
+        }
+        let planned = 0;
+        const generated = Recommendation.planSessionWithStrategy(state, { budgetMinutes: minutes, strategy: state.preferences?.planningStrategy || 'balanced', now });
+        if (generated.items.length) {
+          state.sessionPlans.push(SessionEngine.createSavedPlan(generated, { title: 'First session', status: 'draft', plannedFor: today() }, { id: uid('session-plan'), now }));
+          planned = generated.items.length;
+        }
+        saveState();
+        render();
+        showToast(`Set up: ${seeded.added.length} activities, ${interests.length} goals${planned ? `, a ${formatMinutes(minutes)} plan` : ''}. All editable.`, { duration: 7000 });
+      }
       function renderOnboarding() {
         const section = root.querySelector('#acc-onboarding');
         const onboarding = Selectors.selectOnboardingState(state);
         section.hidden = !onboarding.visible;
         if (!onboarding.visible) return;
-        root.querySelector('#acc-onboarding-steps').innerHTML = onboarding.steps.map(step => `<div class="acc-onboarding-step" data-onboarding-complete="${step.complete}"><span class="acc-onboarding-check" aria-hidden="true">${step.complete ? '✓' : ''}</span><span>${escapeHtml(step.label)}</span>${step.complete ? '' : `<button class="btn btn-ghost" type="button" data-command-action="${escapeHtml(step.action)}">Go</button>`}</div>`).join('');
+        const body = root.querySelector('#acc-wizard-body');
+        root.querySelector('#acc-wizard-progress').textContent = `Step ${wizardState.step} of 3`;
+        const active = character();
+        if (wizardState.step === 1) {
+          body.innerHTML = `<p class="acc-wizard-question">Is this your character?</p>
+            <div class="acc-wizard-identity"><div class="acc-character-avatar" aria-hidden="true">${escapeHtml(resolveCharacterTheme(active).glyph)}</div>
+              <div><strong>${escapeHtml(active.name)}</strong><span class="acc-wizard-hint">${escapeHtml(active.race)} ${escapeHtml(active.className)} · ${escapeHtml(active.realm)} ${escapeHtml(active.region)}</span></div></div>
+            <div class="acc-wizard-actions"><button class="btn btn-primary" type="button" data-wizard="next">Yes, that’s me</button><button class="btn" type="button" data-wizard="edit-character">Change details</button></div>`;
+        } else if (wizardState.step === 2) {
+          body.innerHTML = `<p class="acc-wizard-question">What do you play for?</p>
+            <span class="acc-wizard-hint">Pick any that apply. This decides what gets set up for you.</span>
+            <div class="acc-chip-row">${INTEREST_CHIPS.map(([id, label]) => `<button class="btn" type="button" data-wizard-interest="${id}" aria-pressed="${wizardState.interests.has(id)}">${escapeHtml(label)}</button>`).join('')}</div>
+            <div class="acc-wizard-actions"><button class="btn btn-primary" type="button" data-wizard="next">Continue</button><button class="btn btn-ghost" type="button" data-wizard="back">Back</button></div>`;
+        } else {
+          body.innerHTML = `<p class="acc-wizard-question">How long is a normal session?</p>
+            <span class="acc-wizard-hint">We’ll size your plans to fit.</span>
+            <div class="acc-chip-row">${SESSION_LENGTH_CHIPS.map(value => `<button class="btn" type="button" data-wizard-minutes="${value}" aria-pressed="${wizardState.minutes === value}">${formatChipMinutes(value)}</button>`).join('')}</div>
+            <div class="acc-wizard-actions"><button class="btn btn-primary" type="button" data-wizard="finish">Set up my campaign</button><button class="btn btn-ghost" type="button" data-wizard="back">Back</button></div>`;
+        }
+        refreshIcons();
       }
       function renderTodaySummary() {
         const summary = Schedule.commandCenterTodaySummary(state, { now: new Date(), characterId: state.activeCharacterId });
@@ -3573,6 +3678,27 @@
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-wizard-body').addEventListener('click', e => {
+        const interest = e.target.closest('[data-wizard-interest]');
+        if (interest) {
+          const id = interest.dataset.wizardInterest;
+          if (wizardState.interests.has(id)) wizardState.interests.delete(id); else wizardState.interests.add(id);
+          interest.setAttribute('aria-pressed', String(wizardState.interests.has(id)));
+          return;
+        }
+        const minutes = e.target.closest('[data-wizard-minutes]');
+        if (minutes) {
+          wizardState.minutes = Number(minutes.dataset.wizardMinutes);
+          renderOnboarding();
+          return;
+        }
+        const action = e.target.closest('[data-wizard]')?.dataset.wizard;
+        if (!action) return;
+        if (action === 'next') { wizardState.step = Math.min(3, wizardState.step + 1); renderOnboarding(); }
+        else if (action === 'back') { wizardState.step = Math.max(1, wizardState.step - 1); renderOnboarding(); }
+        else if (action === 'edit-character') openCharacterDialog(true);
+        else if (action === 'finish') finishWizard();
+      });
       root.querySelector('#acc-template-search').addEventListener('input', () => renderTemplatePicker());
       root.querySelector('#acc-template-packs').addEventListener('click', e => {
         const button = e.target.closest('[data-template-pack]');
