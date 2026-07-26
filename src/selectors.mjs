@@ -371,6 +371,37 @@ export function selectOnboardingState(state) {
   return { visible: selectCampaignStage(state) === 'fresh' && !dismissed, dismissed, steps, allComplete: steps.every(step => step.complete) };
 }
 
+/*
+ * View model for the Guided Today screen: which of the four things the home screen
+ * should be doing right now, and the ranked candidates behind "Show another option".
+ *
+ *   setup   — campaign is fresh; run the wizard
+ *   session — something is running or paused; continue it
+ *   choose  — here is what to do, sized to the available time
+ *   clear   — real campaign, genuinely nothing to do right now
+ */
+export function selectGuidedToday(state, { minutes = null, now = new Date() } = {}) {
+  const requested = number(minutes, 0);
+  const preferred = number(state?.preferences?.defaultSessionMinutes, 0);
+  const budget = requested > 0 ? requested : (preferred > 0 ? preferred : 60);
+  const activeSession = list(state?.sessionPlans)
+    .find(plan => ['in_progress', 'paused'].includes(plan?.status)) || null;
+  const empty = { minutes: budget, recommendations: [], activeSession: null };
+  if (selectCampaignStage(state) === 'fresh') return { ...empty, mode: 'setup', stage: 'fresh' };
+  if (activeSession) return { ...empty, mode: 'session', stage: 'active', activeSession };
+  const recommendations = selectNextUp(state, {
+    limit: 5, now, availableMinutes: budget,
+    strategy: state?.preferences?.planningStrategy || 'balanced'
+  });
+  return {
+    mode: recommendations.length ? 'choose' : 'clear',
+    stage: 'active',
+    minutes: budget,
+    recommendations,
+    activeSession: null
+  };
+}
+
 export const Selectors = Object.freeze({
   selectActiveGoals,
   selectGoalObjectiveCounts,
@@ -381,7 +412,8 @@ export const Selectors = Object.freeze({
   selectWeeklyMomentum,
   selectNextUp,
   selectOnboardingState,
-  selectCampaignStage
+  selectCampaignStage,
+  selectGuidedToday
 });
 
 globalThis.AzerothSelectors = Selectors;

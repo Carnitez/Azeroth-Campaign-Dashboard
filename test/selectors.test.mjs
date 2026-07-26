@@ -10,7 +10,8 @@ import {
   selectWeeklyMomentum,
   selectNextUp,
   selectOnboardingState,
-  selectCampaignStage
+  selectCampaignStage,
+  selectGuidedToday
 } from '../src/selectors.mjs';
 
 const at = (day, hour = 12, minute = 0) => new Date(2026, 6, day, hour, minute, 0);
@@ -384,5 +385,87 @@ test('campaign stage selector never mutates canonical state', () => {
   const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu')] });
   const before = structuredClone(campaign);
   selectCampaignStage(campaign);
+  assert.deepEqual(campaign, before);
+});
+
+const plannedActivity = (id, characterId, overrides = {}) => ({
+  id, characterId, kind: 'planned', title: id, description: '', category: 'Campaign', priority: 1,
+  status: 'todo', estimatedMinutes: 30, repeatType: 'daily', tags: [], notes: '', scheduledFor: null,
+  schedule: { type: 'daily', startDate: '2026-07-01', dueTime: null, weekdays: [], intervalValue: 1, intervalUnit: 'days', endDate: null, timezoneMode: 'local', graceMinutes: 0, paused: false, pausedUntil: null },
+  createdAt: iso(1), updatedAt: iso(1), completedAt: null, ...overrides
+});
+const sessionPlan = (id, status, overrides = {}) => ({
+  id, title: id, status, characterIds: ['carnitez-silvermoon-eu'], items: [], totalEstimatedMinutes: 30,
+  plannedFor: '2026-07-22', createdAt: iso(1), updatedAt: iso(1), startedAt: null, completedAt: null,
+  endedAt: null, activeStartedAt: null, pausedAt: null, accumulatedMs: 0, currentItemId: null,
+  notes: '', reconciliation: null, ...overrides
+});
+
+test('guided today asks for setup while the campaign is fresh', () => {
+  const campaign = state({ activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()] });
+  const view = selectGuidedToday(campaign, { now: at(22) });
+  assert.equal(view.mode, 'setup');
+  assert.deepEqual(view.recommendations, []);
+});
+
+test('guided today offers recommendations once there is real work', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')]
+  });
+  const view = selectGuidedToday(campaign, { minutes: 30, now: at(22) });
+  assert.equal(view.mode, 'choose');
+  assert.equal(view.minutes, 30);
+  assert.ok(view.recommendations.length >= 1);
+});
+
+test('guided today hands over to a running session', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')],
+    sessionPlans: [sessionPlan('running', 'in_progress', { startedAt: iso(22, 10), activeStartedAt: iso(22, 10) })]
+  });
+  const view = selectGuidedToday(campaign, { now: at(22) });
+  assert.equal(view.mode, 'session');
+  assert.equal(view.activeSession.id, 'running');
+});
+
+test('guided today treats a paused session as the session to continue', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')],
+    sessionPlans: [sessionPlan('paused', 'paused', { startedAt: iso(22, 10), pausedAt: iso(22, 11) })]
+  });
+  assert.equal(selectGuidedToday(campaign, { now: at(22) }).mode, 'session');
+});
+
+test('guided today falls back to the saved session length', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    preferences: { defaultSessionMinutes: 90 },
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')]
+  });
+  assert.equal(selectGuidedToday(campaign, { now: at(22) }).minutes, 90);
+  assert.equal(selectGuidedToday(campaign, { minutes: 15, now: at(22) }).minutes, 15);
+});
+
+test('guided today reports nothing to do when work exists but none is available', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [plannedActivity('done', 'carnitez-silvermoon-eu', { status: 'completed', completedAt: iso(22) })],
+    collectionTrackers: [tracker('mounts', 'carnitez-silvermoon-eu', { owned: 5, target: 5 })]
+  });
+  const view = selectGuidedToday(campaign, { minutes: 30, now: at(22) });
+  assert.equal(view.mode, 'clear');
+  assert.deepEqual(view.recommendations, []);
+});
+
+test('guided today never mutates canonical state', () => {
+  const campaign = state({
+    activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()],
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')]
+  });
+  const before = structuredClone(campaign);
+  selectGuidedToday(campaign, { minutes: 60, now: at(22) });
   assert.deepEqual(campaign, before);
 });

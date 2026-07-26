@@ -1077,6 +1077,14 @@
     #azeroth-command-center .acc-template-row[data-owned="true"] { opacity: 0.55; }
     #azeroth-command-center .acc-template-group { padding: 0.35rem 0.6rem; background: var(--secondary); color: var(--muted-foreground); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; }
     #azeroth-command-center .acc-onboarding { padding: 0.75rem 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+    #azeroth-command-center .acc-guided { display: grid; gap: 0.6rem; margin-top: 0.6rem; padding: 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+    #azeroth-command-center .acc-guided-card { display: grid; gap: 0.45rem; padding: 0.9rem; border: 1px solid color-mix(in srgb, var(--acc-primary) 30%, var(--border)); border-radius: 9px; background: color-mix(in srgb, var(--acc-primary) 6%, transparent); }
+    #azeroth-command-center .acc-guided-card .acc-guided-title { font-size: 1.1rem; font-weight: 640; }
+    #azeroth-command-center .acc-guided-card .acc-guided-why { color: var(--muted-foreground); font-size: 0.74rem; }
+    #azeroth-command-center .acc-guided-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.2rem; }
+    #azeroth-command-center .acc-guided-actions .btn-primary { min-height: 2.6rem; padding-inline: 1.2rem; }
+    #azeroth-command-center .acc-guided details summary { cursor: pointer; color: var(--acc-secondary); font-size: 0.7rem; }
+    #azeroth-command-center .acc-guided details ul { margin: 0.3rem 0 0; padding-left: 1rem; color: var(--muted-foreground); font-size: 0.7rem; }
     #azeroth-command-center .acc-wizard { display: grid; gap: 0.75rem; margin-top: 0.75rem; }
     #azeroth-command-center .acc-wizard-question { margin: 0; font-size: 1.05rem; font-weight: 620; }
     #azeroth-command-center .acc-wizard-hint { color: var(--muted-foreground); font-size: 0.72rem; }
@@ -1857,6 +1865,12 @@
         <div class="acc-wizard" id="acc-wizard-body"></div>
       </section>
 
+      <section class="acc-guided" id="acc-guided" aria-labelledby="acc-guided-question" hidden>
+        <p class="acc-wizard-question" id="acc-guided-question">How much time do you have?</p>
+        <div class="acc-chip-row" id="acc-guided-times"></div>
+        <div id="acc-guided-result"></div>
+      </section>
+
       <nav class="acc-quick-actions" id="acc-quick-actions" aria-label="Quick actions">
         <button class="btn btn-primary" type="button" data-command-action="plan-session"><i data-lucide="calendar-clock" aria-hidden="true"></i> Plan session</button>
         <button class="btn" type="button" data-command-action="log-session"><i data-lucide="timer" aria-hidden="true"></i> Log session</button>
@@ -2557,6 +2571,51 @@
         const pct = Math.max(0, Math.min(100, Number(progress.current) / Number(progress.target) * 100));
         return `<span class="acc-mini-progress"><span class="acc-progress-track"><span class="acc-progress-fill" style="display:block;width:${pct}%"></span></span><span>${Number(progress.current).toLocaleString()}/${Number(progress.target).toLocaleString()}</span></span>`;
       }
+      const GUIDED_TIME_CHIPS = [15, 30, 60, 90];
+      let guidedMinutes = null;
+      let guidedIndex = 0;
+      function renderGuidedToday() {
+        const section = root.querySelector('#acc-guided');
+        const view = Selectors.selectGuidedToday(state, { minutes: guidedMinutes, now: new Date() });
+        section.hidden = view.mode === 'setup' || view.mode === 'session';
+        if (section.hidden) return;
+        root.querySelector('#acc-guided-times').innerHTML = GUIDED_TIME_CHIPS
+          .map(value => `<button class="btn" type="button" data-guided-minutes="${value}" aria-pressed="${view.minutes === value}">${formatChipMinutes(value)}</button>`).join('');
+        const target = root.querySelector('#acc-guided-result');
+        if (view.mode === 'clear') {
+          target.innerHTML = '<div class="acc-empty">Nothing is due right now. Enjoy the break, or add more to your list.<div class="acc-actions"><button class="btn" type="button" data-command-action="create-activity">Add activities</button></div></div>';
+          refreshIcons();
+          return;
+        }
+        guidedIndex = Math.min(guidedIndex, view.recommendations.length - 1);
+        const item = view.recommendations[guidedIndex];
+        const others = view.recommendations.length - 1;
+        const positive = item.factors.filter(factor => factor.value > 0).slice(0, 3);
+        target.innerHTML = `<article class="acc-guided-card" data-recommendation-type="${escapeHtml(item.sourceType)}" data-recommendation-id="${escapeHtml(item.sourceId)}">
+          <span class="acc-guided-title">${escapeHtml(item.title)}</span>
+          <span class="acc-guided-why">${escapeHtml(item.reason)}${item.character?.name ? ` · ${escapeHtml(item.character.name)}` : ''}</span>
+          ${progressMarkup(item.progress)}
+          <div class="acc-guided-actions">
+            <button class="btn btn-primary" type="button" data-guided="start">${escapeHtml(item.sourceType === 'activity' ? 'Start now' : item.actionLabel)}</button>
+            ${others > 0 ? `<button class="btn btn-ghost" type="button" data-guided="another">Show another option</button>` : ''}
+          </div>
+          ${positive.length ? `<details><summary>Why this?</summary><ul>${positive.map(factor => `<li>${escapeHtml(factor.label)}</li>`).join('')}</ul></details>` : ''}
+        </article>`;
+        refreshIcons();
+      }
+      function startGuidedSession() {
+        const view = Selectors.selectGuidedToday(state, { minutes: guidedMinutes, now: new Date() });
+        const item = view.recommendations[guidedIndex];
+        if (!item) return;
+        if (item.sourceType !== 'activity') { performCommandAction(item.action, item.characterId, item.sourceId); return; }
+        const now = new Date();
+        const generated = Recommendation.planSessionWithStrategy(state, { budgetMinutes: view.minutes, strategy: state.preferences?.planningStrategy || 'balanced', selectedIds: [item.sourceId], now });
+        if (!generated.items.length) { startAgendaActivity(item.sourceId); return; }
+        const plan = SessionEngine.createSavedPlan(generated, { title: `${formatChipMinutes(view.minutes)} session`, status: 'ready', plannedFor: today() }, { id: uid('session-plan'), now });
+        state.sessionPlans.push(plan);
+        saveState();
+        openSavedSession(plan.id, { start: true });
+      }
       function renderCommandCenter(c) {
         root.querySelector('#acc-command-name').textContent = c.name;
         root.querySelector('#acc-command-profile').textContent = `${c.race || 'Race not set'} ${c.className || 'Class not set'} · ${c.realm || 'Realm not set'} ${c.region || ''}`.trim();
@@ -2570,6 +2629,7 @@
         root.querySelector('#acc-quick-actions').hidden = stage === 'fresh';
         root.querySelector('#acc-today-summary').hidden = stage === 'fresh';
         root.querySelector('.acc-command-grid').hidden = stage === 'fresh';
+        renderGuidedToday();
         if (stage === 'fresh') {
           root.querySelector('.acc-recent').hidden = true;
           return;
@@ -3678,6 +3738,22 @@
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-guided-times').addEventListener('click', e => {
+        const chip = e.target.closest('[data-guided-minutes]');
+        if (!chip) return;
+        guidedMinutes = Number(chip.dataset.guidedMinutes);
+        guidedIndex = 0;
+        renderGuidedToday();
+      });
+      root.querySelector('#acc-guided-result').addEventListener('click', e => {
+        const action = e.target.closest('[data-guided]')?.dataset.guided;
+        if (action === 'start') startGuidedSession();
+        else if (action === 'another') {
+          const view = Selectors.selectGuidedToday(state, { minutes: guidedMinutes, now: new Date() });
+          guidedIndex = view.recommendations.length ? (guidedIndex + 1) % view.recommendations.length : 0;
+          renderGuidedToday();
+        }
+      });
       root.querySelector('#acc-wizard-body').addEventListener('click', e => {
         const interest = e.target.closest('[data-wizard-interest]');
         if (interest) {
