@@ -8,7 +8,7 @@ const Schedule = globalThis.AzerothSchedule ?? await import('./schedule-engine.m
 const Recommendations = globalThis.AzerothRecommendations ?? await import('./recommendation-engine.mjs');
 
 export const ACTIVITY_CATEGORIES = Object.freeze([
-  'Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts',
+  'Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Pets',
   'Transmog', 'Achievements', 'Events', 'Custom'
 ]);
 export const ACTIVITY_STATUSES = Object.freeze(['todo', 'in_progress', 'completed', 'skipped']);

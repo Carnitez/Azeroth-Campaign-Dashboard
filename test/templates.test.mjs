@@ -5,7 +5,7 @@ import {
   ACTIVITY_TEMPLATES, ACTIVITY_PACKS, templateById, packById, templatesForPack,
   packsForPlaystyles, templateToActivityInput, addTemplatesToState, resetWeekdayForRegion
 } from '../src/templates.mjs';
-import { createPlannedActivity, isPlannedActivity } from '../src/activity-engine.mjs';
+import { createPlannedActivity, isPlannedActivity, ACTIVITY_CATEGORIES } from '../src/activity-engine.mjs';
 import { normalizeSchedule, validateSchedule } from '../src/schedule-engine.mjs';
 import { validateV2State } from '../src/core.mjs';
 
@@ -29,6 +29,16 @@ test('every template produces a valid planned activity', () => {
     assert.equal(isPlannedActivity(activity), true, `${item.id} is not a planned activity`);
     assert.equal(activity.title, item.title);
     assert.ok(activity.estimatedMinutes > 0, `${item.id} has no duration`);
+  }
+});
+
+// createPlannedActivity silently coerces an unrecognised category to 'Custom', so a
+// typo in the catalog is invisible unless the round trip is asserted directly.
+test('every template category survives createPlannedActivity uncoerced', () => {
+  for (const item of ACTIVITY_TEMPLATES) {
+    assert.ok(ACTIVITY_CATEGORIES.includes(item.category), `${item.id} uses unknown category ${item.category}`);
+    const activity = createPlannedActivity(templateToActivityInput(item, { characterId: 'a', region: 'EU' }), { id: item.id, now });
+    assert.equal(activity.category, item.category, `${item.id} category was coerced`);
   }
 });
 

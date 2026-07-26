@@ -18,7 +18,7 @@ export function nextCollectionMilestone(target, name) {
   const sequence = name === 'Appearances' ? APPEARANCE_MILESTONE_SEQUENCE : COLLECTION_MILESTONE_SEQUENCE;
   return sequence.find(value => value > Number(target)) ?? null;
 }
-export const PLANNED_ACTIVITY_CATEGORIES = ['Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Transmog', 'Achievements', 'Events', 'Custom'];
+export const PLANNED_ACTIVITY_CATEGORIES = ['Campaign', 'Weekly', 'Gold', 'Reputation', 'Professions', 'Mounts', 'Pets', 'Transmog', 'Achievements', 'Events', 'Custom'];
 export const PLANNED_ACTIVITY_STATUSES = ['todo', 'in_progress', 'completed', 'skipped'];
 export const PLANNED_ACTIVITY_REPEAT_TYPES = ['one_time', 'daily', 'weekly', 'weekdays', 'interval', 'manual'];
 
