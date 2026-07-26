@@ -1064,6 +1064,18 @@
     #azeroth-command-center .acc-insight { display: grid; gap: 0.18rem; padding: 0.55rem; background: var(--card); }
     #azeroth-command-center .acc-insight span { color: var(--muted-foreground); font-size: 0.63rem; }
     #azeroth-command-center .acc-insight strong { font-size: 0.78rem; }
+    #azeroth-command-center .acc-pack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+    #azeroth-command-center .acc-pack-card { display: grid; gap: 0.3rem; padding: 0.65rem; border: 1px solid var(--border); border-radius: 8px; background: var(--card); }
+    #azeroth-command-center .acc-pack-card strong { font-size: 0.85rem; }
+    #azeroth-command-center .acc-pack-card span { color: var(--muted-foreground); font-size: 0.7rem; }
+    #azeroth-command-center .acc-pack-card .btn { margin-top: 0.2rem; justify-content: center; }
+    #azeroth-command-center .acc-template-list-head { margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    #azeroth-command-center .acc-template-list { display: grid; gap: 1px; max-height: 17rem; overflow-y: auto; background: var(--border); border: 1px solid var(--border); border-radius: 8px; }
+    #azeroth-command-center .acc-template-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; padding: 0.45rem 0.6rem; background: var(--card); }
+    #azeroth-command-center .acc-template-row .acc-row-title { font-size: 0.82rem; }
+    #azeroth-command-center .acc-template-row .acc-row-meta { color: var(--muted-foreground); font-size: 0.68rem; }
+    #azeroth-command-center .acc-template-row[data-owned="true"] { opacity: 0.55; }
+    #azeroth-command-center .acc-template-group { padding: 0.35rem 0.6rem; background: var(--secondary); color: var(--muted-foreground); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; }
     #azeroth-command-center .acc-onboarding { padding: 0.75rem 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
     #azeroth-command-center .acc-onboarding-steps { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
     #azeroth-command-center .acc-onboarding-step { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.5rem; border-radius: 8px; background: var(--secondary); }
@@ -2080,6 +2092,22 @@
     </form>
   </dialog>
 
+  <dialog id="acc-template-dialog" aria-labelledby="acc-template-title">
+    <div class="acc-dialog-head">
+      <div><h2 id="acc-template-title">Add activities</h2><span class="text-muted text-small">Pick what you actually do. Everything is editable afterwards.</span></div>
+      <button class="btn btn-ghost" type="button" data-close-dialog="acc-template-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
+    </div>
+    <label class="form-label"><span class="sr-only">Search activities</span><input class="form-control" id="acc-template-search" type="search" placeholder="Search activities…"></label>
+    <div id="acc-template-packs" class="acc-pack-grid"></div>
+    <div class="acc-section-head acc-template-list-head"><h3>Or pick individually</h3><span class="text-muted text-small" id="acc-template-selected-count">None selected</span></div>
+    <div id="acc-template-list" class="acc-template-list"></div>
+    <div class="acc-actions">
+      <button class="btn btn-primary" type="button" id="acc-template-add" disabled>Add selected</button>
+      <button class="btn btn-ghost" type="button" id="acc-template-scratch">Start from scratch</button>
+      <button class="btn" type="button" data-close-dialog="acc-template-dialog">Done</button>
+    </div>
+  </dialog>
+
   <dialog id="acc-schedule-dialog" aria-labelledby="acc-schedule-title">
     <form method="dialog" id="acc-schedule-form">
       <div class="acc-dialog-head"><div><h2 id="acc-schedule-title">Edit schedule</h2><span class="text-muted text-small">Availability is calculated locally from this reusable rule.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-schedule-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
@@ -2253,6 +2281,7 @@
       const SessionEngine = globalThis.AzerothSessions;
       const Schedule = globalThis.AzerothSchedule;
       const Recommendation = globalThis.AzerothRecommendations;
+      const Templates = globalThis.AzerothTemplates;
       const collectionNames = Core.COLLECTION_NAMES;
       const today = () => Core.localDateKey();
       const uid = prefix => Core.createId(prefix);
@@ -2762,7 +2791,7 @@
           root.querySelector('#acc-agenda-today-section').hidden = false;
           root.querySelector('#acc-agenda-today-header').hidden = true;
           root.querySelector('#acc-agenda-today').innerHTML = '<div class="acc-empty">Create your first activity to start building the Daily Agenda.<div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-agenda-empty-create">Create activity</button></div></div>';
-          root.querySelector('#acc-agenda-empty-create')?.addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
+          root.querySelector('#acc-agenda-empty-create')?.addEventListener('click', () => { activateTab('activities'); openTemplatePicker(); });
           root.querySelector('#acc-agenda-attention-section').hidden = true;
           root.querySelector('#acc-agenda-upcoming-section').hidden = true;
           root.querySelector('#acc-agenda-completed-section').hidden = true;
@@ -3097,6 +3126,64 @@
         const form = root.querySelector('#acc-activity-form');
         root.querySelector('[data-activity-blocked-reason]').hidden = !form.elements.blocked.checked;
       }
+      let templateSelection = new Set();
+      function ownedTemplateTitles() {
+        const characterId = state.activeCharacterId;
+        return new Set(state.activities
+          .filter(item => item.characterId === characterId && ActivityEngine.isPlannedActivity(item))
+          .map(item => String(item.title).trim().toLowerCase()));
+      }
+      function applyTemplates(templateIds, { label }) {
+        const previous = structuredClone(state);
+        const result = Templates.addTemplatesToState(state, templateIds, { characterId: state.activeCharacterId, now: new Date() });
+        if (!result.added.length) { showToast('Already added.', { tone: 'warning' }); renderTemplatePicker(); return; }
+        state = result.state;
+        templateSelection.clear();
+        saveState(); render(); renderTemplatePicker();
+        const skipped = result.skipped.length ? ` (${result.skipped.length} already added)` : '';
+        showToast(`${label}: ${result.added.length} added${skipped}.`, {
+          actionLabel: 'Undo',
+          onAction: () => { state = previous; saveState(); render(); renderTemplatePicker(); showToast('Removed.'); }
+        });
+      }
+      function renderTemplatePicker() {
+        const query = root.querySelector('#acc-template-search').value.trim().toLowerCase();
+        const owned = ownedTemplateTitles();
+        const matches = item => !query || `${item.title} ${item.description} ${item.category}`.toLowerCase().includes(query);
+        const packs = Templates.ACTIVITY_PACKS.filter(pack => Templates.templatesForPack(pack.id).some(matches));
+        root.querySelector('#acc-template-packs').innerHTML = packs.map(pack => {
+          const items = Templates.templatesForPack(pack.id);
+          const remaining = items.filter(item => !owned.has(item.title.trim().toLowerCase())).length;
+          return `<div class="acc-pack-card"><strong>${escapeHtml(pack.name)}</strong><span>${escapeHtml(pack.description)}</span>
+            <button class="btn" type="button" data-template-pack="${escapeHtml(pack.id)}" ${remaining ? '' : 'disabled'}>${remaining ? `Add ${remaining} activit${remaining === 1 ? 'y' : 'ies'}` : 'All added'}</button></div>`;
+        }).join('') || '<div class="acc-empty">No packs match that search.</div>';
+        const grouped = new Map();
+        for (const item of Templates.ACTIVITY_TEMPLATES.filter(matches)) {
+          if (!grouped.has(item.category)) grouped.set(item.category, []);
+          grouped.get(item.category).push(item);
+        }
+        const cadenceLabels = { daily: 'Daily', weekly: 'Weekly', manual: 'Whenever', one_time: 'Once' };
+        root.querySelector('#acc-template-list').innerHTML = [...grouped].map(([category, items]) =>
+          `<div class="acc-template-group">${escapeHtml(category)}</div>` + items.map(item => {
+            const isOwned = owned.has(item.title.trim().toLowerCase());
+            return `<label class="acc-template-row" data-owned="${isOwned}">
+              <input class="form-check-input" type="checkbox" data-template-id="${escapeHtml(item.id)}" ${isOwned ? 'disabled' : ''} ${templateSelection.has(item.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(item.title)}">
+              <span><span class="acc-row-title">${escapeHtml(item.title)}</span><br><span class="acc-row-meta">${escapeHtml(item.description)}</span></span>
+              <span class="acc-row-meta">${isOwned ? 'Added' : `${cadenceLabels[item.cadence] || item.cadence} · ${formatMinutes(item.estimatedMinutes)}`}</span>
+            </label>`;
+          }).join('')).join('') || '<div class="acc-empty">Nothing matches that search.</div>';
+        const count = templateSelection.size;
+        root.querySelector('#acc-template-selected-count').textContent = count ? `${count} selected` : 'None selected';
+        root.querySelector('#acc-template-add').disabled = !count;
+        root.querySelector('#acc-template-add').textContent = count ? `Add ${count} selected` : 'Add selected';
+        refreshIcons();
+      }
+      function openTemplatePicker() {
+        templateSelection = new Set();
+        root.querySelector('#acc-template-search').value = '';
+        renderTemplatePicker();
+        root.querySelector('#acc-template-dialog').showModal();
+      }
       function openActivityDialog(activityId = null, defaults = {}) {
         const form = root.querySelector('#acc-activity-form');
         form.reset();
@@ -3373,7 +3460,7 @@
         else if (item.action === 'log-gold') { activateTab('gold'); focusAfterNavigation('#acc-ledger-form [name="activity"]'); }
         else if (item.action === 'update-collection') { activateTab('collections'); focusAfterNavigation('[data-collection-owned]'); }
         else if (item.action === 'update-progress') root.querySelector('#acc-progress-dialog').showModal();
-        else if (item.action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
+        else if (item.action === 'create-activity') { activateTab('activities'); openTemplatePicker(); }
         else if (item.action === 'plan-session') openPlanner();
         else if (item.action === 'save-current-plan') { if (plannerState.result?.items?.length) openPlanEditor(SessionEngine.createSavedPlan(plannerState.result, { status: 'draft' }, { id: uid('session-plan') })); else { openPlanner(); showToast('Generate a plan before saving it.'); } }
         else if (item.action === 'start-next-session') startNextSavedSession();
@@ -3404,7 +3491,7 @@
         else if (action === 'agenda') activateTab('agenda');
         else if (action === 'open-collections') { activateTab('collections'); requestAnimationFrame(() => root.querySelector('[data-collection-owned]')?.focus()); }
         else if (action === 'edit-character') openCharacterDialog(true);
-        else if (action === 'create-activity') { activateTab('activities'); openActivityDialog(); }
+        else if (action === 'create-activity') { activateTab('activities'); openTemplatePicker(); }
         else if (action === 'switch-character') root.querySelector('#acc-command-character-select').focus();
         else if (action === 'add-goal') openGoalDialog();
         else if (action === 'open-activity') { activateTab('activities'); openActivityDialog(sourceId); }
@@ -3486,6 +3573,30 @@
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-template-search').addEventListener('input', () => renderTemplatePicker());
+      root.querySelector('#acc-template-packs').addEventListener('click', e => {
+        const button = e.target.closest('[data-template-pack]');
+        if (!button) return;
+        const pack = Templates.packById(button.dataset.templatePack);
+        if (pack) applyTemplates([...pack.templateIds], { label: pack.name });
+      });
+      root.querySelector('#acc-template-list').addEventListener('change', e => {
+        const box = e.target.closest('[data-template-id]');
+        if (!box) return;
+        if (box.checked) templateSelection.add(box.dataset.templateId);
+        else templateSelection.delete(box.dataset.templateId);
+        const count = templateSelection.size;
+        root.querySelector('#acc-template-selected-count').textContent = count ? `${count} selected` : 'None selected';
+        root.querySelector('#acc-template-add').disabled = !count;
+        root.querySelector('#acc-template-add').textContent = count ? `Add ${count} selected` : 'Add selected';
+      });
+      root.querySelector('#acc-template-add').addEventListener('click', () => {
+        if (templateSelection.size) applyTemplates([...templateSelection], { label: 'Activities' });
+      });
+      root.querySelector('#acc-template-scratch').addEventListener('click', () => {
+        root.querySelector('#acc-template-dialog').close();
+        openActivityDialog();
+      });
       root.querySelector('#acc-onboarding-dismiss').addEventListener('click', () => {
         state.preferences = { ...state.preferences, onboardingDismissed: true };
         saveState(); renderOnboarding();
@@ -3546,7 +3657,7 @@
         state.preferences = { ...state.preferences, agendaSort: value, ...(value === 'manual' && !state.preferences?.agendaManualOrder?.length ? { agendaManualOrder: plannedIds } : {}) };
         saveState(); renderAgenda(); refreshIcons();
       });
-      root.querySelector('#acc-agenda-create').addEventListener('click', () => { activateTab('activities'); openActivityDialog(); });
+      root.querySelector('#acc-agenda-create').addEventListener('click', () => { activateTab('activities'); openTemplatePicker(); });
       root.querySelector('#acc-agenda-plan').addEventListener('click', openPlanner);
       root.querySelector('#acc-agenda-resume').addEventListener('click', event => openSavedSession(event.currentTarget.dataset.sessionId));
       root.querySelector('#acc-agenda-selected-plan').addEventListener('click', () => createAgendaPlan([...agendaSelected]));
@@ -3602,7 +3713,7 @@
         const session = event.target.closest('[data-history-session]'); if (session) { root.querySelector('#acc-run-history-dialog').close(); openSavedSession(session.dataset.historySession); return; }
         const undo = event.target.closest('[data-history-undo]'); if (!undo) return; state = Schedule.undoOccurrence(state, undo.dataset.historyUndo); saveState(); root.querySelector('#acc-run-history-dialog').close(); render(); showToast('Occurrence restored.');
       });
-      root.querySelector('#acc-create-activity').addEventListener('click', () => openActivityDialog());
+      root.querySelector('#acc-create-activity').addEventListener('click', () => openTemplatePicker());
       root.querySelectorAll('[data-activity-view]').forEach(button => button.addEventListener('click', () => { activityView = button.dataset.activityView; renderActivities(); refreshIcons(); }));
       ['acc-activity-character-filter', 'acc-activity-category-filter', 'acc-activity-priority-filter', 'acc-activity-status-filter', 'acc-activity-sort'].forEach(id => root.querySelector(`#${id}`).addEventListener('change', () => { renderActivities(); refreshIcons(); }));
       ['acc-activity-search', 'acc-activity-tags-filter'].forEach(id => root.querySelector(`#${id}`).addEventListener('input', () => { renderActivities(); refreshIcons(); }));
@@ -3623,7 +3734,7 @@
       root.querySelector('#acc-activity-list').addEventListener('click', e => {
         const action = e.target.closest('[data-activity-action]');
         if (!action) return;
-        if (action.dataset.activityAction === 'create') { openActivityDialog(); return; }
+        if (action.dataset.activityAction === 'create') { openTemplatePicker(); return; }
         const row = action.closest('[data-activity-id]'), id = row?.dataset.activityId;
         const activity = state.activities.find(item => item.id === id && ActivityEngine.isPlannedActivity(item));
         if (!activity) return;
