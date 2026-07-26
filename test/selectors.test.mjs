@@ -11,7 +11,8 @@ import {
   selectNextUp,
   selectOnboardingState,
   selectCampaignStage,
-  selectGuidedToday
+  selectGuidedToday,
+  selectCoachHint
 } from '../src/selectors.mjs';
 
 const at = (day, hour = 12, minute = 0) => new Date(2026, 6, day, hour, minute, 0);
@@ -467,5 +468,82 @@ test('guided today never mutates canonical state', () => {
   });
   const before = structuredClone(campaign);
   selectGuidedToday(campaign, { minutes: 60, now: at(22) });
+  assert.deepEqual(campaign, before);
+});
+
+const coachState = (extra = {}) => state({
+  activeCharacterId: 'carnitez-silvermoon-eu', characters: [starterCharacter()], ...extra
+});
+
+test('the coach sends a fresh campaign to the setup wizard', () => {
+  assert.equal(selectCoachHint(coachState(), { now: at(22) }).id, 'run-setup');
+});
+
+test('the coach asks for a first plan once activities exist', () => {
+  const campaign = coachState({ activities: [plannedActivity('work', 'carnitez-silvermoon-eu')] });
+  assert.equal(selectCoachHint(campaign, { now: at(22) }).id, 'plan-first-session');
+});
+
+test('the coach points at a ready plan for today', () => {
+  const campaign = coachState({
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')],
+    sessionPlans: [sessionPlan('ready', 'ready', { plannedFor: '2026-07-22' })]
+  });
+  assert.equal(selectCoachHint(campaign, { now: at(22) }).id, 'start-ready-plan');
+});
+
+test('a paused session outranks everything else', () => {
+  const campaign = coachState({
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')],
+    sessionPlans: [sessionPlan('paused', 'paused', { startedAt: iso(22, 10), pausedAt: iso(22, 11) })]
+  });
+  assert.equal(selectCoachHint(campaign, { now: at(22) }).id, 'resume-session');
+});
+
+test('the coach nudges about stale gold only once sessions are being played', () => {
+  const stale = coachState({
+    activities: [
+      plannedActivity('work', 'carnitez-silvermoon-eu'),
+      { id: 'sess', characterId: 'carnitez-silvermoon-eu', kind: 'session', occurredAt: iso(21), durationMinutes: 40, gold: { delta: 0 } },
+      { id: 'gold', characterId: 'carnitez-silvermoon-eu', kind: 'gold', occurredAt: iso(1), durationMinutes: 10, gold: { revenue: 5, cost: 0, delta: 5 } }
+    ],
+    sessionPlans: [sessionPlan('done', 'completed', { completedAt: iso(21) })]
+  });
+  assert.equal(selectCoachHint(stale, { now: at(22) }).id, 'log-gold');
+});
+
+test('the coach stays quiet when the campaign is healthy', () => {
+  const campaign = coachState({
+    activities: [
+      plannedActivity('work', 'carnitez-silvermoon-eu'),
+      { id: 'gold', characterId: 'carnitez-silvermoon-eu', kind: 'gold', occurredAt: iso(21), durationMinutes: 10, gold: { revenue: 5, cost: 0, delta: 5 } }
+    ],
+    sessionPlans: [sessionPlan('done', 'completed', { completedAt: iso(21) })]
+  });
+  assert.equal(selectCoachHint(campaign, { now: at(22) }), null);
+});
+
+test('a dismissed hint stays gone for seven days and then returns', () => {
+  const campaign = coachState({ activities: [plannedActivity('work', 'carnitez-silvermoon-eu')] });
+  const dismissed = { ...campaign, preferences: { coachDismissals: { 'plan-first-session': iso(20) } } };
+  assert.equal(selectCoachHint(dismissed, { now: at(22) }), null);
+  assert.equal(selectCoachHint(dismissed, { now: at(28) })?.id, 'plan-first-session');
+});
+
+test('dismissing one hint does not silence the others', () => {
+  const campaign = coachState({
+    activities: [plannedActivity('work', 'carnitez-silvermoon-eu')],
+    sessionPlans: [sessionPlan('paused', 'paused', { startedAt: iso(22, 10), pausedAt: iso(22, 11) })],
+    preferences: { coachDismissals: { 'resume-session': iso(22) } }
+  });
+  // The next applicable rule takes over. It is not plan-first-session: a session plan
+  // already exists, so that rule correctly does not apply.
+  assert.equal(selectCoachHint(campaign, { now: at(22) })?.id, 'log-gold');
+});
+
+test('the coach never mutates canonical state', () => {
+  const campaign = coachState({ activities: [plannedActivity('work', 'carnitez-silvermoon-eu')] });
+  const before = structuredClone(campaign);
+  selectCoachHint(campaign, { now: at(22) });
   assert.deepEqual(campaign, before);
 });

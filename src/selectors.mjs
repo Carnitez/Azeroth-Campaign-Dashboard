@@ -402,6 +402,60 @@ export function selectGuidedToday(state, { minutes = null, now = new Date() } = 
   };
 }
 
+const COACH_DISMISS_DAYS = 7;
+const GOLD_STALE_DAYS = 7;
+
+/*
+ * The single most useful next step, or null when the campaign is healthy. Rules are
+ * ordered by urgency and evaluated top-down; the first that applies wins. Deterministic
+ * and explainable by design — no learning, no invented advice.
+ */
+export function selectCoachHint(state, { now = new Date() } = {}) {
+  const rosterIds = new Set(activeCharacters(state).map(item => item.id));
+  const activities = list(state?.activities).filter(item => rosterIds.has(item.characterId) && item.source !== 'legacy-v1');
+  const plans = list(state?.sessionPlans);
+  const todayKey = Core.localDateKey(now);
+  const hints = [];
+
+  if (selectCampaignStage(state) === 'fresh') {
+    hints.push({ id: 'run-setup', message: 'Set up your campaign in three questions.', actionLabel: 'Start setup', action: 'run-setup' });
+  } else {
+    const paused = plans.find(plan => plan.status === 'paused');
+    if (paused) hints.push({ id: 'resume-session', message: 'You have a paused session waiting.', actionLabel: 'Resume', action: 'open-session', sourceId: paused.id });
+
+    const running = plans.find(plan => plan.status === 'in_progress');
+    if (running) hints.push({ id: 'open-session', message: 'A session is running.', actionLabel: 'Open it', action: 'open-session', sourceId: running.id });
+
+    const readyToday = plans.find(plan => plan.status === 'ready' && plan.plannedFor && plan.plannedFor <= todayKey);
+    if (readyToday) hints.push({ id: 'start-ready-plan', message: 'Your session plan is ready to go.', actionLabel: 'Start it', action: 'start-session', sourceId: readyToday.id });
+
+    const hasActivities = activities.some(item => Activities.isPlannedActivity(item));
+    if (hasActivities && !plans.length) {
+      hints.push({ id: 'plan-first-session', message: 'You have activities but no session plan yet.', actionLabel: 'Plan a session', action: 'plan-session' });
+    }
+
+    // Only worth mentioning to someone who is actually playing.
+    const playing = plans.some(plan => ['completed', 'in_progress', 'paused'].includes(plan.status))
+      || activities.some(item => item.kind === 'session');
+    const latestGold = activities.filter(item => item.kind === 'gold')
+      .reduce((newest, item) => Math.max(newest, timestamp(item.occurredAt)), 0);
+    if (playing && timestamp(now) - latestGold > GOLD_STALE_DAYS * DAY_MS) {
+      hints.push({ id: 'log-gold', message: 'No gold logged in a while. Worth recording?', actionLabel: 'Log gold', action: 'log-gold' });
+    }
+
+    if (!hasActivities) {
+      hints.push({ id: 'add-activities', message: 'Add the things you actually do to get recommendations.', actionLabel: 'Add activities', action: 'create-activity' });
+    }
+  }
+
+  const dismissals = Core.isPlainObject(state?.preferences?.coachDismissals) ? state.preferences.coachDismissals : {};
+  const cutoff = timestamp(now) - COACH_DISMISS_DAYS * DAY_MS;
+  // A missing dismissal must read as "never dismissed"; timestamp() would otherwise
+  // resolve undefined to the current time and silence every hint.
+  const dismissedAt = id => (dismissals[id] ? timestamp(dismissals[id]) : 0);
+  return hints.find(hint => dismissedAt(hint.id) < cutoff) ?? null;
+}
+
 export const Selectors = Object.freeze({
   selectActiveGoals,
   selectGoalObjectiveCounts,
@@ -413,7 +467,8 @@ export const Selectors = Object.freeze({
   selectNextUp,
   selectOnboardingState,
   selectCampaignStage,
-  selectGuidedToday
+  selectGuidedToday,
+  selectCoachHint
 });
 
 globalThis.AzerothSelectors = Selectors;

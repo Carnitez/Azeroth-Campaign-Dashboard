@@ -1084,6 +1084,9 @@
      * that beats those class rules.
      */
     #azeroth-command-center details:not([open]) > *:not(summary) { display: none; }
+    #azeroth-command-center .acc-coach { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 0.75rem; padding: 0.55rem 0.75rem; border: 1px solid color-mix(in srgb, var(--acc-secondary) 32%, var(--border)); border-radius: 8px; background: color-mix(in srgb, var(--acc-secondary) 8%, transparent); font-size: 0.8rem; }
+    #azeroth-command-center .acc-coach > span { flex: 1; min-width: 12rem; }
+    #azeroth-command-center .acc-coach .btn { min-height: 2rem; }
     #azeroth-command-center .acc-more-summary { cursor: pointer; color: var(--acc-secondary); font-size: 0.75rem; padding: 0.45rem 0; }
     #azeroth-command-center .acc-guided { display: grid; gap: 0.6rem; margin-top: 0.6rem; padding: 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
     #azeroth-command-center .acc-guided-card { display: grid; gap: 0.45rem; padding: 0.9rem; border: 1px solid color-mix(in srgb, var(--acc-primary) 30%, var(--border)); border-radius: 9px; background: color-mix(in srgb, var(--acc-primary) 6%, transparent); }
@@ -1843,6 +1846,12 @@
         </div>
       </header>
 
+      <section class="acc-coach" id="acc-coach" role="status" hidden>
+        <span id="acc-coach-message"></span>
+        <button class="btn btn-primary" type="button" id="acc-coach-action"></button>
+        <button class="btn btn-ghost" type="button" id="acc-coach-dismiss" aria-label="Dismiss this suggestion"><i data-lucide="x" aria-hidden="true"></i></button>
+      </section>
+
       <main class="acc-main">
     <section class="acc-panel" id="acc-panel-overview" data-panel="overview">
       <section class="acc-command-header" aria-labelledby="acc-command-name">
@@ -2575,6 +2584,7 @@
         renderCollections(c);
         renderGold(c);
         renderJournal(c);
+        renderCoach();
         refreshIcons();
       }
       function renderCharacterSelect(c) {
@@ -2593,6 +2603,27 @@
       }
       // Filter bars are noise until there is enough in the list to actually filter.
       const FILTER_VISIBILITY_THRESHOLD = 8;
+      let currentCoachHint = null;
+      function renderCoach() {
+        currentCoachHint = Selectors.selectCoachHint(state, { now: new Date() });
+        const section = root.querySelector('#acc-coach');
+        section.hidden = !currentCoachHint;
+        if (!currentCoachHint) return;
+        root.querySelector('#acc-coach-message').textContent = currentCoachHint.message;
+        root.querySelector('#acc-coach-action').textContent = currentCoachHint.actionLabel;
+        refreshIcons();
+      }
+      function runCoachAction() {
+        const hint = currentCoachHint;
+        if (!hint) return;
+        if (hint.action === 'run-setup') {
+          state.preferences = { ...state.preferences, onboardingDismissed: false };
+          wizardState = { step: 1, interests: new Set(), minutes: Number(state.preferences?.defaultSessionMinutes) || 60 };
+          saveState(); activateTab('overview'); render();
+          return;
+        }
+        performCommandAction(hint.action, '', hint.sourceId || '');
+      }
       const GUIDED_TIME_CHIPS = [15, 30, 60, 90];
       let guidedMinutes = null;
       let guidedIndex = 0;
@@ -3835,6 +3866,12 @@
       root.querySelector('#acc-open-command').addEventListener('click', () => openCommandPalette());
       root.querySelector('#acc-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
       root.querySelector('#acc-command-character-select').addEventListener('change', e => { selectCharacter(e.target.value); });
+      root.querySelector('#acc-coach-action').addEventListener('click', () => runCoachAction());
+      root.querySelector('#acc-coach-dismiss').addEventListener('click', () => {
+        if (!currentCoachHint) return;
+        state.preferences = { ...state.preferences, coachDismissals: { ...(state.preferences?.coachDismissals || {}), [currentCoachHint.id]: new Date().toISOString() } };
+        saveState(); renderCoach();
+      });
       root.querySelector('#acc-schedule-presets').addEventListener('click', e => {
         const button = e.target.closest('[data-schedule-preset]');
         if (button) applySchedulePreset(button.dataset.schedulePreset);
