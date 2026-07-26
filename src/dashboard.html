@@ -1087,6 +1087,8 @@
     #azeroth-command-center .acc-coach { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 0.75rem; padding: 0.55rem 0.75rem; border: 1px solid color-mix(in srgb, var(--acc-secondary) 32%, var(--border)); border-radius: 8px; background: color-mix(in srgb, var(--acc-secondary) 8%, transparent); font-size: 0.8rem; }
     #azeroth-command-center .acc-coach > span { flex: 1; min-width: 12rem; }
     #azeroth-command-center .acc-coach .btn { min-height: 2rem; }
+    #azeroth-command-center .acc-session-wrapup { display: grid; gap: 0.3rem; margin: 0.75rem 0; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; background: var(--card); }
+    #azeroth-command-center .acc-session-wrapup h3 { margin: 0; font-size: 0.9rem; }
     #azeroth-command-center .acc-more-summary { cursor: pointer; color: var(--acc-secondary); font-size: 0.75rem; padding: 0.45rem 0; }
     #azeroth-command-center .acc-guided { display: grid; gap: 0.6rem; margin-top: 0.6rem; padding: 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
     #azeroth-command-center .acc-guided-card { display: grid; gap: 0.45rem; padding: 0.9rem; border: 1px solid color-mix(in srgb, var(--acc-primary) 30%, var(--border)); border-radius: 9px; background: color-mix(in srgb, var(--acc-primary) 6%, transparent); }
@@ -2241,14 +2243,14 @@
     <form method="dialog" id="acc-session-result-form">
       <div class="acc-dialog-head"><div><h2 id="acc-session-result-title">Record activity result</h2><span class="text-muted text-small" id="acc-session-result-subtitle"></span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-result-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
       <input type="hidden" name="itemId">
-      <div class="acc-form-grid"><label class="form-label">Result<select class="form-select" name="status"><option value="completed">Completed</option><option value="partial">Partially completed</option><option value="skipped">Skipped</option></select></label><label class="form-label">Actual minutes<input class="form-control" name="actualMinutes" type="number" min="0" max="1440" value="0" required></label><label class="form-label">Gold earned<input class="form-control" name="goldEarned" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Gold spent<input class="form-control" name="goldSpent" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Progress metric<input class="form-control" name="progressMetric" maxlength="100" placeholder="level or collection:mounts:owned"></label><label class="form-label">Progress gained<input class="form-control" name="progressGained" type="number" step="0.01" value="0"></label><label class="form-label">Completion quantity<input class="form-control" name="completionQuantity" type="number" min="0" step="1"></label><label class="form-label">Underlying activity<select class="form-select" name="completionMode"><option value="run">Log this run only</option><option value="complete">Complete underlying activity</option></select></label><label class="form-label wide">Result notes<textarea class="form-control" name="resultNotes" rows="3" maxlength="600"></textarea></label></div>
+      <div class="acc-form-grid"><label class="form-label">Result<select class="form-select" name="status"><option value="completed">Completed</option><option value="partial">Partially completed</option><option value="skipped">Skipped</option></select></label><label class="form-label">Actual minutes<input class="form-control" name="actualMinutes" type="number" min="0" max="1440" value="0" required></label><label class="form-label">Gold earned<input class="form-control" name="goldEarned" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Gold spent<input class="form-control" name="goldSpent" type="number" min="0" step="0.01" value="0"></label><label class="form-label">Completion quantity<input class="form-control" name="completionQuantity" type="number" min="0" step="1"></label><label class="form-label">Underlying activity<select class="form-select" name="completionMode"><option value="run">Log this run only</option><option value="complete">Complete underlying activity</option></select></label><label class="form-label wide">Result notes<textarea class="form-control" name="resultNotes" rows="3" maxlength="600"></textarea></label></div><details><summary class="acc-more-summary">More options</summary><div class="acc-form-grid"><label class="form-label">Progress metric<input class="form-control" name="progressMetric" maxlength="100" placeholder="level or collection:mounts:owned"></label><label class="form-label">Progress gained<input class="form-control" name="progressGained" type="number" step="0.01" value="0"></label></div></details>
       <div class="acc-actions"><button class="btn btn-primary" type="submit">Save result</button><button class="btn" type="button" data-close-dialog="acc-session-result-dialog">Cancel</button></div>
     </form>
   </dialog>
 
   <dialog id="acc-session-review-dialog" aria-labelledby="acc-session-review-title">
     <div class="acc-dialog-head"><div><h2 id="acc-session-review-title">Review session results</h2><span class="text-muted text-small">Correct individual results before final confirmation.</span></div><button class="btn btn-ghost" type="button" data-close-dialog="acc-session-review-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div>
-    <div class="acc-review-grid" id="acc-session-review-summary"></div><div class="acc-review-items" id="acc-session-review-items"></div><div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-confirm-session-results">Confirm & finish session</button><button class="btn" type="button" data-close-dialog="acc-session-review-dialog">Continue session</button></div>
+    <div class="acc-review-grid" id="acc-session-review-summary"></div><section class="acc-session-wrapup" id="acc-session-wrapup"><h3>Anything to record?</h3><span class="text-muted text-small">Optional. Saved once, here — no need to enter it again elsewhere.</span><div class="acc-form-grid" id="acc-wrapup-fields"></div></section><details><summary class="acc-more-summary">Per-activity results</summary><div class="acc-review-items" id="acc-session-review-items"></div></details><div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-confirm-session-results">Confirm & finish session</button><button class="btn" type="button" data-close-dialog="acc-session-review-dialog">Continue session</button></div>
   </dialog>
 
   <dialog id="acc-add-unplanned-dialog" aria-labelledby="acc-add-unplanned-title"><div class="acc-dialog-head"><h2 id="acc-add-unplanned-title">Add an unplanned activity</h2><button class="btn btn-ghost" type="button" data-close-dialog="acc-add-unplanned-dialog" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button></div><label class="form-label">Existing activity<select class="form-select" id="acc-unplanned-activity"></select></label><div class="acc-actions"><button class="btn btn-primary" type="button" id="acc-confirm-unplanned">Add to session</button><button class="btn" type="button" data-close-dialog="acc-add-unplanned-dialog">Cancel</button></div></dialog>
@@ -3319,7 +3321,63 @@
         root.querySelector('#acc-session-review-title').textContent = plan.status === 'completed' ? 'Edit session results' : 'Review session results';
         root.querySelector('#acc-confirm-session-results').textContent = plan.status === 'completed' ? 'Save corrected results' : 'Confirm & finish session';
         root.querySelector('#acc-session-review-summary').innerHTML = [['Planned', formatMinutes(summary.plannedMinutes)], ['Actual', formatMinutes(summary.actualMinutes)], ['Completed', String(summary.completed)], ['Skipped', String(summary.skipped)], ['Partial', String(summary.partial)], ['Unfinished', String(summary.unfinished)], ['Gold earned', formatGold(summary.goldEarned)], ['Net gold', `${summary.netGold >= 0 ? '+' : '−'}${formatGold(Math.abs(summary.netGold))}`]].map(([label, value]) => `<div class="acc-review-stat"><span>${label}</span><strong>${value}</strong></div>`).join('');
+        renderSessionWrapup(plan);
         root.querySelector('#acc-session-review-items').innerHTML = plan.items.map(item => `<article class="acc-review-row" data-review-item-id="${escapeHtml(item.id)}"><div class="acc-row-copy"><span class="acc-row-title">${escapeHtml(item.snapshot.title)}</span><span class="acc-row-meta"><span>${escapeHtml(sessionItemStatusLabels[item.status] || item.status)}</span><span>·</span><span>${formatMinutes(item.actualMinutes)} actual</span>${item.resultNotes ? `<span>·</span><span>${escapeHtml(item.resultNotes)}</span>` : ''}</span></div><span class="text-small text-muted">${item.goldEarned || item.goldSpent ? `${formatGold(item.goldEarned)} / ${formatGold(item.goldSpent)}` : ''}</span><button class="btn" type="button" data-review-action="edit">Edit result</button></article>`).join('');
+      }
+      // Activity categories that correspond to a tracked collection, so a session that
+      // touched them can offer the matching count instead of making you retype it in
+      // the Collections view.
+      const CATEGORY_TO_COLLECTION = Object.freeze({ Mounts: 'Mounts', Pets: 'Pets', Transmog: 'Appearances', Achievements: 'Achievements', Reputation: 'Reputations' });
+      function sessionWrapupTrackers(plan) {
+        const trackers = ensureCollectionTrackers(character());
+        const touched = new Set(plan.items.map(item => CATEGORY_TO_COLLECTION[item.snapshot?.category]).filter(Boolean));
+        return trackers.filter(tracker => touched.has(tracker.name));
+      }
+      function renderSessionWrapup(plan) {
+        const wrapup = root.querySelector('#acc-session-wrapup');
+        // Corrections re-open this dialog; the gold field would double-count there, and
+        // reconcileSessionResults already owns that path.
+        if (plan.status === 'completed') { wrapup.hidden = true; return; }
+        wrapup.hidden = false;
+        const trackers = sessionWrapupTrackers(plan);
+        root.querySelector('#acc-wrapup-fields').innerHTML = [
+          '<label class="form-label">Gold earned<input class="form-control" id="acc-wrapup-gold" type="number" min="0" step="0.01" placeholder="0"></label>',
+          ...trackers.map(tracker => `<label class="form-label">${escapeHtml(tracker.name)} owned now<input class="form-control" data-wrapup-tracker="${escapeHtml(tracker.id)}" type="number" min="0" step="1" placeholder="${Number(tracker.owned)}"></label>`)
+        ].join('');
+      }
+      /*
+       * Applies the wrap-up numbers before finalizing, so the one confirm writes gold,
+       * collection counts and their progress events together.
+       *
+       * Gold rides on the first completed item rather than being written straight to the
+       * character, so reconcileSessionResults stays the single writer and corrections
+       * cannot double-count. Collection counts are absolute, not deltas, so re-entering
+       * the same number is a no-op.
+       */
+      function applySessionWrapup(plan) {
+        const goldInput = root.querySelector('#acc-wrapup-gold');
+        const gold = Number(goldInput?.value);
+        let working = plan;
+        if (goldInput && goldInput.value !== '' && Number.isFinite(gold) && gold > 0) {
+          const target = working.items.find(item => item.status === 'completed') || working.items[0];
+          if (target) {
+            working = SessionEngine.updateSessionItemResult(working, target.id,
+              { ...target, status: target.status === 'skipped' ? 'completed' : target.status, goldEarned: Number(target.goldEarned || 0) + gold },
+              { now: new Date(), advance: false });
+            replaceSessionPlan(working);
+          }
+        }
+        const recordedAt = new Date().toISOString();
+        const owner = character();
+        for (const input of root.querySelectorAll('[data-wrapup-tracker]')) {
+          if (input.value === '') continue;
+          const tracker = state.collectionTrackers.find(item => item.id === input.dataset.wrapupTracker);
+          const owned = Math.max(0, Number(input.value));
+          if (!tracker || !Number.isFinite(owned) || owned === Number(tracker.owned)) continue;
+          tracker.owned = owned;
+          state.progressEvents.push({ id: uid('progress-collection'), entityType: 'character', entityId: owner.id, metric: `collection:${String(tracker.name).toLowerCase()}:owned`, value: owned, recordedAt, source: 'session-result' });
+        }
+        return sessionPlan(plan.id) || working;
       }
       function openSessionReview() {
         renderSessionReview();
@@ -4224,7 +4282,7 @@
         const plan = sessionPlan(runnerPlanId); if (!plan) return;
         try {
           if (plan.status === 'completed') { const reconciled = SessionEngine.reconcileSessionResults(state, plan); state = reconciled.state; const index = state.sessionPlans.findIndex(item => item.id === plan.id); state.sessionPlans[index] = reconciled.plan; }
-          else state = SessionEngine.finalizeSession(state, plan.id);
+          else { applySessionWrapup(plan); state = SessionEngine.finalizeSession(state, plan.id); }
           saveState(); render(); renderSessionRunner(); root.querySelector('#acc-session-review-dialog').close(); showToast(plan.status === 'completed' ? 'Corrected results saved without duplicate records.' : 'Session completed and results applied.');
         } catch (error) { showToast(error.message, { tone: 'warning', duration: 8000 }); }
       });
